@@ -18,6 +18,7 @@ public class Connection extends Thread {
 	public Connection(int portnumber, String mcaddress) {
 		
 		try {
+			Update u = new Update()
 			InetAddress address = InetAddress.getByName(mcaddress);
 			socket = new MulticastSocket(portnumber);
 			socket.joinGroup(address);
@@ -33,6 +34,7 @@ public class Connection extends Thread {
 		
 		byte[] buffer = new byte[1000];
 		DatagramPacket recv = new DatagramPacket(buffer, buffer.length);
+		
 		try {
 			socket.receive(recv);
 		} catch (IOException e) {
