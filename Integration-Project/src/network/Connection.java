@@ -32,6 +32,7 @@ public class Connection extends Thread {
 	}
 	
 	//Tries to receive a new datagram, if it gets one, put it in the queue.
+	//TODO must stop if the rest of the program stops...
 	public void run() {
 		while(true) {
 			byte[] buffer = new byte[1000];

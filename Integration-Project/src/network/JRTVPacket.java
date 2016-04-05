@@ -23,10 +23,7 @@ public class JRTVPacket {
 	private boolean update = false;
 	private boolean normal = false;
 	private boolean fin = false;
-	
-	
-	
-	
+
 	public JRTVPacket(String message) {
 		this.message = message;
 	}
@@ -64,6 +61,44 @@ public class JRTVPacket {
 		setFlags(flags);
 	}
 	
+	public byte[] toByteArray() {
+		byte[] result = new byte[HEADERLENGTH + message.getBytes().length];
+		
+		byte[] dest = intToByteArray(destination);
+		result[0] = dest[0];
+		result[1] = dest[1];
+		result[2] = dest[2];
+		result[3] = dest[3];
+		
+		byte[] src = intToByteArray(source);
+		result[4] = src[0];
+		result[5] = src[1];
+		result[6] = src[2];
+		result[7] = src[3];
+		
+		byte[] seq = intToByteArray(seqnr);
+		result[8] = seq[0];
+		result[9] = seq[1];
+		result[10] = seq[2];
+		result[11] = seq[3];
+		
+		byte[] ack = intToByteArray(acknr);
+		result[12] = ack[0];
+		result[13] = ack[1];
+		result[14] = ack[2];
+		result[15] = ack[3];
+		
+		byte[] hpayload = intToByteArray(hashPayload);
+		result[16] = hpayload[1];
+		result[17] = hpayload[2];
+		result[18] = hpayload[3];
+		
+		result[19] = getByteFlags();
+		
+		System.arraycopy(message.getBytes(), 0, result, 20, message.getBytes().length);
+		return result;
+	}
+	
 	private void setFlags(byte[] flags) {
 		Byte b = flags[0];
 		int value = b.intValue();
@@ -87,6 +122,28 @@ public class JRTVPacket {
 			fin = true;
 			value =- 8;
 		}
+	}
+	
+	private byte getByteFlags() {
+		int value = 0;
+		byte b = 0;
+		if (syn) {
+			value =+ 128;
+		}
+		if (ack) {
+			value =+ 64;
+		}
+		if (update) {
+			value =+ 32;
+		}
+		if (normal) {
+			value =+ 16;
+		}
+		if (fin) {
+			value =+ 8;
+		}
+		b = (byte) value;
+		return b;
 	}
 	
 	private static int byteArrayToInt(byte[] b) {

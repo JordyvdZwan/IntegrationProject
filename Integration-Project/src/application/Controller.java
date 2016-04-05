@@ -10,8 +10,9 @@ public class Controller extends Thread {
 
 	View view;
 	Connection connection;
-	
 	InetAddress IAddress;
+	
+	String clientName = "Anonomous";
 	
 	public Controller(View view) {
 		this.view = view;
@@ -47,6 +48,14 @@ public class Controller extends Thread {
 	public void sendMessage(String client, String message) {
 		DatagramPacket data = new DatagramPacket(message.getBytes(), message.getBytes().length, IAddress, 2000);
 		connection.send(data);
+	}
+	
+	public void setClientName(String clientName) {
+		this.clientName = clientName;
+	}
+	
+	public String getClientName() {
+		return clientName;
 	}
 	
 	public InetAddress getAddress() {
