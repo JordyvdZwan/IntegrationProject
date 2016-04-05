@@ -18,6 +18,7 @@ public class Connection extends Thread {
 	public Connection(int portnumber, String mcaddress) {
 		
 		try {
+
 			InetAddress address = InetAddress.getByName(mcaddress);
 			socket = new MulticastSocket(portnumber);
 			socket.joinGroup(address);
@@ -38,6 +39,8 @@ public class Connection extends Thread {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+
+			System.out.println("Received packet from " + recv.getAddress() + "with " + recv.getLength() +  " bytes of data");
 			queuedpackets.add(recv);
 			recv.setLength(buffer.length);
 		}

@@ -30,10 +30,11 @@ public class View extends Application {
 	public void start(Stage primaryStage) {
 		try {
 			GridPane root = new GridPane();
+			root.setId("root");
 			
 			//Finalize Combobox
 			recipient.getItems().add("All");
-//			recipient.setValue("All");
+			recipient.setValue("All");
 			recipient.setMinWidth(200);
 			
 			//Finalize chatText
@@ -80,7 +81,9 @@ public class View extends Application {
 			Scene scene = new Scene(root,600,800);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
+			primaryStage.setFullScreen(true);
 			primaryStage.show();
+			
 			controller.start();
 		} catch(Exception e) {
 			e.printStackTrace();
