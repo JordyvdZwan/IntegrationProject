@@ -22,7 +22,9 @@ public class View extends Application {
 	Button sendButton = new Button();
 	TextField inputField = new TextField();
 	ComboBox<String> recipient = new ComboBox<String>();
-	Controller controller;
+	
+	
+	Controller controller = new Controller(this);
 	
 	@Override
 	public void start(Stage primaryStage) {
@@ -46,7 +48,9 @@ public class View extends Application {
 			sendButton.setMinWidth(80);
 			sendButton.setText("Send");
 			sendButton.setOnAction(new EventHandler<ActionEvent>() {
-			    @Override public void handle(ActionEvent e) {
+				
+			    @Override 
+			    public void handle(ActionEvent e) {
 		    		if (recipient.getValue() == null) {
 		    			Stage dialog = new Stage();
 		    			dialog.initStyle(StageStyle.UTILITY);
@@ -55,12 +59,15 @@ public class View extends Application {
 		    			dialog.show();
 		    		} else {
 		    			if (!inputField.getText().isEmpty()) {
-			    			chatText.setText(chatText.getText() + "\n" + recipient.getValue() + ": " + inputField.getText());
+			    			chatText.setText(chatText.getText() + "\n" + "You" + ": " + inputField.getText());
+			    			//recipient.getValue()
+			    			//inputField.getText()
 			    			controller.sendMessage(recipient.getValue(), inputField.getText());
 			    			inputField.clear();
 		    			}
 		    		}
 			    }
+			    
 			});
 			
 			//Put all the controls in the pane.
@@ -74,7 +81,7 @@ public class View extends Application {
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
 			primaryStage.show();
-			controller = new Controller(this);
+			controller.start();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

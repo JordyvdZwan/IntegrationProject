@@ -2,39 +2,50 @@ package application;
 
 import java.net.DatagramPacket;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 import network.Connection;
 
-public class Controller {
+public class Controller extends Thread {
 
 	View view;
 	Connection connection;
 	
+	InetAddress IAddress;
+	
 	public Controller(View view) {
 		this.view = view;
 		
-		String address = "224.0.0.1";
+		String address = "224.0.0.2";
+		try {
+			IAddress = InetAddress.getByName(address);
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		int port = 2000;
 		
 		connection = new Connection(port, address);
-		
-		start();
 	}
 	
-	public void start() {
+	public void run() {
 		while (true) {
-			DatagramPacket data = connection.getFirstInQueue();
-			String message = new String(data.getData());
-			view.addMessage(data.getAddress().toString(), message);
+			DatagramPacket data;
+			if((data = connection.getFirstInQueue()) != null) {
+				String message = new String(data.getData());
+				view.addMessage(data.getAddress().toString(), message);
+			}
+			try {
+				this.sleep(100);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 	
 	public void sendMessage(String client, String message) {
-		DatagramPacket data = new DatagramPacket(message.getBytes(), message.getBytes().length);
+		DatagramPacket data = new DatagramPacket(message.getBytes(), message.getBytes().length, IAddress, 2000);
 		connection.send(data);
 	}
-	
-	
-	
-	
 }
