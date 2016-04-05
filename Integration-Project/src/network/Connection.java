@@ -22,6 +22,9 @@ public class Connection extends Thread {
 			InetAddress address = InetAddress.getByName(mcaddress);
 			socket = new MulticastSocket(portnumber);
 			socket.joinGroup(address);
+			System.out.println(socket.getLocalAddress().toString());
+			System.out.println(socket.getInterface().toString());
+			System.out.println(socket.getInetAddress().toString());
 		} catch(IOException e) {
 			e.printStackTrace();
 		}

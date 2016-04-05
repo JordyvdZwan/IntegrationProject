@@ -48,4 +48,8 @@ public class Controller extends Thread {
 		DatagramPacket data = new DatagramPacket(message.getBytes(), message.getBytes().length, IAddress, 2000);
 		connection.send(data);
 	}
+	
+	public InetAddress getAddress() {
+		return IAddress;
+	}
 }
