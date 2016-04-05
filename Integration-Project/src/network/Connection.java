@@ -3,6 +3,7 @@ package network;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.MulticastSocket;
+import java.net.SocketException;
 import java.net.InetAddress;
 import java.util.List;
 import java.util.ArrayList;
@@ -14,20 +15,19 @@ public class Connection extends Thread {
 	MulticastSocket socket;
 	InetAddress paddress;
 	List<DatagramPacket> queuedpackets = new ArrayList<DatagramPacket>();
+	Update update;
 	
 	public Connection(int portnumber, String mcaddress) {
 		
 		try {
-			
 			InetAddress address = InetAddress.getByName(mcaddress);
 			socket = new MulticastSocket(portnumber);
 			socket.joinGroup(address);
-			System.out.println(socket.getLocalAddress().toString());
-			System.out.println(socket.getInterface().toString());
-			System.out.println(socket.getInetAddress().toString());
 		} catch(IOException e) {
 			e.printStackTrace();
 		}
+		update =  new Update("Vincent", this);
+		
 		this.start();
 	}
 	
@@ -42,6 +42,7 @@ public class Connection extends Thread {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+
 			System.out.println("Received packet from " + recv.getAddress() + "with " + recv.getLength() +  " bytes of data");
 			queuedpackets.add(recv);
 			recv.setLength(buffer.length);
