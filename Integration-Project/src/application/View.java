@@ -14,7 +14,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 
-
 public class View extends Application {
 	
 	//Initializing all controls on of the program
@@ -22,7 +21,6 @@ public class View extends Application {
 	Button sendButton = new Button();
 	TextField inputField = new TextField();
 	ComboBox<String> recipient = new ComboBox<String>();
-	
 	
 	Controller controller = new Controller(this);
 	
