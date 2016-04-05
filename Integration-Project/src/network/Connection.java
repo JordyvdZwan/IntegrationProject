@@ -18,7 +18,6 @@ public class Connection extends Thread {
 	public Connection(int portnumber, String mcaddress) {
 		
 		try {
-			Update u = new Update()
 			InetAddress address = InetAddress.getByName(mcaddress);
 			socket = new MulticastSocket(portnumber);
 			socket.joinGroup(address);
@@ -30,17 +29,19 @@ public class Connection extends Thread {
 	
 	//Tries to receive a new datagram, if it gets one, put it in the queue.
 	public void run() {
-		
-		byte[] buffer = new byte[1000];
-		DatagramPacket recv = new DatagramPacket(buffer, buffer.length);
-		
-		try {
-			socket.receive(recv);
-		} catch (IOException e) {
-			e.printStackTrace();
+		while(true) {
+			byte[] buffer = new byte[1000];
+			DatagramPacket recv = new DatagramPacket(buffer, buffer.length);
+			
+			try {
+				socket.receive(recv);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			queuedpackets.add(recv);
+			recv.setLength(buffer.length);
 		}
-		queuedpackets.add(recv);
-		recv.setLength(buffer.length);
+
 	}
 	
 	//Sends a datagrampacket coming from the client
