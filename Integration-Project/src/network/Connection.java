@@ -26,7 +26,7 @@ public class Connection extends Thread {
 		} catch(IOException e) {
 			e.printStackTrace();
 		}
-		update =  new Update("Vincent", this);
+		//update =  new Update("Vincent", this);
 		
 		this.start();
 	}
