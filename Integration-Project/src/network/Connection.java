@@ -42,6 +42,7 @@ public class Connection extends Thread {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+
 			System.out.println("Received packet from " + recv.getAddress() + "with " + recv.getLength() +  " bytes of data");
 			queuedpackets.add(recv);
 			recv.setLength(buffer.length);
