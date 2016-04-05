@@ -7,6 +7,8 @@ import java.net.InetAddress;
 import java.util.List;
 import java.util.ArrayList;
 
+
+
 public class Connection extends Thread {
 	
 	MulticastSocket socket;
