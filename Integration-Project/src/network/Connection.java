@@ -3,6 +3,7 @@ package network;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.MulticastSocket;
+import java.net.SocketException;
 import java.net.InetAddress;
 import java.util.List;
 import java.util.ArrayList;
@@ -18,7 +19,6 @@ public class Connection extends Thread {
 	public Connection(int portnumber, String mcaddress) {
 		
 		try {
-
 			InetAddress address = InetAddress.getByName(mcaddress);
 			socket = new MulticastSocket(portnumber);
 			socket.joinGroup(address);
@@ -28,6 +28,7 @@ public class Connection extends Thread {
 		} catch(IOException e) {
 			e.printStackTrace();
 		}
+		System.out.println(socket.getInetAddress().getHostAddress());
 		this.start();
 	}
 	
