@@ -22,7 +22,6 @@ public class Connection extends Thread {
 			InetAddress address = InetAddress.getByName(mcaddress);
 			socket = new MulticastSocket(portnumber);
 			socket.joinGroup(address);
-			
 		} catch(IOException e) {
 			e.printStackTrace();
 		}
@@ -59,11 +58,11 @@ public class Connection extends Thread {
 	}
 	
 	public DatagramPacket getFirstInQueue() {
-		
-		DatagramPacket selectedpacket = queuedpackets.get(0);
-		queuedpackets.remove(0);
-		
+		DatagramPacket selectedpacket = null;
+		if (!queuedpackets.isEmpty()) {
+			selectedpacket = queuedpackets.get(0);
+			queuedpackets.remove(0);
+		}
 		return selectedpacket;
-	
 	}
 }
