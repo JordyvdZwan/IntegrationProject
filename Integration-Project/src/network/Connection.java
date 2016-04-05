@@ -15,6 +15,7 @@ public class Connection extends Thread {
 	MulticastSocket socket;
 	InetAddress paddress;
 	List<DatagramPacket> queuedpackets = new ArrayList<DatagramPacket>();
+	Update update;
 	
 	public Connection(int portnumber, String mcaddress) {
 		
@@ -22,13 +23,11 @@ public class Connection extends Thread {
 			InetAddress address = InetAddress.getByName(mcaddress);
 			socket = new MulticastSocket(portnumber);
 			socket.joinGroup(address);
-			System.out.println(socket.getLocalAddress().toString());
-			System.out.println(socket.getInterface().toString());
-			System.out.println(socket.getInetAddress().toString());
 		} catch(IOException e) {
 			e.printStackTrace();
 		}
-		System.out.println(socket.getInetAddress().getHostAddress());
+		update =  new Update("Vincent", this);
+		
 		this.start();
 	}
 	
