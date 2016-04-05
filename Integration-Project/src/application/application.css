@@ -29,4 +29,5 @@
 
 .root {
 	-fx-padding: 10;
+	-fx-background-color: lightgray;
 }
