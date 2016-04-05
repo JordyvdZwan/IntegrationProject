@@ -22,6 +22,7 @@ public class View extends Application {
 	Button sendButton = new Button();
 	TextField inputField = new TextField();
 	ComboBox<String> recipient = new ComboBox<String>();
+	Controller controller;
 	
 	@Override
 	public void start(Stage primaryStage) {
@@ -55,6 +56,7 @@ public class View extends Application {
 		    		} else {
 		    			if (!inputField.getText().isEmpty()) {
 			    			chatText.setText(chatText.getText() + "\n" + recipient.getValue() + ": " + inputField.getText());
+			    			controller.sendMessage(recipient.getValue(), inputField.getText());
 			    			inputField.clear();
 		    			}
 		    		}
@@ -72,7 +74,7 @@ public class View extends Application {
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
 			primaryStage.show();
-			
+			controller = new Controller(this);
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -96,7 +98,6 @@ public class View extends Application {
 	}
 	
 	public void addMessage(String client, String message) {
-		
-		
+		chatText.setText(chatText.getText() + "\n" + client + ": " + message);
 	}
 }
