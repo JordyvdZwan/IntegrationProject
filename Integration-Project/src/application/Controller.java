@@ -37,10 +37,10 @@ public class Controller extends Thread {
 		int port = 2000;
 		connection = new Connection(port, address);
 		update = new Update(this);
-		settupIP();
+		setupIP();
 	}
 	
-	private void settupIP() {
+	private void setupIP() {
 		boolean found = false;
 		initString = randomString();
 		while (settingUp) {
