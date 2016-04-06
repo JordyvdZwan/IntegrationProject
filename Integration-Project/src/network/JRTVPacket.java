@@ -28,7 +28,7 @@ public class JRTVPacket {
 		this.message = message;
 	}
 	
-	public JRTVPacket(Byte[] bytes) {
+	public JRTVPacket(byte[] bytes) {
 		byte[] message = new byte[bytes.length - HEADERLENGTH];
 		System.arraycopy(bytes, HEADERLENGTH, message, 0, bytes.length - HEADERLENGTH);
 		this.message = new String(message);
