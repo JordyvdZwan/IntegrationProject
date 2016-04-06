@@ -180,7 +180,6 @@ public class View extends Application {
     			chatText.appendText("\n" + "You" + ": " + inputField.getText());
     			chatText.setScrollTop(Double.MIN_VALUE);
     			controller.receiveFromView(recipient.getValue(), inputField.getText());
-    			
     			inputField.requestFocus();
     			inputField.clear();
 			}
