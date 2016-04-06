@@ -78,9 +78,12 @@ public class View extends Application {
 			    @Override
 			    public void changed(ObservableValue<?> observable, Object oldValue,
 			            Object newValue) {
-			    	chatText.setScrollTop(Double.MAX_VALUE);
+			    	chatText.setScrollTop(Double.MIN_VALUE);
 			    }
 			});
+			
+			
+			
 			
 			//Finalize nameField
 			nameField.setId("textfield");
@@ -175,6 +178,7 @@ public class View extends Application {
 		} else {
 			if (!inputField.getText().isEmpty()) {
     			chatText.appendText("\n" + "You" + ": " + inputField.getText());
+    			chatText.setScrollTop(Double.MIN_VALUE);
     			controller.sendMessage(recipient.getValue(), inputField.getText());
     			
     			inputField.requestFocus();

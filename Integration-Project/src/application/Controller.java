@@ -12,7 +12,7 @@ public class Controller extends Thread {
 	Connection connection;
 	InetAddress IAddress;
 	
-	String clientName = "Anonomous";
+	String clientName = "Anonymous";
 	
 	public Controller(View view) {
 		this.view = view;
