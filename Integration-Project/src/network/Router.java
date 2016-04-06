@@ -12,7 +12,7 @@ import application.Controller;
 public class Router {
 	
 	private Controller controller;
-	Map<InetAddress, String> addresstable = new HashMap<InetAddress, String>();
+	Map<Integer, String> addresstable = new HashMap<Integer, String>();
 	
 	
 	public Router(Controller controller) {
@@ -23,14 +23,15 @@ public class Router {
 		return null;
 	}
 	
-	public InetAddress getIP(String client) {
+	public Integer getIP(String client) {
 		
-		InetAddress result = null;
+		Integer result = null;
 		
 		if (client.equals("Anonymous")) {
-			result =  controller.getMulticastAddress();
+			//result =  controller.getMulticastAddress().;
+			result = null;
 		} else { 
-			for(InetAddress e: addresstable.keySet()) {
+			for(Integer e: addresstable.keySet()) {
 				if(addresstable.get(e).equals(client)) {
 					result = e;
 					break;
@@ -63,7 +64,7 @@ public class Router {
 		return addresstable.get(address).toString();
 	}
 	
-	public void setEntry(InetAddress address, String name) {
+	public void setEntry(Integer address, String name) {
 		if(addresstable.containsKey(address)) {
 			addresstable.remove(address);
 		}

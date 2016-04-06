@@ -102,7 +102,7 @@ public class Controller extends Thread {
 		
 //		System.out.println(message.getAddress());
 		JRTVPacket packet = new JRTVPacket(message.getData());
-
+		String source = message.getAddress().toString();
 		System.out.println("is het een update? : " + packet.isUpdate());
 		System.out.println(router.getName(message.getAddress()));
 		System.out.println("is het een normal? : " + packet.isNormal());
@@ -110,7 +110,7 @@ public class Controller extends Thread {
 		if(packet.isNormal()) {
 			handleNormal(packet);
 		} else if (packet.isUpdate()) {
-			handleUpdate(message);
+			handleUpdate(packet);
 		} else if (packet.isSyn()) {
 			handleSyn(packet);
 		} else if (packet.isFin()) {
@@ -126,8 +126,8 @@ public class Controller extends Thread {
 		//TODO: implement setting the right sequence and acknowledgement numbers
 	}
 	
-	public void handleUpdate(DatagramPacket p) {
-		router.setEntry(p.getAddress(), p.getData().toString());
+	public void handleUpdate(JRTVPacket p) {
+		router.setEntry(p.getSource(), p.getMessage());
 		
 	}
 	
