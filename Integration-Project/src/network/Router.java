@@ -12,7 +12,7 @@ import application.Controller;
 public class Router {
 	
 	private Controller controller;
-	Map<Integer, String> addresstable = new HashMap<Integer, String>();
+	Map<InetAddress, String> addresstable = new HashMap<InetAddress, String>();
 	
 	
 	public Router(Controller controller) {
@@ -30,13 +30,9 @@ public class Router {
 		if (client.equals("Anonymous")) {
 			result =  controller.getMulticastAddress();
 		} else { 
-			for(Integer e: addresstable.keySet()) {
+			for(InetAddress e: addresstable.keySet()) {
 				if(addresstable.get(e).equals(client)) {
-					try {
-						result = InetAddress.getByName("" + e);
-					} catch (UnknownHostException e1) {
-						e1.printStackTrace();
-					}
+					result = e;
 					break;
 				}
 			}
@@ -64,7 +60,7 @@ public class Router {
 		return addresstable.get(address);
 	}
 	
-	public void setEntry(Integer address, String name) {
+	public void setEntry(InetAddress address, String name) {
 		if(addresstable.containsKey(address)) {
 			addresstable.remove(address);
 		}

@@ -18,7 +18,9 @@ public class Update extends Thread {
 	
 	public void run() {
 		while(true) {
-			controller.broadcastMessage(controller.getClientName());
+			JRTVPacket packet = new JRTVPacket(controller.getClientName());
+			packet.setUpdate(true);
+			controller.broadcastMessage(packet.toByteArray().toString());
 			try {
 				TimeUnit.SECONDS.sleep(1);
 			} catch (InterruptedException e) {
