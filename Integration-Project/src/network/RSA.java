@@ -10,7 +10,7 @@ public class RSA {
 	
 	private static final int LENGTH = 1024;
 	
-	public RSA(int bits) {
+	public RSA() {
 		SecureRandom r = new SecureRandom();
 		BigInteger p = new BigInteger("3");//new BigInteger(LENGTH / 2, 100, r);
 		BigInteger q = new BigInteger("11");//new BigInteger(LENGTH / 2, 100, r);
@@ -40,7 +40,7 @@ public class RSA {
 	public boolean verify(String signature, String message) {
 		Integer hashed = message.hashCode();
 		return (new BigInteger(signature.getBytes()).modPow(e, n).toString()
-				.equals(new BigInteger(hashed.toString())));
+				.equals(new BigInteger(hashed.toString()).toString()));
 	}
 	
 }
