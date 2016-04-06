@@ -32,4 +32,12 @@ public class JRTVtest {
 		byte syn = (byte) 192;
 		assertEquals(pakket[19], syn);
 	}
+	
+	@Test
+	public void testSequence() {
+		packet.setSeqnr(82);
+		byte[] pakket = packet.toByteArray();
+		byte seq = (byte) 82;
+		assertEquals(pakket[8] + pakket[9] + pakket[10] + pakket[11], seq);
+	}
 }
