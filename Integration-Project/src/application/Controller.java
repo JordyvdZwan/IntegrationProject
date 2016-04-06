@@ -5,6 +5,7 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.SecureRandom;
+import java.util.Map;
 
 import network.Connection;
 import network.JRTVPacket;
@@ -15,7 +16,8 @@ public class Controller extends Thread {
 	private View view;
 	private Connection connection;
 	private InetAddress multicastIAddress;
-	private int localIAddress;
+	private int localIAddress = 0;
+	public static int multicastAddress = IPtoInt("224.0.0.2");
 	private Router router = new Router(this);
 	private Update update;
 	private boolean settingUp = true;
@@ -41,7 +43,6 @@ public class Controller extends Thread {
 	}
 	
 	private void setupIP() {
-		boolean found = false;
 		initString = randomString();
 		while (settingUp) {
 			DatagramPacket data;
@@ -65,10 +66,9 @@ public class Controller extends Thread {
 				e.printStackTrace();
 			}
 		}
-		view.addMessage("SYS", "Your ip is: " + localIAddress);
 	}
 	
-	private int IPtoInt(String ipaddress) {
+	private static int IPtoInt(String ipaddress) {
 		int[] ip = new int[4];
 		String[] parts = ipaddress.split("\\.");
 
@@ -80,6 +80,10 @@ public class Controller extends Thread {
 		    ipNumbers += ip[i] << (24 - (8 * i));
 		}
 		return (int) ipNumbers;
+	}
+	
+	public Map<Integer, InetAddress> getForwardingTable() {
+		return router.getTable();
 	}
 	
 	private SecureRandom random = new SecureRandom();
@@ -122,8 +126,11 @@ public class Controller extends Thread {
 		} else {
 			JRTVPacket packet = new JRTVPacket(message);
 			packet.setNormal(true);
-			packet.setSource(router.getLocalIntAddress());			
+			packet.setSource(localIAddress);			
 			packet.setDestination(router.getIntIP(client));
+			if (router.getIntIP(client) == Controller.multicastAddress) {
+				packet.setBroadcasted(true);
+			}
 			
 			System.out.println(packet.toString()); //TODO
 			DatagramPacket data = new DatagramPacket(packet.toByteArray(), packet.toByteArray().length, router.getRouteIP(client), 2000);
@@ -135,6 +142,9 @@ public class Controller extends Thread {
 	public void sendPacket(String client, JRTVPacket packet) {
 		packet.setSource(router.getLocalIntAddress());			
 		packet.setDestination(router.getIntIP(client));
+		if (router.getIntIP(client) == Controller.multicastAddress) {
+			packet.setBroadcasted(true);
+		}
 		
 		System.out.println(packet.toString()); //TODO
 		DatagramPacket data = new DatagramPacket(packet.toByteArray(), packet.toByteArray().length, router.getRouteIP(client), 2000);
@@ -151,6 +161,10 @@ public class Controller extends Thread {
 		sendMessage("Anonymous", message);
 	}
 	
+	public Router getRouter() {
+		return router;
+	}
+	
 	//HIERONDER IS SAFE VINCENT!
 	//-----------------VVVVVVVVVVVVVVVVVVVVVVVV-------------------------
 	
@@ -165,10 +179,6 @@ public class Controller extends Thread {
 //		System.out.println(message.getAddress());
 		JRTVPacket packet = new JRTVPacket(message.getData());
 		String source = message.getAddress().toString();
-		System.out.println("is het een update? : " + packet.isUpdate());
-//		System.out.println(router.getName(message.getAddress()));
-		System.out.println("is het een normal? : " + packet.isNormal());
-		System.out.println(packet.toString());
 		if(packet.isNormal()) {
 			handleNormal(packet);
 		} else if (packet.isUpdate()) {

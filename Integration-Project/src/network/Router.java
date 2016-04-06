@@ -69,6 +69,10 @@ public class Router {
 		addresstable.put(address, name);
 	}
 	
+	public Map<Integer, InetAddress> getTable() {
+		return table.getTable();
+	}
+	
 	//TO BE IMPLEMENTED
 	
 	public int getLocalIntAddress() {
