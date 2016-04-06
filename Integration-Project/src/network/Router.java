@@ -57,7 +57,10 @@ public class Router {
 	
 	
 	public String getName(InetAddress address) {
-		return addresstable.get(address);
+		if(!addresstable.containsKey(address)) {
+			return null;
+		}
+		return addresstable.get(address).toString();
 	}
 	
 	public void setEntry(InetAddress address, String name) {

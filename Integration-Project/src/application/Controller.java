@@ -91,8 +91,8 @@ public class Controller extends Thread {
 	//-----------------VVVVVVVVVVVVVVVVVVVVVVVV-------------------------
 	
 	public void receiveFromView(String client, String message) {
-//		JRTVPacket packet = new JRTVPacket(message);
-//		packet.setNormal(true);
+		JRTVPacket packet = new JRTVPacket(message);
+		packet.setNormal(true);
 		sendMessage(client, message);
 	}
 	
@@ -100,7 +100,10 @@ public class Controller extends Thread {
 		
 		System.out.println(message.getAddress());
 		JRTVPacket packet = new JRTVPacket(message.getData());
-		System.out.println(packet.isUpdate());
+		System.out.println("is het een update? : " + packet.isUpdate());
+		System.out.println(router.getName(message.getAddress()));
+		System.out.println("is het een normal? : " + packet.isNormal());
+		
 		if(packet.isNormal()) {
 			handleNormal(packet);
 		} else if (packet.isUpdate()) {
