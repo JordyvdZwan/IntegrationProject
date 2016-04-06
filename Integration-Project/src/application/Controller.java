@@ -7,12 +7,14 @@ import java.net.UnknownHostException;
 import network.Connection;
 import network.JRTVPacket;
 import network.Router;
+import network.Update;
 public class Controller extends Thread {
 
 	View view;
 	Connection connection;
 	InetAddress IAddress;
-	Router router;
+	Router router = new Router(this);
+	Update update = new Update(this);
 	
 	String clientName = "Anonymous";
 	
@@ -49,21 +51,34 @@ public class Controller extends Thread {
 	//Sends the string message as payload to the client if it can see the client otherwise error
 	public void sendMessage(String client, String message) {
 		if (router.getIP() != null) {
-			DatagramPacket data = new DatagramPacket(message.getBytes(), message.getBytes().length, IAddress, 2000);
+			JRTVPacket packet = new JRTVPacket(message);
+			
+			
+			
+			
+			
+			DatagramPacket data = new DatagramPacket(, .length, router.getIP(), 2000);
 			connection.send(data);
+		} else if (client.equals("Anonymous")) {
+			broadcastPacket()
+		} else {
+			view.error("Recipient")
 		}
-		
+	}
+	
+	//sends the packet after processing the packet;
+	public void sendPacket(JRTVPacket packet) {
 		
 	}
 	
-	//sends the packet
-	public void sendPacket(JRTVPacket packet) {
+	//sends the packet after processing the packet;
+	public void broadcastPacket(JRTVPacket packet) {
 		
 	}
 	
 	//Broadcasts the message to all connected clients
 	public void broadcastMessage(String message) {
-		
+		sendMessage("Anonymous", message);
 	}
 	
 	//HIERONDER IS SAFE VINCENT!
