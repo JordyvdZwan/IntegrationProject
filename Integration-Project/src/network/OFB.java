@@ -111,30 +111,30 @@ public class OFB {
 	/*
 	 * MAIN to test some stuff
 	 */
-	public static void main(String[] args) {
-		OFB hoi = new OFB();
-		hoi.setKey(new byte[]{1,0});
-		
-		System.out.println("Encrypt: \n{1, 1, 1, 0, 1, 1, 1, 0, 0, 0}");
-		byte[] result = hoi.EnDecrypt(new byte[]{1,1,1,0,1,1,1,0,0,0});
-		System.out.print("{" );
-		for (int i = 0; i < result.length; i++) {
-			if (i != 0) {
-				System.out.print(", ");
-			}
-		System.out.print(result[i]);
-		}
-		System.out.print("}\n");
-	
-		System.out.println("Decrypt:");
-		byte[] retur = hoi.EnDecrypt(result);
-		System.out.print("{" );
-		for (int i = 0; i < retur.length; i++) {
-			if (i != 0) {
-				System.out.print(", ");
-			}
-		System.out.print(retur[i]);
-		}
-		System.out.print("}");
-	}
+//	public static void main(String[] args) {
+//		OFB hoi = new OFB();
+//		hoi.setKey(new byte[]{1,0});
+//		
+//		System.out.println("Encrypt: \n{1, 1, 1, 0, 1, 1, 1, 0, 0, 0}");
+//		byte[] result = hoi.EnDecrypt(new byte[]{1,1,1,0,1,1,1,0,0,0});
+//		System.out.print("{" );
+//		for (int i = 0; i < result.length; i++) {
+//			if (i != 0) {
+//				System.out.print(", ");
+//			}
+//		System.out.print(result[i]);
+//		}
+//		System.out.print("}\n");
+//	
+//		System.out.println("Decrypt:");
+//		byte[] retur = hoi.EnDecrypt(result);
+//		System.out.print("{" );
+//		for (int i = 0; i < retur.length; i++) {
+//			if (i != 0) {
+//				System.out.print(", ");
+//			}
+//		System.out.print(retur[i]);
+//		}
+//		System.out.print("}");
+//	}
 }
