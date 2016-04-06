@@ -25,6 +25,14 @@ public class JRTVtest {
 	}
 	
 	@Test
+	public void testNormal() {
+		packet.setNormal(true);
+		byte[] pakket = packet.toByteArray();
+		byte syn = (byte) 16;
+		assertEquals(pakket[19], syn);
+	}
+	
+	@Test
 	public void testACKSYN() {
 		packet.setAck(true);
 		packet.setSyn(true);
