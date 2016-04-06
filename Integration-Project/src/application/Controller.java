@@ -63,6 +63,7 @@ public class Controller extends Thread {
 			packet.setSource(router.getLocalIntAddress());			
 			packet.setDestination(router.getIntIP(client));
 			
+			System.out.println(packet.toString()); //TODO
 			DatagramPacket data = new DatagramPacket(packet.toByteArray(), packet.toByteArray().length, router.getRouteIP(client), 2000);
 			connection.send(data);
 		}
@@ -73,6 +74,7 @@ public class Controller extends Thread {
 		packet.setSource(router.getLocalIntAddress());			
 		packet.setDestination(router.getIntIP(client));
 		
+		System.out.println(packet.toString()); //TODO
 		DatagramPacket data = new DatagramPacket(packet.toByteArray(), packet.toByteArray().length, router.getRouteIP(client), 2000);
 		connection.send(data);
 	}
@@ -98,12 +100,13 @@ public class Controller extends Thread {
 	
 	public void handleMessage(DatagramPacket message) {
 		
-		System.out.println(message.getAddress());
+//		System.out.println(message.getAddress());
 		JRTVPacket packet = new JRTVPacket(message.getData());
+
 		System.out.println("is het een update? : " + packet.isUpdate());
 		System.out.println(router.getName(message.getAddress()));
 		System.out.println("is het een normal? : " + packet.isNormal());
-		
+
 		if(packet.isNormal()) {
 			handleNormal(packet);
 		} else if (packet.isUpdate()) {
@@ -118,7 +121,7 @@ public class Controller extends Thread {
 	}
 	
 	public void handleNormal(JRTVPacket p) {
-		String message = new String(p.getMessage());
+		String message = p.getMessage();
 		view.addMessage("" + p.getSource(), message);
 		//TODO: implement setting the right sequence and acknowledgement numbers
 	}
