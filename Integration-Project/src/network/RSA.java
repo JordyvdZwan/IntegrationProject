@@ -40,7 +40,7 @@ public class RSA {
 	public boolean verify(String signature, String message) {
 		Integer hashed = message.hashCode();
 		return (new BigInteger(signature.getBytes()).modPow(e, n).toString()
-				.equals(new BigInteger(hashed.toString())));
+				.equals(new BigInteger(hashed.toString()).toString()));
 	}
 	
 }
