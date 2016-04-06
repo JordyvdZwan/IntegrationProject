@@ -13,18 +13,32 @@ public class Update extends Thread {
 	public static final int TIMEOUT = 3;
 	public Update(Controller controller) {
 		this.controller = controller;
+		this.setDaemon(true);
 		this.start();
+		
 	}
 	
 	public void run() {
+		this.setName("Updater");
 		while(true) {
-			JRTVPacket packet = new JRTVPacket(controller.getClientName());
-			packet.setUpdate(true);
-			controller.broadcastPacket(packet);
-			try {
-				TimeUnit.SECONDS.sleep(TIMEOUT);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+			JRTVPacket packet = null;
+			if (controller.getSettingUp()) {
+				System.out.println(controller.getInitString());
+				if (controller.getInitString() != null) {
+					packet = new JRTVPacket(controller.getInitString());
+				}
+			} else {
+				packet = new JRTVPacket(controller.getClientName());
+				System.out.println(controller.getClientName());
+			}
+			if (packet != null) {
+				packet.setUpdate(true);
+				controller.broadcastPacket(packet);
+				try {
+					TimeUnit.SECONDS.sleep(TIMEOUT);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 	}

@@ -12,34 +12,49 @@ import application.Controller;
 public class Router {
 	
 	private Controller controller;
-	Map<InetAddress, String> addresstable = new HashMap<InetAddress, String>();
-	
+	Map<Integer, String> addresstable = new HashMap<Integer, String>();
+	private ForwardingTable table = new ForwardingTable();
 	
 	public Router(Controller controller) {
 		this.controller = controller;
 	}
 	
-	public InetAddress getIP() {
-		return null;
+	public void processUpdate(JRTVPacket packet) {
+		setEntry(packet.getSource(), packet.getMessage());
 	}
 	
-	public InetAddress getIP(String client) {
-		
-		InetAddress result = null;
-		
+	
+	public Integer getIP(String client) {
+		Integer result = null;
 		if (client.equals("Anonymous")) {
-			result =  controller.getMulticastAddress();
+			//result =  controller.getMulticastAddress().;
+			result = null;
 		} else { 
-			for(InetAddress e: addresstable.keySet()) {
+			for(Integer e: addresstable.keySet()) {
 				if(addresstable.get(e).equals(client)) {
 					result = e;
 					break;
 				}
 			}
 		}
-
 		return result;
 	}
+	
+	public String getName(int address) {
+		if(!addresstable.containsKey(address)) {
+			return "Anonymous";//TODO
+		}
+		return addresstable.get(address);
+	}
+	
+	private void setEntry(Integer address, String name) {
+		if(addresstable.containsKey(address)) {
+			addresstable.remove(address);
+		}
+		addresstable.put(address, name);
+	}
+	
+	//TO BE IMPLEMENTED
 	
 	public int getLocalIntAddress() {
 		return 0;
@@ -53,20 +68,10 @@ public class Router {
 		return controller.getMulticastAddress();
 	}
 	
-	
-	
-	
-	public String getName(InetAddress address) {
-		if(!addresstable.containsKey(address)) {
-			return null;
-		}
-		return addresstable.get(address).toString();
+	public InetAddress getIP() {
+		return null;
 	}
 	
-	public void setEntry(InetAddress address, String name) {
-		if(addresstable.containsKey(address)) {
-			addresstable.remove(address);
-		}
-		addresstable.put(address, name);
-	}
+	
+
 }

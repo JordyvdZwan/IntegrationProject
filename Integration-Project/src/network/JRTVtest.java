@@ -40,7 +40,7 @@ public class JRTVtest {
 	public void testACKSYN() {
 		packet.setAck(true);
 		packet.setSyn(true);
-		packet.setUpdate(true);
+//		packet.setUpdate(true);
 		System.out.println(packet.toString());
 		
 		byte[] pakket = packet.toByteArray();
@@ -50,9 +50,9 @@ public class JRTVtest {
 		byte syn = (byte) 192;
 		JRTVPacket p = new JRTVPacket(pakket);
 		System.out.println(p.toString());
-		
 		assertEquals(packet.isSyn(), p.isSyn());
 		assertEquals(packet.isAck(), p.isAck());
+		assertEquals(pakket[19], syn);
 	}
 	
 	@Test
