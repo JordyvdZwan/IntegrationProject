@@ -26,12 +26,13 @@ public class Connection extends Thread {
 		} catch(IOException e) {
 			e.printStackTrace();
 		}
-		update =  new Update("Vincent", this);
+		//update =  new Update("Vincent", this);
 		
 		this.start();
 	}
 	
 	//Tries to receive a new datagram, if it gets one, put it in the queue.
+	//TODO must stop if the rest of the program stops...
 	public void run() {
 		while(true) {
 			byte[] buffer = new byte[1000];
