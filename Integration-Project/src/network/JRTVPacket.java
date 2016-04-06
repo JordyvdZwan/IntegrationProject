@@ -149,10 +149,10 @@ public class JRTVPacket {
 		result[23] = payloadLength[3];
 		
 		byte[] nextHop = intToByteArray(this.nextHop);
-		result[20] = nextHop[0];
-		result[21] = nextHop[1];
-		result[22] = nextHop[2];
-		result[23] = nextHop[3];
+		result[24] = nextHop[0];
+		result[25] = nextHop[1];
+		result[26] = nextHop[2];
+		result[27] = nextHop[3];
 		
 		System.arraycopy(message.getBytes(), 0, result, HEADERLENGTH, message.getBytes().length);
 		return result;
@@ -242,6 +242,7 @@ public class JRTVPacket {
 
 	public void setMessage(String message) {
 		this.message = message;
+		this.payloadLength = message.getBytes().length;
 	}
 
 	public Byte getFlags() {
@@ -338,5 +339,13 @@ public class JRTVPacket {
 
 	public void setBroadcasted(boolean broadcasted) {
 		this.broadcasted = broadcasted;
+	}
+	
+	public int getPayloadLength() {
+		return payloadLength;
+	}
+
+	public void setPayloadLength(int payloadLength) {
+		this.payloadLength = payloadLength;
 	}
 }

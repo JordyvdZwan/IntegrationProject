@@ -7,13 +7,23 @@ public class ClientPacketHistory {
 	int length;
 	boolean broadcasted;
 	int destination;
+	int source;
 	
-	public ClientPacketHistory(int seq, int ack, int length, int destination, boolean broadcasted) {
+	public ClientPacketHistory(int seq, int ack, int length, int destination, int source, boolean broadcasted) {
 		this.seq = seq;
 		this.ack = ack;
 		this.length = length;
 		this.destination = destination;
 		this.broadcasted = broadcasted;
+		this.source = source;
+	}
+
+	public int getSource() {
+		return source;
+	}
+
+	public void setSource(int source) {
+		this.source = source;
 	}
 
 	public int getSeq() {

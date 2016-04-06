@@ -1,7 +1,6 @@
 package network;
 
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -19,31 +18,60 @@ public class Router {
 		this.controller = controller;
 	}
 	
-	public void processUpdate(JRTVPacket packet) {
-		
-		//Puts true into the list with valid hops
-		try {
-			table.getvalidhops().put(InetAddress.getByName("" + packet.getSource()), true);
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
+	Map<InetAddress, EntryTimeOut> timeouts = new HashMap<InetAddress, EntryTimeOut>();
+	
+	public void processUpdate(JRTVPacket packet, InetAddress source) {
+		if (source != controller.getLocalInetAddress()) {
+			//Puts true into the list with valid hops
+				table.getvalidhops().put(source, true);
+			
+			//TODO: Split at destination, next hop and put these into the forwardingtables
+			byte[] bytes = packet.getMessage().getBytes();
+			byte[] addresses = new byte[bytes.length - packet.getHashPayload()];
+			System.arraycopy(bytes, packet.getHashPayload(), addresses, 0, bytes.length - packet.getHashPayload());
+			Integer[] integers = new Integer[addresses.length / 4];
+			for (int i = 0; i < integers.length; i++) {
+				byte[] b = new byte[4];
+				System.arraycopy(addresses, (i * 4), b, 0, 4);
+				integers[i] = byteArrayToInt(b);
+			}
+			for (int i = 0; i < integers.length / 2; i++) {
+				table.addHop(integers[i * 2], source, integers[(i * 2) + 1]);
+			}
+			
+			
+			
+			//This creates a new timeout for the specified next hop
+			if (!timeouts.containsKey(source)) {
+				EntryTimeOut e = new EntryTimeOut(this, source);
+				timeouts.put(source, e);
+			}
+			
+			byte[] nameBytes = new byte[packet.getMessage().getBytes().length];
+			System.arraycopy(packet.getMessage().getBytes(), 0, nameBytes, 0, packet.getHashPayload());
+			String name = new String(nameBytes);
+			if (!name.equals("Anonymous")) {
+				addresstable.put(packet.getSource(), name);
+				controller.addRecipientToView(name);
+			}
 		}
-		
-		//TODO: Split at destination, next hop and put these into the forwardingtables
-		//This creates a new timeout for the specified next hop
-		try {
-			EntryTimeOut e = new EntryTimeOut(this, InetAddress.getByName("" + packet.getSource()));
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		}
-		addresstable.put(packet.getSource(), packet.getMessage());
 	}
 	
+	public void removeFromTimeout(InetAddress source) {
+		timeouts.remove(source);
+	}
+	
+	private static int byteArrayToInt(byte[] b) {
+	    return   b[3] & 0xFF |
+	            (b[2] & 0xFF) << 8 |
+	            (b[1] & 0xFF) << 16 |
+	            (b[0] & 0xFF) << 24;
+	}
 	
 	public Integer getIP(String client) {
 		Integer result = null;
 		if (client.equals("Anonymous")) {
-			//result =  controller.getMulticastAddress().;
-			result = null;
+			result = Controller.multicastAddress;
 		} else { 
 			for(Integer e: addresstable.keySet()) {
 				if(addresstable.get(e).equals(client)) {
@@ -55,6 +83,10 @@ public class Router {
 		return result;
 	}
 	
+	public int getNextHopCost(Integer destination) {
+		return table.getNextHopCost(destination);
+	}
+	
 	public String getName(int address) {
 		if(!addresstable.containsKey(address)) {
 			return "Anonymous";//TODO
@@ -62,33 +94,21 @@ public class Router {
 		return addresstable.get(address);
 	}
 	
-	private void setEntry(Integer address, String name) {
-		if(addresstable.containsKey(address)) {
-			addresstable.remove(address);
-		}
-		addresstable.put(address, name);
-	}
-	
 	public Map<Integer,Map<InetAddress, Integer>> getTable() {
 		return table.getTable();
 	}
 	
-	//TO BE IMPLEMENTED
-	
 	public int getLocalIntAddress() {
-		return 0;
+		return controller.getLocalIAddress();
 	}
 	
 	public int getIntIP(String client) {
-		return 0;
+		return getIP(client);
 	}
 	
-	public InetAddress getRouteIP(String client) {
+		//TO BE IMPLEMENTED
+	public InetAddress getRouteIP(int client) {
 		return controller.getMulticastAddress();
-	}
-	
-	public InetAddress getIP() {
-		return null;
 	}
 	
 	public ForwardingTable getForwardingTable() {
