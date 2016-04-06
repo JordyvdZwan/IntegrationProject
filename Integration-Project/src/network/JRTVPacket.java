@@ -7,7 +7,7 @@ public class JRTVPacket {
 	static final int DESTINATIONLENGTH = 4;
 	static final int SEQLENGTH = 4;
 	static final int ACKLENGTH = 4;
-	static final int HASHPAYLOADLENGTH = 4;
+	static final int HASHPAYLOADLENGTH = 3;
 	static final int FLAGSLENGTH = 1;
 	
 	private String message;
@@ -24,6 +24,36 @@ public class JRTVPacket {
 	private boolean normal = false;
 	private boolean fin = false;
 
+	public String toString() {
+		String res = "";
+		res = res.concat("Addressing data:\n");
+		res = res.concat("Sequence number: " + seqnr + "\n");
+		res = res.concat("Acknowledgement number: " + acknr + "\n");
+		res = res.concat("Source Address: " + source + "\n");
+		res = res.concat("Destination Address: " + destination + "\n");
+		res = res.concat("Hash Payload Length: " + hashPayload + "\n");
+		res = res.concat("\n");
+		res = res.concat("Flaggs:\n");
+		res = res.concat("SYN: " + syn + "\n");
+		res = res.concat("ACK: " + ack + "\n");
+		res = res.concat("UPDATE: " + update + "\n");
+		res = res.concat("NORMAL: " + normal + "\n");
+		res = res.concat("FIN: " + fin + "\n");
+		res = res.concat("\n");
+		res = res.concat("DATA: \n");
+		res = res.concat(message + "\n");
+		res = res.concat("\n");
+		res = res.concat("Bytes\n");
+		for (int i = 0; i < 20; i++) {
+			Integer j = (int) this.toByteArray()[i];
+			res = res.concat(j.toString());
+			res = res.concat("\n");
+		}
+		
+		
+		return res;
+	}
+	
 	public JRTVPacket(String message) {
 		this.message = message;
 	}
@@ -102,25 +132,25 @@ public class JRTVPacket {
 	private void setFlags(byte[] flags) {
 		Byte b = flags[0];
 		int value = b.intValue();
-		if (value >= 128) {
+		if (value < 0) {
 			syn = true;
-			value =- 128;
+			value += 128;
 		}
 		if (value >= 64) {
 			ack = true;
-			value =- 64;	
+			value -= 64;	
 		}
 		if (value >= 32) {
 			update = true;
-			value =- 32;
+			value -= 32;
 		}
 		if (value >= 16) {
 			normal = true;
-			value =- 16;
+			value -= 16;
 		}
 		if (value >= 8) {
 			fin = true;
-			value =- 8;
+			value -= 8;
 		}
 	}
 	
@@ -128,19 +158,19 @@ public class JRTVPacket {
 		int value = 0;
 		byte b = 0;
 		if (syn) {
-			value =+ 128;
+			value += 128;
 		}
 		if (ack) {
-			value =+ 64;
+			value += 64;
 		}
 		if (update) {
-			value =+ 32;
+			value += 32;
 		}
 		if (normal) {
-			value =+ 16;
+			value += 16;
 		}
 		if (fin) {
-			value =+ 8;
+			value += 8;
 		}
 		b = (byte) value;
 		return b;
