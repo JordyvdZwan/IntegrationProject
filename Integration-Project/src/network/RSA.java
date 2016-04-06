@@ -23,12 +23,12 @@ public class RSA {
 		d = e.modInverse(m);
 	}
 	
-	public byte[] encrypt(String message) {
-		return (new BigInteger(message.getBytes())).modPow(e, n).toByteArray();
+	public byte[] encrypt(byte[] message) {
+		return (new BigInteger(message)).modPow(e, n).toByteArray();
 	}
 	
-	public byte[] decrypt(String message) {
-		return (new BigInteger(message.getBytes())).modPow(d, n).toByteArray();
+	public byte[] decrypt(byte[] message) {
+		return (new BigInteger(message)).modPow(d, n).toByteArray();
 	}
 	
 	

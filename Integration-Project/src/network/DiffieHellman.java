@@ -28,7 +28,7 @@ public class DiffieHellman {
 	 */
 	public DiffieHellman(BigInteger g, BigInteger p, BigInteger A) {
 		SecureRandom r = new SecureRandom();
-		a = new BigInteger(length / 3, 100, r);
+		a = new BigInteger(LENGTH / 2, 100, r);
 	}
 	
 	/**
