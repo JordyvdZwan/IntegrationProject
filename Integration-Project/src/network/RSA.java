@@ -34,6 +34,7 @@ public class RSA {
 	
 	public String sign(String message) {
 		Integer hashed = message.hashCode(); 
+		System.out.println(hashed);
 		return (new BigInteger(hashed.toString())).modPow(d, n).toString(); 
 	}
 	
