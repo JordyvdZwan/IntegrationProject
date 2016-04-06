@@ -181,9 +181,15 @@ public class View extends Application {
 			showDialog("You did not select a recipient.");
 		} else {
 			if (!inputField.getText().isEmpty()) {
+				String dest;
+				if (recipient.getValue().equals("All")) {
+					dest = "Anonymous";
+				} else {
+					dest = recipient.getValue();
+				}
     			chatText.appendText("\n" + "You" + ": " + inputField.getText());
     			chatText.setScrollTop(Double.MIN_VALUE);
-    			controller.receiveFromView(recipient.getValue(), inputField.getText());
+    			controller.receiveFromView(dest, inputField.getText());
     			inputField.requestFocus();
     			inputField.clear();
 			}
