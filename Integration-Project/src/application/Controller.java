@@ -12,7 +12,8 @@ public class Controller extends Thread {
 
 	View view;
 	Connection connection;
-	InetAddress IAddress;
+	InetAddress multicastIAddress;
+	InetAddress localIAddress;
 	Router router = new Router(this);
 	Update update = new Update(this);
 	
@@ -23,7 +24,7 @@ public class Controller extends Thread {
 		
 		String address = "224.0.0.2";
 		try {
-			IAddress = InetAddress.getByName(address);
+			multicastIAddress = InetAddress.getByName(address);
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -51,19 +52,20 @@ public class Controller extends Thread {
 
 	//Sends the string message as payload to the client if it can see the client otherwise error
 	public void sendMessage(String client, String message) {
-		if (router.getIP() != null) {
-			JRTVPacket packet = new JRTVPacket(message);
-			
-			
-			
-			
-			
-			DatagramPacket data = new DatagramPacket(, .length, router.getIP(), 2000);
-			connection.send(data);
+		if (router.getIP(client) == null) {
+			view.error("Recipient not valid!");
 		} else if (client.equals("Anonymous")) {
-			broadcastPacket()
+			JRTVPacket packet = new JRTVPacket(message);
+			broadcastPacket(packet);
 		} else {
-			view.error("Recipient")
+			JRTVPacket packet = new JRTVPacket(message);
+			packet.setNormal(true);
+			packet.setSource(router.getLocalIntAddress());			
+			packet.setDestination(router.getIntIP(client));
+			
+			//TODO getRouteIP for next hop and getIP for destination!
+			DatagramPacket data = new DatagramPacket(packet.toByteArray(), packet.toByteArray().length, router.getRouteIP(client), 2000);
+			connection.send(data);
 		}
 	}
 	
@@ -137,6 +139,6 @@ public class Controller extends Thread {
 	}
 	
 	public InetAddress getAddress() {
-		return IAddress;
+		return multicastIAddress;
 	}
 }

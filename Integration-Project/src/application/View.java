@@ -161,20 +161,24 @@ public class View extends Application {
 	
 	private void setName() {
 		controller.setName(nameField.getText());
-    	Stage dialog = new Stage();
+		showDialog("Your name is set to: " + nameField.getText());
+	}
+	
+	private void showDialog(String message) {
+		Stage dialog = new Stage();
 		dialog.initStyle(StageStyle.UTILITY);
-		Scene sc = new Scene(new Group(new Text(25, 25, "Your name is set to: " + nameField.getText())), 260, 80);
+		Scene sc = new Scene(new Group(new Text(25, 25, message)), 260, 80);
 		dialog.setScene(sc);
 		dialog.show();
 	}
 	
+	public void error(String message) {
+		showDialog("ERROR: " + message);
+	}
+	
 	private void send() {
 		if (recipient.getValue() == null) {
-			Stage dialog = new Stage();
-			dialog.initStyle(StageStyle.UTILITY);
-			Scene sc = new Scene(new Group(new Text(25, 25, "You did not select a recipient.")), 260, 80);
-			dialog.setScene(sc);
-			dialog.show();
+			showDialog("You did not select a recipient.");
 		} else {
 			if (!inputField.getText().isEmpty()) {
     			chatText.appendText("\n" + "You" + ": " + inputField.getText());
