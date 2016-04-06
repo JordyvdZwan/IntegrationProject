@@ -27,7 +27,6 @@ public class Controller extends Thread {
 			e.printStackTrace();
 		}
 		int port = 2000;
-		
 		connection = new Connection(port, address);
 	}
 	
@@ -95,22 +94,23 @@ public class Controller extends Thread {
 	public void handleNormal(JRTVPacket p) {
 		String message = new String(p.getMessage());
 		view.addMessage("" + p.getSource(), message);
+		//TODO: implement setting the right sequence and acknowledgement numbers
 	}
 	
 	public void handleUpdate(JRTVPacket p) {
-		
+		//Map<Ip adres, naam>
 	}
 	
 	public void handleSyn(JRTVPacket p) {
-		
+		//TODO: read sequencenumber, set that as ack, give appropiate ack, set syn and ack flag
 	}
 	
 	public void handleFin(JRTVPacket p) {
-		
+		//TODO: send Fin + ack
 	}
 	
 	public void handleAck(JRTVPacket p) {
-		
+		//TODO: start sending data
 	}
 	
 	public void setClientName(String clientName) {
