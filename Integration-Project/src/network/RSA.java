@@ -1,25 +1,47 @@
 package network;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.math.BigInteger;
+import java.security.SecureRandom;
 
 public class RSA {
+	private BigInteger n;
+	private BigInteger d;
+	private BigInteger e;
 	
-	public static final byte[] E = {1,0,0,1,1,0,0,0,1,0,1,0,0,1,0,1,1,0,0,0,0,0,1,0,1,0,1,1,1}; // decimale waarde 320122967
-	public static final long N = 3917136493L;
-	public static final byte[] d = {1,1,1,0,1,1,1,0,0,0,0,1,1,0,0,1,1,1,0,1,1,0,1,0,0,1,1,1}; // decimale waarde 249666983
+	private int length = 1024;
 	
-	public List<Byte> sign(byte[] message) {
-		List<Byte> signed = new ArrayList<Byte>();
-		
-		return signed;
+	public RSA(int bits) {
+		length = bits;
+		SecureRandom r = new SecureRandom();
+		BigInteger p = new BigInteger(length / 3, 100, r);
+		BigInteger q = new BigInteger(length / 3, 100, r);
+		n = p.multiply(q);
+		BigInteger m = (p.subtract(BigInteger.ONE).multiply(q.subtract(BigInteger.ONE)));
+		e = new BigInteger("3");
+		while (m.gcd(e).intValue() > 1) {
+			e = e.add(new BigInteger("2"));
+		}
+		d = e.modInverse(m);
 	}
 	
-	public boolean verify(byte[] message, byte[] hash) {
-		
+	public String encrypt(String message) {
+		return (new BigInteger(message.getBytes())).modPow(e, n).toString();
 	}
 	
-	public byte[] publicKeyEncrypt(byte[] publickey) {
-		
+	public String decrypt(String message) {
+		return (new BigInteger(message.getBytes())).modPow(d, n).toString();
 	}
+	
+	
+	public String sign(String message) {
+		Integer hashed = message.hashCode(); 
+		return (new BigInteger(hashed.toString())).modPow(d, n).toString(); 
+	}
+	
+	public boolean verify(String signature, String message) {
+		Integer hashed = message.hashCode();
+		return (new BigInteger(signature.getBytes()).modPow(e, n).toString()
+				.equals(new BigInteger(hashed.toString())));
+	}
+	
 }
