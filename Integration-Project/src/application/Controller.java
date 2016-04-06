@@ -38,7 +38,7 @@ public class Controller extends Thread {
 		while (true) {
 			DatagramPacket data;
 			if((data = connection.getFirstInQueue()) != null) {
-				handleMessage(data.getData());
+				handleMessage(data);
 			}
 			try {
 				this.sleep(100);
@@ -63,6 +63,7 @@ public class Controller extends Thread {
 			packet.setSource(router.getLocalIntAddress());			
 			packet.setDestination(router.getIntIP(client));
 			
+			System.out.println(packet.toString()); //TODO
 			DatagramPacket data = new DatagramPacket(packet.toByteArray(), packet.toByteArray().length, router.getRouteIP(client), 2000);
 			connection.send(data);
 		}
@@ -73,6 +74,7 @@ public class Controller extends Thread {
 		packet.setSource(router.getLocalIntAddress());			
 		packet.setDestination(router.getIntIP(client));
 		
+		System.out.println(packet.toString()); //TODO
 		DatagramPacket data = new DatagramPacket(packet.toByteArray(), packet.toByteArray().length, router.getRouteIP(client), 2000);
 		connection.send(data);
 	}
@@ -91,18 +93,24 @@ public class Controller extends Thread {
 	//-----------------VVVVVVVVVVVVVVVVVVVVVVVV-------------------------
 	
 	public void receiveFromView(String client, String message) {
-//		JRTVPacket packet = new JRTVPacket(message);
-//		packet.setNormal(true);
-		sendMessage(client, message);
+		JRTVPacket packet = new JRTVPacket(message);
+		packet.setNormal(true);
+		sendPacket(client, packet);
 	}
 	
-	public void handleMessage(byte[] message) {
+	public void handleMessage(DatagramPacket message) {
 		
-		JRTVPacket packet = new JRTVPacket(message);
+//		System.out.println(message.getAddress());
+		JRTVPacket packet = new JRTVPacket(message.getData());
+
+		System.out.println("is het een update? : " + packet.isUpdate());
+		System.out.println(router.getName(message.getAddress()));
+		System.out.println("is het een normal? : " + packet.isNormal());
+		System.out.println(packet.toString());
 		if(packet.isNormal()) {
 			handleNormal(packet);
 		} else if (packet.isUpdate()) {
-			handleUpdate(packet);
+			handleUpdate(message);
 		} else if (packet.isSyn()) {
 			handleSyn(packet);
 		} else if (packet.isFin()) {
@@ -113,13 +121,14 @@ public class Controller extends Thread {
 	}
 	
 	public void handleNormal(JRTVPacket p) {
-		String message = new String(p.getMessage());
+		String message = p.getMessage();
 		view.addMessage("" + p.getSource(), message);
 		//TODO: implement setting the right sequence and acknowledgement numbers
 	}
 	
-	public void handleUpdate(JRTVPacket p) {
-		//Map<Ip adres, naam>
+	public void handleUpdate(DatagramPacket p) {
+		router.setEntry(p.getAddress(), p.getData().toString());
+		
 	}
 	
 	public void handleSyn(JRTVPacket p) {
@@ -145,4 +154,5 @@ public class Controller extends Thread {
 	public InetAddress getMulticastAddress() {
 		return multicastIAddress;
 	}
+	
 }

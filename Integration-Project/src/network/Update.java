@@ -10,7 +10,7 @@ import application.Controller;
 public class Update extends Thread {
 	
 	Controller controller;
-	
+	public static final int TIMEOUT = 3;
 	public Update(Controller controller) {
 		this.controller = controller;
 		this.start();
@@ -18,9 +18,11 @@ public class Update extends Thread {
 	
 	public void run() {
 		while(true) {
-			controller.broadcastMessage(controller.getClientName());
+			JRTVPacket packet = new JRTVPacket(controller.getClientName());
+			packet.setUpdate(true);
+			controller.broadcastPacket(packet);
 			try {
-				TimeUnit.SECONDS.sleep(1);
+				TimeUnit.SECONDS.sleep(TIMEOUT);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
