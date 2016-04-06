@@ -10,7 +10,7 @@ import application.Controller;
 
 
 public class Router {
-
+	
 	private Controller controller;
 	Map<InetAddress, String> addresstable = new HashMap<InetAddress, String>();
 	
