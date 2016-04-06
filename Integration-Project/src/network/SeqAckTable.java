@@ -53,7 +53,7 @@ public class SeqAckTable {
 			}
 //		}
 		if (max == null) {
-			max = (int) Math.random() * Integer.MAX_VALUE/2;
+			max = (int) (Math.random() * 900000);
 		}
 		return max;
 	}
@@ -90,10 +90,14 @@ public class SeqAckTable {
 		} else {
 			b = 0;
 		}
-		table.put(getKey(packet.getSeqnr(), packet.getAcknr(), packet.getDestination(), b), true);
+		if (getKey(packet.getSeqnr(), packet.getAcknr(), packet.getDestination(), b) != null) {
+			table.put(getKey(packet.getSeqnr(), packet.getAcknr(), packet.getDestination(), b), true);
+		}
 		for (Integer[] integers : table.keySet()) {
-			if (integers[3] == packet.getDestination() && b == integers[4] && table.get(integers) == false && packet.getAcknr() > integers[2]) {
-				table.put(integers, true);
+			if (integers != null) {
+				if (integers[3] == packet.getDestination() && b == integers[4] && table.get(integers) == false && packet.getAcknr() > integers[2]) {
+					table.put(integers, true);
+				}
 			}
 		}
 		history.add(new ClientPacketHistory(packet.getSeqnr(), packet.getAcknr(), packet.getPayloadLength(),packet.getDestination(), packet.getSource() ,packet.isBroadcasted()));

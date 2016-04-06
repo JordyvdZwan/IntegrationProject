@@ -22,6 +22,7 @@ public class TimeOutTimer extends Thread {
 		} else {
 			table.retransmit(data);
 		}
+		this.interrupt();
 	}
 	
 }

@@ -50,13 +50,13 @@ public class JRTVPacket {
 		res = res.concat("\n");
 		res = res.concat("DATA: \n");
 		res = res.concat(message + "\n");
-		res = res.concat("\n");
-		res = res.concat("Bytes\n");
-		for (int i = 0; i < 20; i++) {
-			Integer j = (int) this.toByteArray()[i];
-			res = res.concat(j.toString());
-			res = res.concat("\n");
-		}
+//		res = res.concat("\n");
+//		res = res.concat("Bytes\n");
+//		for (int i = 0; i < 20; i++) {
+//			Integer j = (int) this.toByteArray()[i];
+//			res = res.concat(j.toString());
+//			res = res.concat("\n");
+//		}
 		
 		
 		return res;
@@ -111,17 +111,17 @@ public class JRTVPacket {
 	public byte[] toByteArray() {
 		byte[] result = new byte[HEADERLENGTH + message.getBytes().length];
 		
-		byte[] dest = intToByteArray(destination);
-		result[0] = dest[0];
-		result[1] = dest[1];
-		result[2] = dest[2];
-		result[3] = dest[3];
-		
 		byte[] src = intToByteArray(source);
-		result[4] = src[0];
-		result[5] = src[1];
-		result[6] = src[2];
-		result[7] = src[3];
+		result[0] = src[0];
+		result[1] = src[1];
+		result[2] = src[2];
+		result[3] = src[3];
+		
+		byte[] dest = intToByteArray(destination);
+		result[4] = dest[0];
+		result[5] = dest[1];
+		result[6] = dest[2];
+		result[7] = dest[3];
 		
 		byte[] seq = intToByteArray(seqnr);
 		result[8] = seq[0];

@@ -5,11 +5,7 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import network.Connection;
 import network.JRTVPacket;
@@ -123,7 +119,6 @@ public class Controller extends Thread {
 		update = new Update(this);
 		setupIP();
 		while (true) {
-			System.out.println("dd");
 			DatagramPacket data;
 			if((data = connection.getFirstInQueue()) != null) {
 				handleMessage(data);
@@ -152,7 +147,7 @@ public class Controller extends Thread {
 	
 	//sends the packet after processing the packet;
 	public void sendPacket(String client, JRTVPacket packet) {
-		packet.setSource(router.getLocalIntAddress());			
+		packet.setSource(localIAddress);			
 		packet.setDestination(router.getIntIP(client));
 		if (router.getIntIP(client) == Controller.multicastAddress) {
 			packet.setBroadcasted(true);
@@ -163,21 +158,27 @@ public class Controller extends Thread {
 	
 	public void sendPacket(int client, JRTVPacket packet) {
 		int[] seqAck = seqAckTable.getSeqAck(client, packet.isBroadcasted());
-		packet.setSeqnr(seqAck[0]);
+		packet.setSeqnr((int) Math.random() * 200000 + packet.getPayloadLength());
 		packet.setAcknr(seqAck[1]);
-		seqAckTable.registerOutgoingPackage(packet);
+		if (!packet.getMessage().equals("ACK")) {
+			seqAckTable.registerOutgoingPackage(packet);
+		}
 		DatagramPacket data = new DatagramPacket(packet.toByteArray(), packet.toByteArray().length, router.getRouteIP(packet.getDestination()), 2000);
 		connection.send(data);
 	}
 	
 	public void retransmit(JRTVPacket packet) {
-		seqAckTable.registerOutgoingPackage(packet);
+		if (!packet.getMessage().equals("ACK")) {
+			seqAckTable.registerOutgoingPackage(packet);
+		}
 		DatagramPacket data = new DatagramPacket(packet.toByteArray(), packet.toByteArray().length, router.getRouteIP(packet.getDestination()), 2000);
 		connection.send(data);
 	}
 	
 	private void sendAck(JRTVPacket packet) {
 		JRTVPacket p = new JRTVPacket("ACK");
+		p.setDestination(localIAddress);//packet.getSource());
+		p.setSource(localIAddress);
 		sendPacket(packet.getSource(), p);
 	}
 	
@@ -210,9 +211,16 @@ public class Controller extends Thread {
 		if (packet.getNextHop() == localIAddress) {
 			retransmit(packet);
 		}
-		if (packet.getDestination() == localIAddress || (packet.getDestination() == multicastAddress && !packet.isUpdate())) {
+		System.out.println("Local controller IP" + localIAddress);
+		System.out.println("Packet Source" + packet.getSource());
+		System.out.println("Packet Destination" + packet.getDestination());
+		System.out.println("MultiCast IP" + multicastAddress);
+		if (packet.getSource() != localIAddress && (packet.getDestination() == localIAddress || (packet.getDestination() == multicastAddress && !packet.isUpdate() ))) {
 			
-			sendAck(packet);
+			seqAckTable.receivedPackage(packet);
+			if (!packet.getMessage().equals("ACK") && !packet.isUpdate()){
+				sendAck(packet);
+			}
 			
 			if (!seqAckTable.received(packet.getSeqnr(), packet.getAcknr(), packet.isBroadcasted(), packet.getSource())) {
 				if(packet.isNormal()) {
@@ -227,21 +235,18 @@ public class Controller extends Thread {
 					handleAck(packet);
 				}
 			}
+			
+			
+			
 		}
 	}
 	
-	Set<String> recipients = new HashSet<String>();
-	
 	public void addRecipientToView(String recipient) {
-		recipients.add(recipient);
+		view.addRecipient(recipient);
 	}
 	
 	public void removeRecipientToView(String recipient) {
-		recipients.remove(recipient);
-	}
-	
-	public Set<String> getRecipients() {
-		return recipients;
+		view.removeRecipient(recipient);
 	}
 	
 	public void handleNormal(JRTVPacket p) {

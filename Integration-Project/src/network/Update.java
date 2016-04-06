@@ -29,7 +29,7 @@ public class Update extends Thread {
 				}
 			} else {
 				packet = new JRTVPacket(controller.getClientName());
-				packet.setHashPayload(packet.getPayloadLength());
+				packet.setHashPayload(controller.getClientName().getBytes().length);
 				byte[] bytes = new byte[4 * (2 + (2 * controller.getForwardingTable().keySet().size()))];
 				
 				bytes[0] = intToByteArray(controller.getLocalIAddress())[0];

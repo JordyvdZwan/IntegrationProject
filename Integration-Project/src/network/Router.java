@@ -47,7 +47,7 @@ public class Router {
 				timeouts.put(source, e);
 			}
 			
-			byte[] nameBytes = new byte[packet.getMessage().getBytes().length];
+			byte[] nameBytes = new byte[packet.getHashPayload()];
 			System.arraycopy(packet.getMessage().getBytes(), 0, nameBytes, 0, packet.getHashPayload());
 			String name = new String(nameBytes);
 			if (!name.equals("Anonymous")) {

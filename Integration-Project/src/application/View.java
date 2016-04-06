@@ -181,15 +181,33 @@ public class View extends Application {
 	}
 	
 	public void addRecipient(String recipient) {
-		if (!this.recipient.getItems().contains(recipient)) {
-			this.recipient.getItems().add(recipient);
+		try {
+			if (!this.recipient.getItems().contains(recipient) && !recipient.equals("Anonymous")) {
+				this.recipient.getItems().add(recipient);
+			}
+		} catch (IllegalStateException e) {
+			//TODO actualy do nothing...
 		}
 	}
 	
 	public void removeRecipient(String recipient) {
-		if (this.recipient.getItems().contains(recipient)) {
-			this.recipient.getItems().remove(recipient);
+		try {
+			if (this.recipient.getItems().contains(recipient)) {
+				this.recipient.getItems().remove(recipient);
+				this.recipient.setValue(null);
+			}
+		} catch (IllegalStateException e) {
+			//TODO actualy do nothing...
+		}
+	}
+	
+	public void removeAllRecipient() {
+		try {
+			this.recipient.getItems().clear();
 			this.recipient.setValue(null);
+			this.recipient.getItems().add("All");
+		} catch (IllegalStateException e) {
+			//TODO actualy do nothing...
 		}
 	}
 	
