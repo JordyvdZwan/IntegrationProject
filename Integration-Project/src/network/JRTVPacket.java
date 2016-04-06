@@ -52,9 +52,9 @@ public class JRTVPacket {
 		System.arraycopy(bytes, SOURCELENGTH + DESTINATIONLENGTH + SEQLENGTH , ack, 0, ACKLENGTH);
 		this.acknr = byteArrayToInt(ack);
 		
-		byte[] hashPayload = new byte[HASHPAYLOADLENGTH];
-		System.arraycopy(bytes, SOURCELENGTH + DESTINATIONLENGTH + SEQLENGTH + ACKLENGTH, hashPayload, 1, HASHPAYLOADLENGTH);
-		this.hashPayload = byteArrayToInt(hashPayload);
+//		byte[] hashPayload = new byte[HASHPAYLOADLENGTH];
+//		System.arraycopy(bytes, SOURCELENGTH + DESTINATIONLENGTH + SEQLENGTH + ACKLENGTH, hashPayload, 1, HASHPAYLOADLENGTH);
+//		this.hashPayload = byteArrayToInt(hashPayload);
 		
 		byte[] flags = new byte[FLAGSLENGTH];
 		System.arraycopy(bytes, SOURCELENGTH + DESTINATIONLENGTH + SEQLENGTH + ACKLENGTH + HASHPAYLOADLENGTH, flags, 0, FLAGSLENGTH);

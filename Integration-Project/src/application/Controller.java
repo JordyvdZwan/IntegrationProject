@@ -85,6 +85,11 @@ public class Controller extends Thread {
 		connection.send(data);
 	}
 	
+	public void receiveFromView(String client, String message) {
+		JRTVPacket packet = new JRTVPacket(message);
+		packet.setNormal(true);
+		sendMessage(client, packet.getMessage());
+	}
 	public void setClientName(String clientName) {
 		this.clientName = clientName;
 	}
