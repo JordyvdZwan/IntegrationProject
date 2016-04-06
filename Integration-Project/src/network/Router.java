@@ -69,7 +69,7 @@ public class Router {
 		addresstable.put(address, name);
 	}
 	
-	public Map<Integer, InetAddress> getTable() {
+	public Map<Integer,Map<InetAddress, Integer>> getTable() {
 		return table.getTable();
 	}
 	
