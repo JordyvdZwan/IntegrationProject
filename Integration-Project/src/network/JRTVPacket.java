@@ -56,13 +56,10 @@ public class JRTVPacket {
 	
 	public JRTVPacket(String message) {
 		this.message = message;
+		this.hashPayload = message.getBytes().length;
 	}
 	
 	public JRTVPacket(byte[] bytes) {
-		byte[] message = new byte[bytes.length - HEADERLENGTH];
-		System.arraycopy(bytes, HEADERLENGTH, message, 0, bytes.length - HEADERLENGTH);
-		this.message = new String(message);
-		
 		byte[] header = new byte[HEADERLENGTH];
 		System.arraycopy(bytes, 0, header, 0, HEADERLENGTH);
 		
@@ -82,9 +79,13 @@ public class JRTVPacket {
 		System.arraycopy(bytes, SOURCELENGTH + DESTINATIONLENGTH + SEQLENGTH , ack, 0, ACKLENGTH);
 		this.acknr = byteArrayToInt(ack);
 		
-//		byte[] hashPayload = new byte[HASHPAYLOADLENGTH];
-//		System.arraycopy(bytes, SOURCELENGTH + DESTINATIONLENGTH + SEQLENGTH + ACKLENGTH, hashPayload, 1, HASHPAYLOADLENGTH);
-//		this.hashPayload = byteArrayToInt(hashPayload);
+		byte[] hashPayload = new byte[HASHPAYLOADLENGTH + 1];
+		System.arraycopy(bytes, SOURCELENGTH + DESTINATIONLENGTH + SEQLENGTH + ACKLENGTH, hashPayload, 1, HASHPAYLOADLENGTH);
+		this.hashPayload = byteArrayToInt(hashPayload);
+		
+		byte[] message = new byte[this.hashPayload];
+		System.arraycopy(bytes, HEADERLENGTH, message, 0, this.hashPayload);
+		this.message = new String(message);
 		
 		byte[] flags = new byte[FLAGSLENGTH];
 		System.arraycopy(bytes, SOURCELENGTH + DESTINATIONLENGTH + SEQLENGTH + ACKLENGTH + HASHPAYLOADLENGTH, flags, 0, FLAGSLENGTH);

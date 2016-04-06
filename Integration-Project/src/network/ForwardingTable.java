@@ -6,21 +6,21 @@ import java.net.InetAddress;
 public class ForwardingTable {
 	
 	//Map<Destination, Next hop>
-	Map<InetAddress, InetAddress> forwardingtable = new HashMap<InetAddress, InetAddress>();
+	Map<Integer, InetAddress> forwardingtable = new HashMap<Integer, InetAddress>();
 	
-	public Map<InetAddress, InetAddress> getTable() {
+	public Map<Integer, InetAddress> getTable() {
 		return forwardingtable;
 	}
 	
-	public InetAddress getNextHop(InetAddress destination) {
+	public InetAddress getNextHop(Integer destination) {
 		return forwardingtable.get(destination); 
 	}
 	
-	public void  addHop(InetAddress destination, InetAddress nexthop) {
+	public void  addHop(Integer destination, InetAddress nexthop) {
 		forwardingtable.put(destination, nexthop);
 	}
 	
-	public void removeRoute(InetAddress destination) {
+	public void removeRoute(Integer destination) {
 		forwardingtable.remove(destination);
 	}
 }

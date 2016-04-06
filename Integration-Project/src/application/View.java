@@ -153,14 +153,16 @@ public class View extends Application {
 			primaryStage.setScene(scene);
 			primaryStage.show();
 			
+			controller.setDaemon(true);
 			controller.start();
+			
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
 	private void setName() {
-		controller.setName(nameField.getText());
+		controller.setClientName(nameField.getText());
 		showDialog("Your name is set to: " + nameField.getText());
 	}
 	
