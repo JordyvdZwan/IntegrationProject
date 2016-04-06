@@ -27,6 +27,7 @@ public class Router {
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
+		
 		//TODO: Split at destination, next hop and put these into the forwardingtables
 		//This creates a new timeout for the specified next hop
 		try {
