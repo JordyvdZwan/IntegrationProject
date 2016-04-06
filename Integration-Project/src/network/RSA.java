@@ -42,7 +42,7 @@ public class RSA {
 		System.out.println(new BigInteger(signature.getBytes()).modPow(e, n).toString());
 		System.out.println(new BigInteger(hashed.toString()).toString());
 		return (new BigInteger(signature.getBytes()).modPow(e, n).toString()
-				.equals(new BigInteger(hashed.toString()).toString()));
+				== (new BigInteger(hashed.toString()).toString()));
 	}
 	
 }
