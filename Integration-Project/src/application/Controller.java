@@ -12,9 +12,10 @@ public class Controller extends Thread {
 
 	View view;
 	Connection connection;
-	InetAddress IAddress;
+	InetAddress multicastIAddress;
+	InetAddress localIAddress;
 	Router router = new Router(this);
-	Update update = new Update(this);
+	Update update;
 	
 	String clientName = "Anonymous";
 	
@@ -23,13 +24,14 @@ public class Controller extends Thread {
 		
 		String address = "224.0.0.2";
 		try {
-			IAddress = InetAddress.getByName(address);
+			multicastIAddress = InetAddress.getByName(address);
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		int port = 2000;
 		connection = new Connection(port, address);
+		update = new Update(this);
 	}
 	
 	public void run() {
@@ -47,33 +49,37 @@ public class Controller extends Thread {
 		}
 	}
 	
-
+	//TODO implement SEQ and ACK numbers.
 	//Sends the string message as payload to the client if it can see the client otherwise error
 	public void sendMessage(String client, String message) {
-		if (router.getIP() != null) {
+		if (client.equals("Anonymous")) {
 			JRTVPacket packet = new JRTVPacket(message);
-			
-			
-			
-			
-			
-			DatagramPacket data = new DatagramPacket(, .length, router.getIP(), 2000);
-			connection.send(data);
-		} else if (client.equals("Anonymous")) {
-			broadcastPacket()
+			broadcastPacket(packet);
+		} else if (router.getIP(client) == null) {
+			view.error("Recipient not valid!");
 		} else {
-			view.error("Recipient")
+			JRTVPacket packet = new JRTVPacket(message);
+			packet.setNormal(true);
+			packet.setSource(router.getLocalIntAddress());			
+			packet.setDestination(router.getIntIP(client));
+			
+			DatagramPacket data = new DatagramPacket(packet.toByteArray(), packet.toByteArray().length, router.getRouteIP(client), 2000);
+			connection.send(data);
 		}
 	}
 	
 	//sends the packet after processing the packet;
-	public void sendPacket(JRTVPacket packet) {
+	public void sendPacket(String client, JRTVPacket packet) {
+		packet.setSource(router.getLocalIntAddress());			
+		packet.setDestination(router.getIntIP(client));
 		
+		DatagramPacket data = new DatagramPacket(packet.toByteArray(), packet.toByteArray().length, router.getRouteIP(client), 2000);
+		connection.send(data);
 	}
 	
 	//sends the packet after processing the packet;
 	public void broadcastPacket(JRTVPacket packet) {
-		
+		sendPacket("Anonymous", packet);
 	}
 	
 	//Broadcasts the message to all connected clients
@@ -85,9 +91,9 @@ public class Controller extends Thread {
 	//-----------------VVVVVVVVVVVVVVVVVVVVVVVV-------------------------
 	
 	public void receiveFromView(String client, String message) {
-		JRTVPacket packet = new JRTVPacket(message);
-		packet.setNormal(true);
-		sendMessage(client, packet.toByteArray());
+//		JRTVPacket packet = new JRTVPacket(message);
+//		packet.setNormal(true);
+		sendMessage(client, message);
 	}
 	
 	public void handleMessage(byte[] message) {
@@ -136,7 +142,7 @@ public class Controller extends Thread {
 		return clientName;
 	}
 	
-	public InetAddress getAddress() {
-		return IAddress;
+	public InetAddress getMulticastAddress() {
+		return multicastIAddress;
 	}
 }
