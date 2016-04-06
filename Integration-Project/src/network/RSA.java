@@ -10,7 +10,7 @@ public class RSA {
 	
 	private static final int LENGTH = 1024;
 	
-	public RSA(int bits) {
+	public RSA() {
 		SecureRandom r = new SecureRandom();
 		BigInteger p = new BigInteger("3");//new BigInteger(LENGTH / 2, 100, r);
 		BigInteger q = new BigInteger("11");//new BigInteger(LENGTH / 2, 100, r);
