@@ -4,11 +4,11 @@ public class OFB {
 
 	//TODO Goede waardes instellen
 	private byte[] key = new byte[BLOCKSIZE];
-	private static final int BLOCKSIZE = 2; //64
-	private static final byte[] Oj = {1,1};
-//						,0,1,1,1,0,1,1,0,0,1,1,0,1,1,0,1,0,1,0,
-//					 1,1,0,1,0,1,1,0,0,1,1,1,0,1,0,0,1,0,1,0,0,
-//					 1,0,1,0,0,1,0,0,1,1,0,0,1,0,1,1,0,1,0,0,0}; 
+	private static final int BLOCKSIZE = 64;
+	private static final byte[] Oj = 
+					{1,1,0,1,1,1,0,1,1,0,0,1,1,0,1,1,0,1,0,1,0,
+					 1,1,0,1,0,1,1,0,0,1,1,1,0,1,0,0,1,0,1,0,0,
+					 1,0,1,0,0,1,0,0,1,1,0,0,1,0,1,1,0,1,0,0,0}; 
 	
 	public byte[] EnDecrypt(byte[] message) {
 		/**
@@ -30,29 +30,43 @@ public class OFB {
 			}
 		}
 		
-//		/*
-//		 * For loop om te printen van de de blocks created
-//		 */
-//		for (int i = 0; i < blocks.length; i++) {
-//			System.out.print("{" );
-//			for (int j = 0; j < BLOCKSIZE; j++) {
-//				if (j != 0) {
-//					System.out.print(", ");
-//				}
-//				System.out.print(blocks[i][j]);
-//			}
-//			System.out.print("}");
-//		}
-//		System.out.print("\n");
+		/*
+		 * For loop om te printen van de de blocks created
+		 */
+		for (int i = 0; i < blocks.length; i++) {
+			System.out.print("{" );
+			for (int j = 0; j < BLOCKSIZE; j++) {
+				if (j != 0) {
+					System.out.print(", ");
+				}
+				System.out.print(blocks[i][j]);
+			}
+			System.out.print("}");
+		}
+		System.out.print("\n");
 		
 		
 		for(int i = 0; i < m; i += BLOCKSIZE) {
 			byte[] blocki = new byte[BLOCKSIZE];
-			System.arraycopy(message, i, blocki, 0, BLOCKSIZE);
-			System.arraycopy(xor(blocki, blocks[i/BLOCKSIZE]), 0, result, i, BLOCKSIZE);
-		
-		}		
+			/*
+			 * Normal case, BLOCKSIZE is smaller then the still to be encrypted message
+			 */
+			if ((message.length - i) / BLOCKSIZE >= 1.00) {
+				System.arraycopy(message, i, blocki, 0, BLOCKSIZE);
+				System.arraycopy(xor(blocki, blocks[i/BLOCKSIZE]), 0, result, i, BLOCKSIZE);
+			} else {
+				/*
+				 * Case in which the BLOCKSIZE is bigger then the still to be done message
+				 * No arraycopy possible.
+				 */
+				for (int j = 0; j < message.length - i; j++) {
+					blocki[j] = message [j + i];
+				}
+				System.arraycopy(xor(blocki, blocks[i/BLOCKSIZE]), 0, result, i, blocki.length - 1);
+			}
+		}
 		return result;
+
 	}
 	
 	/**
@@ -64,20 +78,16 @@ public class OFB {
 	 *  - Recast the whole thing as a byte.
 	 *  - Put in corresponding position of the output
 	 *  
-	 * The method needs to receive is only used to work with the blocksize
-	 * So this is hardcoded. 
-	 * 
-	 * The previous statement implies a.lenght && b.lenght >= BLOCKSIZE.
-	 * (For this application a && b == BLOCKSIZE should hold).
-	 * If a.length or b.length < BLOCKSIZE, indexoutofbound error will occur.
+	 * The method will output an array with the same
+	 * length as the first byte array given.
 	 * 
 	 * @param a
 	 * @param b
 	 * @return
 	 */
 	private byte[] xor(byte[] a, byte[] b) {
-		byte[] result = new byte[BLOCKSIZE];
-		for (int i = 0; i < BLOCKSIZE; i++) {
+		byte[] result = new byte[a.length];
+		for (int i = 0; i < a.length; i++) {
 			result[i] = (byte)((int)a[i] ^ (int)b[i]);
 		}
 		return result;
@@ -93,6 +103,11 @@ public class OFB {
 	
 	
 	
+	
+	
+	
+	
+	
 	/*
 	 * MAIN to test some stuff
 	 */
@@ -100,7 +115,8 @@ public class OFB {
 		OFB hoi = new OFB();
 		hoi.setKey(new byte[]{1,0});
 		
-		byte[] result = hoi.EnDecrypt(new byte[]{1,0,1,0,1,1});
+		System.out.println("Encrypt: \n{1, 1, 1, 0, 1, 1, 1, 0, 0, 0}");
+		byte[] result = hoi.EnDecrypt(new byte[]{1,1,1,0,1,1,1,0,0,0});
 		System.out.print("{" );
 		for (int i = 0; i < result.length; i++) {
 			if (i != 0) {
@@ -110,7 +126,7 @@ public class OFB {
 		}
 		System.out.print("}\n");
 	
-		
+		System.out.println("Decrypt:");
 		byte[] retur = hoi.EnDecrypt(result);
 		System.out.print("{" );
 		for (int i = 0; i < retur.length; i++) {
