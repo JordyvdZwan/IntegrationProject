@@ -6,11 +6,13 @@ import java.net.UnknownHostException;
 
 import network.Connection;
 import network.JRTVPacket;
+import network.Router;
 public class Controller extends Thread {
 
 	View view;
 	Connection connection;
 	InetAddress IAddress;
+	Router router;
 	
 	String clientName = "Anonymous";
 	
@@ -42,6 +44,36 @@ public class Controller extends Thread {
 				e.printStackTrace();
 			}
 		}
+	}
+	
+
+	//Sends the string message as payload to the client if it can see the client otherwise error
+	public void sendMessage(String client, String message) {
+		if (router.getIP() != null) {
+			DatagramPacket data = new DatagramPacket(message.getBytes(), message.getBytes().length, IAddress, 2000);
+			connection.send(data);
+		}
+		
+		
+	}
+	
+	//sends the packet
+	public void sendPacket(JRTVPacket packet) {
+		
+	}
+	
+	//Broadcasts the message to all connected clients
+	public void broadcastMessage(String message) {
+		
+	}
+	
+	//HIERONDER IS SAFE VINCENT!
+	//-----------------VVVVVVVVVVVVVVVVVVVVVVVV-------------------------
+	
+	public void receiveFromView(String client, String message) {
+		JRTVPacket packet = new JRTVPacket(message);
+		packet.setNormal(true);
+		sendMessage(client, packet.toByteArray());
 	}
 	
 	public void handleMessage(byte[] message) {
@@ -79,16 +111,6 @@ public class Controller extends Thread {
 	
 	public void handleAck(JRTVPacket p) {
 		
-	}
-	public void sendMessage(String client, String message) {
-		DatagramPacket data = new DatagramPacket(message.getBytes(), message.getBytes().length, IAddress, 2000);
-		connection.send(data);
-	}
-	
-	public void receiveFromView(String client, String message) {
-		JRTVPacket packet = new JRTVPacket(message);
-		packet.setNormal(true);
-		sendMessage(client, packet.toByteArray());
 	}
 	
 	public void setClientName(String clientName) {

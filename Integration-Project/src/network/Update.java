@@ -18,7 +18,7 @@ public class Update extends Thread {
 	
 	public void run() {
 		while(true) {
-			controller.broadcastMessage(controller.getClientName().getBytes());
+			controller.broadcastMessage(controller.getClientName());
 			try {
 				TimeUnit.SECONDS.sleep(1);
 			} catch (InterruptedException e) {
