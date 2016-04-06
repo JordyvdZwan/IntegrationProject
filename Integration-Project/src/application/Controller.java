@@ -1,8 +1,10 @@
 package application;
 
+import java.math.BigInteger;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.security.SecureRandom;
 
 import network.Connection;
 import network.JRTVPacket;
@@ -10,16 +12,19 @@ import network.Router;
 import network.Update;
 public class Controller extends Thread {
 
-	View view;
-	Connection connection;
-	InetAddress multicastIAddress;
-	InetAddress localIAddress;
-	Router router = new Router(this);
-	Update update;
+	private View view;
+	private Connection connection;
+	private InetAddress multicastIAddress;
+	private int localIAddress;
+	private Router router = new Router(this);
+	private Update update;
+	private boolean settingUp = true;
+	private String initString;
 	
-	String clientName = "Anonymous";
+	private String clientName = "Anonymous";
 	
 	public Controller(View view) {
+		this.setName("Controller");
 		this.view = view;
 		
 		String address = "224.0.0.2";
@@ -32,6 +37,63 @@ public class Controller extends Thread {
 		int port = 2000;
 		connection = new Connection(port, address);
 		update = new Update(this);
+		settupIP();
+	}
+	
+	private void settupIP() {
+		boolean found = false;
+		initString = randomString();
+		while (settingUp) {
+			DatagramPacket data;
+			if((data = connection.getFirstInQueue()) != null) {
+				System.out.print("EQUAL: " +new JRTVPacket(data.getData()).getMessage().equals(initString));
+				JRTVPacket p = new JRTVPacket(data.getData());
+				System.out.print("1: " +p.getMessage());
+				System.out.print("1: " +initString);
+				if (new JRTVPacket(data.getData()).getMessage().equals(initString)) {
+					InetAddress add = data.getAddress(); 
+					String address = add.toString();
+					address = address.replace("/", "");
+					localIAddress = IPtoInt(address);
+					settingUp = false;
+				}
+			}
+			try {
+				this.sleep(500);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		view.addMessage("SYS", "Your ip is: " + localIAddress);
+	}
+	
+	private int IPtoInt(String ipaddress) {
+		int[] ip = new int[4];
+		String[] parts = ipaddress.split("\\.");
+
+		for (int i = 0; i < 4; i++) {
+		    ip[i] = Integer.parseInt(parts[i]);
+		}
+		long ipNumbers = 0;
+		for (int i = 0; i < 4; i++) {
+		    ipNumbers += ip[i] << (24 - (8 * i));
+		}
+		return (int) ipNumbers;
+	}
+	
+	private SecureRandom random = new SecureRandom();
+	
+	public String randomString() {
+		return new BigInteger(130, random).toString(32);
+	}
+	
+	public boolean getSettingUp() {
+		return settingUp;
+	}
+	
+	public String getInitString() {
+		return initString;
 	}
 	
 	public void run() {
@@ -99,18 +161,18 @@ public class Controller extends Thread {
 	}
 	
 	public void handleMessage(DatagramPacket message) {
-		
+		System.out.println(message.getAddress().toString());
 //		System.out.println(message.getAddress());
 		JRTVPacket packet = new JRTVPacket(message.getData());
-
+		String source = message.getAddress().toString();
 		System.out.println("is het een update? : " + packet.isUpdate());
-		System.out.println(router.getName(message.getAddress()));
+//		System.out.println(router.getName(message.getAddress()));
 		System.out.println("is het een normal? : " + packet.isNormal());
 		System.out.println(packet.toString());
 		if(packet.isNormal()) {
 			handleNormal(packet);
 		} else if (packet.isUpdate()) {
-			handleUpdate(message);
+			handleUpdate(packet);
 		} else if (packet.isSyn()) {
 			handleSyn(packet);
 		} else if (packet.isFin()) {
@@ -122,13 +184,16 @@ public class Controller extends Thread {
 	
 	public void handleNormal(JRTVPacket p) {
 		String message = p.getMessage();
-		view.addMessage("" + p.getSource(), message);
+		view.addMessage(router.getName(p.getSource()), message);
 		//TODO: implement setting the right sequence and acknowledgement numbers
 	}
 	
-	public void handleUpdate(DatagramPacket p) {
-		router.setEntry(p.getAddress(), p.getData().toString());
-		
+	public String getNameBySource(int source) {
+		return router.getName(source);
+	}
+	
+	public void handleUpdate(JRTVPacket p) {
+		router.processUpdate(p);
 	}
 	
 	public void handleSyn(JRTVPacket p) {
