@@ -39,10 +39,10 @@ public class Controller extends Thread {
 		int port = 2000;
 		connection = new Connection(port, address);
 		update = new Update(this);
-		settupIP();
+		setupIP();
 	}
 	
-	private void settupIP() {
+	private void setupIP() {
 		initString = randomString();
 		while (settingUp) {
 			DatagramPacket data;

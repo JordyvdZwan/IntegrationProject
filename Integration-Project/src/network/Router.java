@@ -20,7 +20,21 @@ public class Router {
 	}
 	
 	public void processUpdate(JRTVPacket packet) {
-		setEntry(packet.getSource(), packet.getMessage());
+		
+		//Puts true into the list with valid hops
+		try {
+			table.getvalidhops().put(InetAddress.getByName("" + packet.getSource()), true);
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
+		//TODO: Split at destination, next hop and put these into the forwardingtables
+		//This creates a new timeout for the specified next hop
+		try {
+			EntryTimeOut e = new EntryTimeOut(this, InetAddress.getByName("" + packet.getSource()));
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
+		addresstable.put(packet.getSource(), packet.getMessage());
 	}
 	
 	
@@ -76,6 +90,8 @@ public class Router {
 		return null;
 	}
 	
-	
+	public ForwardingTable getForwardingTable() {
+		return table;
+	}
 
 }
