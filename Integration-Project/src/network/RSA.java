@@ -12,8 +12,8 @@ public class RSA {
 	
 	public RSA(int bits) {
 		SecureRandom r = new SecureRandom();
-		BigInteger p = new BigInteger(LENGTH / 2, 100, r);
-		BigInteger q = new BigInteger(LENGTH / 2, 100, r);
+		BigInteger p = new BigInteger("3");//new BigInteger(LENGTH / 2, 100, r);
+		BigInteger q = new BigInteger("11");//new BigInteger(LENGTH / 2, 100, r);
 		n = p.multiply(q);
 		BigInteger m = (p.subtract(BigInteger.ONE).multiply(q.subtract(BigInteger.ONE)));
 		e = new BigInteger("3");
