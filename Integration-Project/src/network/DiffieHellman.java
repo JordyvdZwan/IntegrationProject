@@ -6,7 +6,8 @@ import java.security.SecureRandom;
 public class DiffieHellman {
 	
 	private BigInteger key;
-	int length = 1024;
+	private BigInteger a, g, p;
+	private static final int LENGTH = 1024;
 	
 	/**
 	 * Constructor to start a session.
@@ -14,11 +15,9 @@ public class DiffieHellman {
 	 */
 	public DiffieHellman(int bits) {
 		SecureRandom r = new SecureRandom();
-		BigInteger a = new BigInteger(length / 3, 100, r);
-		BigInteger g = new BigInteger(length / 3, 100, r);
-		BigInteger p = new BigInteger(length / 3, 100, r);
-		generate(a, g, p);
-		key = key(A, a, p);
+		a = new BigInteger(LENGTH / 2, 100, r);
+		g = new BigInteger(LENGTH / 2, 100, r);
+		p = new BigInteger(LENGTH / 2, 100, r);
 	}
 	
 	/**
@@ -29,31 +28,18 @@ public class DiffieHellman {
 	 */
 	public DiffieHellman(BigInteger g, BigInteger p, BigInteger A) {
 		SecureRandom r = new SecureRandom();
-		BigInteger a = new BigInteger(length / 3, 100, r);
-		generate(a, g, p);
-		key = key(A, a, p);
+		a = new BigInteger(length / 3, 100, r);
 	}
 	
 	/**
 	 * Generate the first round of variables.
-	 * @param a own generated key
-	 * @param g
+	 * @param a own generated key 	- Received number
+	 * @param g						- own generated key
 	 * @param p
 	 * @return
 	 */
 	public BigInteger generate(BigInteger a, BigInteger g, BigInteger p) {
 		return g.modPow(a, p);
-	}
-	
-	/**
-	 * Extract the key from the variables.
-	 * @param A Received from other party
-	 * @param a own generated key
-	 * @param p 
-	 * @return
-	 */
-	public BigInteger key(BigInteger A, BigInteger a, BigInteger p) {
-		return A.modPow(a, p);
 	}
 	
 	public BigInteger getKey() {
