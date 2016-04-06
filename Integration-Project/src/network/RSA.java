@@ -39,8 +39,10 @@ public class RSA {
 	
 	public boolean verify(String signature, String message) {
 		Integer hashed = message.hashCode();
+		Integer hashed2 = message.hashCode();
 		System.out.println(new BigInteger(signature.getBytes()).modPow(e, n));
 		System.out.println(new BigInteger(hashed.toString()));
+		System.out.println(new BigInteger(hashed2.toString()));
 		
 		return (new BigInteger(signature.getBytes()).modPow(e, n).toString()
 				== (new BigInteger(hashed.toString()).toString()));
