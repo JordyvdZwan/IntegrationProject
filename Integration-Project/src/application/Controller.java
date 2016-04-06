@@ -95,7 +95,7 @@ public class Controller extends Thread {
 	public void receiveFromView(String client, String message) {
 		JRTVPacket packet = new JRTVPacket(message);
 		packet.setNormal(true);
-		sendMessage(client, message);
+		sendPacket(client, packet);
 	}
 	
 	public void handleMessage(DatagramPacket message) {
