@@ -10,6 +10,10 @@ public class OFB {
 					 1,1,0,1,0,1,1,0,0,1,1,1,0,1,0,0,1,0,1,0,0,
 					 1,0,1,0,0,1,0,0,1,1,0,0,1,0,1,1,0,1,0,0,0}; 
 	
+//	public OFB() {
+//		this.key = new DiffieHellman(BLOCKSIZE).getKey().toByteArray();
+//	}
+	
 	public byte[] EnDecrypt(byte[] message) {
 		/**
 		 * OFB
@@ -118,7 +122,7 @@ public class OFB {
 		hoi.setKey(new byte[]{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0});
 		
 		System.out.println("Encrypt: \n{1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1}");
-		byte[] result = hoi.EnDecrypt(new byte[]{1,1,1,0,1,1,1,0,0,0,1});
+		byte[] result = hoi.EnDecrypt(new byte[]{1,1,1,0,1,1,1,0,0,0,0,0});
 		System.out.print("{" );
 		for (int i = 0; i < result.length; i++) {
 			if (i != 0) {
