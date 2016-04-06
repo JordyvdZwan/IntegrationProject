@@ -106,7 +106,7 @@ public class Controller extends Thread {
 		System.out.println("is het een update? : " + packet.isUpdate());
 		System.out.println(router.getName(message.getAddress()));
 		System.out.println("is het een normal? : " + packet.isNormal());
-
+		System.out.println(packet.toString());
 		if(packet.isNormal()) {
 			handleNormal(packet);
 		} else if (packet.isUpdate()) {
