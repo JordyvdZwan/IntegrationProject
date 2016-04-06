@@ -1,7 +1,7 @@
 package network;
 
 import java.net.InetAddress;
-
+import java.net.UnknownHostException;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -10,7 +10,7 @@ import application.Controller;
 
 
 public class Router {
-
+	
 	private Controller controller;
 	Map<InetAddress, String> addresstable = new HashMap<InetAddress, String>();
 	

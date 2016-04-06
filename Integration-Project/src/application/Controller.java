@@ -38,7 +38,7 @@ public class Controller extends Thread {
 		while (true) {
 			DatagramPacket data;
 			if((data = connection.getFirstInQueue()) != null) {
-				handleMessage(data.getData());
+				handleMessage(data);
 			}
 			try {
 				this.sleep(100);
@@ -96,13 +96,15 @@ public class Controller extends Thread {
 		sendMessage(client, message);
 	}
 	
-	public void handleMessage(byte[] message) {
+	public void handleMessage(DatagramPacket message) {
 		
-		JRTVPacket packet = new JRTVPacket(message);
+		System.out.println(message.getAddress());
+		JRTVPacket packet = new JRTVPacket(message.getData());
+		System.out.println(packet.isUpdate());
 		if(packet.isNormal()) {
 			handleNormal(packet);
 		} else if (packet.isUpdate()) {
-			handleUpdate(packet);
+			handleUpdate(message);
 		} else if (packet.isSyn()) {
 			handleSyn(packet);
 		} else if (packet.isFin()) {
@@ -118,8 +120,9 @@ public class Controller extends Thread {
 		//TODO: implement setting the right sequence and acknowledgement numbers
 	}
 	
-	public void handleUpdate(JRTVPacket p) {
-		//Map<Ip adres, naam>
+	public void handleUpdate(DatagramPacket p) {
+		router.setEntry(p.getAddress(), p.getData().toString());
+		
 	}
 	
 	public void handleSyn(JRTVPacket p) {
@@ -145,4 +148,5 @@ public class Controller extends Thread {
 	public InetAddress getMulticastAddress() {
 		return multicastIAddress;
 	}
+	
 }
