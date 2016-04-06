@@ -5,31 +5,20 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.concurrent.TimeUnit;
 
+import application.Controller;
+
 public class Update extends Thread {
 	
+	Controller controller;
 	
-	String clientname;
-	Connection connection;
-	InetAddress IAddress;
-	public Update(String clientname, Connection c) {
-		
-		try {
-			IAddress = InetAddress.getByName("224.0.0.2");
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		}
-		this.clientname = clientname;
-		connection = c;
+	public Update(Controller controller) {
+		this.controller = controller;
 		this.start();
 	}
 	
 	public void run() {
 		while(true) {
-			
-			DatagramPacket updatepacket = new DatagramPacket( clientname.getBytes() , clientname.getBytes().length, IAddress , 2000);
-			 
-			connection.send(updatepacket);
-			
+			controller.broadcastMessage(controller.getClientName().getBytes());
 			try {
 				TimeUnit.SECONDS.sleep(1);
 			} catch (InterruptedException e) {
