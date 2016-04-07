@@ -213,7 +213,7 @@ public class Controller extends Thread {
 		}
 
 
-		if (packet.getSource() != localIAddress && (packet.getDestination() == localIAddress || (packet.getDestination() == multicastAddress && packet.isUpdate() ))) {
+//		if (packet.getSource() != localIAddress && (packet.getDestination() == localIAddress || (packet.getDestination() == multicastAddress))) {
 
 		//System.out.println("Voor die leipe statement is ie een update? : " + packet.isUpdate());
 		//System.out.println("Source ? : " + (packet.getSource() != localIAddress));
@@ -242,7 +242,7 @@ public class Controller extends Thread {
 //			}
 			
 			
-			
+//		}
 		}
 	}
 	
