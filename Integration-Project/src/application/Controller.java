@@ -181,6 +181,7 @@ public class Controller extends Thread {
 	}
 	
 	private void sendAck(JRTVPacket packet) {
+		System.out.println("yo");
 		JRTVPacket p = new JRTVPacket("ACK");
 		p.setSource(localIAddress);
 		p.setDestination(packet.getSource());
@@ -190,8 +191,9 @@ public class Controller extends Thread {
 			p.setNextHop(router.getNextHop(p.getDestination()));
 		}
 		
-		DatagramPacket data = new DatagramPacket(packet.toByteArray(), packet.toByteArray().length, getMulticastIAddress(), 2000);
+		DatagramPacket data = new DatagramPacket(p.toByteArray(), p.toByteArray().length, getMulticastIAddress(), 2000);
 		connection.send(data);
+		System.out.println("peop");
 	}
 	
 	//sends the packet after processing the packet;
@@ -228,8 +230,8 @@ public class Controller extends Thread {
 					if (!seqAckTable.isReceivedSeqNr(packet.getSource(), packet.getSeqnr())) {
 						seqAckTable.addReceivedSeqNr(packet.getSource(), packet.getSeqnr());
 						if(packet.isNormal()) {
-							handleNormal(packet);
 							sendAck(packet);
+							handleNormal(packet);
 						} else if (packet.isUpdate()) {
 							handleUpdate(packet);
 						} else if (packet.isSyn()) {
