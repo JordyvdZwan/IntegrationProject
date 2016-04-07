@@ -3,6 +3,9 @@ package application;
 import java.net.InetAddress;
 import java.sql.Connection;
 
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import java.io.File;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -254,5 +257,9 @@ public class View extends Application {
 	
 	public void addMessage(String client, String message) {
 		chatText.setText(chatText.getText() + "\n" + client + ": " + message);
+//		String ssound = "sound.mp3";
+//	    Media sound = new Media(ssound);
+//	    MediaPlayer mediaPlayer = new MediaPlayer(sound);
+//	    mediaPlayer.play();
 	}
 }

@@ -44,7 +44,7 @@ public class Connection extends Thread {
 			}
 
 			System.out.println("Received packet from " + recv.getAddress() + "with " + recv.getLength() +  " bytes of data");
-			System.out.println(new JRTVPacket(recv.getData()).toString()); //TODO
+
 			queuedpackets.add(recv);
 			recv.setLength(buffer.length);
 		}

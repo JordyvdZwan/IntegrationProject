@@ -207,22 +207,18 @@ public class Controller extends Thread {
 	
 	public void handleMessage(DatagramPacket message) {
 		JRTVPacket packet = new JRTVPacket(message.getData());
-		
+
 		if (packet.getNextHop() == localIAddress) {
 			retransmit(packet);
 		}
-		System.out.println("Local controller IP" + localIAddress);
-		System.out.println("Packet Source" + packet.getSource());
-		System.out.println("Packet Destination" + packet.getDestination());
-		System.out.println("MultiCast IP" + multicastAddress);
 		if (packet.getSource() != localIAddress && (packet.getDestination() == localIAddress || (packet.getDestination() == multicastAddress && !packet.isUpdate() ))) {
 			
 			seqAckTable.receivedPackage(packet);
 			if (!packet.getMessage().equals("ACK") && !packet.isUpdate()){
 				sendAck(packet);
 			}
-			
-			if (!seqAckTable.received(packet.getSeqnr(), packet.getAcknr(), packet.isBroadcasted(), packet.getSource())) {
+			System.out.println(packet.toString()); //TODO
+//			if (!seqAckTable.received(packet.getSeqnr(), packet.getAcknr(), packet.isBroadcasted(), packet.getSource())) {
 				if(packet.isNormal()) {
 					handleNormal(packet);
 				} else if (packet.isUpdate()) {
@@ -234,7 +230,7 @@ public class Controller extends Thread {
 				} else if (packet.isAck()) {
 					handleAck(packet);
 				}
-			}
+//			}
 			
 			
 			
