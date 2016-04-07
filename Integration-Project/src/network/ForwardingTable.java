@@ -24,7 +24,7 @@ public class ForwardingTable {
 	
 	public int getNextHop(Integer destination) {
 		//Loops through all the paths to the destination and selects the one with the lowest cost
-		Integer result = null;
+		Integer result = 0;
 		int resultcost = 200;
 		if (destination == Controller.multicastAddress) {
 			return Controller.multicastAddress;
