@@ -162,9 +162,10 @@ public class Controller extends Thread {
 	//CHANGE NEXTHOP ACCORDINGLY TODO
 	public void sendPacket(int client, JRTVPacket packet) {
 		packet.setSeqnr(seqAckTable.getNextSeq(packet.getDestination()));
-		
-		//INSERT NEXTHOP ROUTING (for unicast) AND ENCRYPTION HERE!
-		System.out.println(packet.toString());
+
+		if (packet.getDestination() != multicastAddress) {
+			packet.setNextHop(router.getNextHop(packet.getDestination()));
+		}
 		
 		seqAckTable.registerSendPacket(packet);
 		DatagramPacket data = new DatagramPacket(packet.toByteArray(), packet.toByteArray().length, getMulticastIAddress(), 2000);
@@ -177,9 +178,13 @@ public class Controller extends Thread {
 	
 	public void retransmit(JRTVPacket packet, int destination) {
 		packet.setDestination(destination);
+		
+		if (packet.getDestination() != multicastAddress) {
+			packet.setNextHop(router.getNextHop(packet.getDestination()));
+		}
+		
 		seqAckTable.registerSendPacket(packet);
 		DatagramPacket data = new DatagramPacket(packet.toByteArray(), packet.toByteArray().length, getMulticastIAddress(), 2000);
-		//Is this a unicast? If not, just set it to multicast address and put it into the actual data
 		connection.send(data);
 	}
 	
@@ -188,6 +193,11 @@ public class Controller extends Thread {
 		p.setSource(localIAddress);
 		p.setDestination(packet.getSource());
 		p.setAcknr(packet.getSeqnr());
+		
+		if (p.getDestination() != multicastAddress) {
+			p.setNextHop(router.getNextHop(p.getDestination()));
+		}
+		
 		DatagramPacket data = new DatagramPacket(packet.toByteArray(), packet.toByteArray().length, getMulticastIAddress(), 2000);
 		connection.send(data);
 	}
