@@ -50,7 +50,7 @@ public class Update extends Thread {
 					bytes[(counter * 8) + 10] = intToByteArray(integer)[2];
 					bytes[(counter * 8) + 11] = intToByteArray(integer)[3];
 					
-					Integer cost = controller.getRouter().getNextHopCost(integer);
+					Integer cost = controller.getRouter().getNextHopCost(integer) + 1;
 					
 					bytes[(counter * 8) + 12] = intToByteArray(cost)[0];
 					bytes[(counter * 8) + 13] = intToByteArray(cost)[1];
