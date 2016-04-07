@@ -30,12 +30,19 @@ public class TimeOutTimer extends Thread {
 		if (packet.getDestination() == Controller.multicastAddress) {
 			for (Integer integer : table.getController().getForwardingTable().keySet()) {
 				if (integer != table.getController().getLocalIAddress()) {
-					
+					if (!table.isReceived(integer, packet.getSeqnr())) {
+						table.retransmit(packet, integer);
+						
+					}
 				}
 			}
 		} else {
-			table.get
+			if (!table.isReceived(packet.getDestination(), packet.getSeqnr())) {
+				table.retransmit(packet, packet.getDestination());
+			}
 		}
+		table.removeReceived(packet.getDestination(), packet.getSeqnr());
+		this.interrupt();
 	}
 	
 }

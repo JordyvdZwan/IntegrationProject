@@ -159,31 +159,32 @@ public class Controller extends Thread {
 		
 		sendPacket(packet.getDestination(), packet);
 	}
-	
+	//CHANGE NEXTHOP ACCORDINGLY TODO
 	public void sendPacket(int client, JRTVPacket packet) {
-		int[] seqAck = seqAckTable.getSeqAck(client, packet.isBroadcasted());
-		packet.setSeqnr(seqAck[0] + packet.getPayloadLength());
-		packet.setAcknr(seqAck[1]);
-//		if (!packet.getMessage().equals("ACK")) {
-//			seqAckTable.registerOutgoingPackage(packet);
-//		}
+		packet.setSeqnr(seqAckTable.getNextSeq(packet.getDestination()));
+		seqAckTable.registerSendPacket(packet);
 		DatagramPacket data = new DatagramPacket(packet.toByteArray(), packet.toByteArray().length, router.getRouteIP(packet.getDestination()), 2000);
 		connection.send(data);
 	}
 	
 	public void retransmit(JRTVPacket packet) {
-//		if (!packet.getMessage().equals("ACK")) {
-//			seqAckTable.registerOutgoingPackage(packet);
-//		}
+		retransmit(packet, packet.getDestination());
+	}
+	
+	public void retransmit(JRTVPacket packet, int destination) {
+		packet.setDestination(destination);
+		seqAckTable.registerSendPacket(packet);
 		DatagramPacket data = new DatagramPacket(packet.toByteArray(), packet.toByteArray().length, router.getRouteIP(packet.getDestination()), 2000);
 		connection.send(data);
 	}
 	
 	private void sendAck(JRTVPacket packet) {
 		JRTVPacket p = new JRTVPacket("ACK");
-		p.setDestination(localIAddress);//packet.getSource());
 		p.setSource(localIAddress);
-		sendPacket(packet.getSource(), p);
+		p.setDestination(packet.getSource());
+		p.setAcknr(packet.getSeqnr());
+		DatagramPacket data = new DatagramPacket(packet.toByteArray(), packet.toByteArray().length, router.getRouteIP(packet.getDestination()), 2000);
+		connection.send(data);
 	}
 	
 	//sends the packet after processing the packet;
@@ -212,44 +213,30 @@ public class Controller extends Thread {
 	public void handleMessage(DatagramPacket message) {
 		JRTVPacket packet = new JRTVPacket(message.getData());
 
-//		if (packet.getNextHop() == localIAddress) {
-//			retransmit(packet);
-//		}
-//
-//
-//		//if (packet.getSource() != localIAddress && (packet.getDestination() == localIAddress || (packet.getDestination() == multicastAddress && packet.isUpdate() ))) {
-////		if (packet.getSource() != localIAddress && (packet.getDestination() == localIAddress || (packet.getDestination() == multicastAddress))) {
-//
-//		//System.out.println("Voor die leipe statement is ie een update? : " + packet.isUpdate());
-//		//System.out.println("Source ? : " + (packet.getSource() != localIAddress));
-//		//System.out.println("Destination? : " + (packet.getDestination() == localIAddress || (packet.getDestination() == multicastAddress && packet.isUpdate() )));
-//		//&& packet.isUpdate() Removed it
-//		if (packet.getSource() != localIAddress && (packet.getDestination() == localIAddress || (packet.getDestination() == multicastAddress))) {
-//
-//			System.out.println("Na die leipe statement is ie een update? : " + packet.isUpdate());
-//			seqAckTable.receivedPackage(packet);
-//			if (!packet.getMessage().equals("ACK") && !packet.isUpdate()){
-//				sendAck(packet);
-//			}
-			System.out.println(packet.toString()); //TODO
-//			if (!seqAckTable.received(packet.getSeqnr(), packet.getAcknr(), packet.isBroadcasted(), packet.getSource())) {
-				if(packet.isNormal()) {
-					handleNormal(packet);
-				} else if (packet.isUpdate()) {
-					handleUpdate(packet, message.getAddress());
-				} else if (packet.isSyn()) {
-					handleSyn(packet);
-				} else if (packet.isFin()) {
-					handleFin(packet);
-				} else if (packet.isAck()) {
-					handleAck(packet);
+		if (packet.getNextHop() == localIAddress && packet.getDestination() != localIAddress) {
+			retransmit(packet);
+		} else {
+			if (packet.getDestination() == localIAddress || packet.getDestination() == multicastAddress) {
+				sendAck(packet);
+				if (!seqAckTable.isReceivedSeqNr(packet.getSource(), packet.getSeqnr())) {
+					seqAckTable.addReceivedSeqNr(packet.getSource(), packet.getSeqnr());
+					//TODO right order?
+					if(packet.isNormal()) {
+						handleNormal(packet);
+					} else if (packet.isUpdate()) {
+						handleUpdate(packet, message.getAddress());
+					} else if (packet.isSyn()) {
+						handleSyn(packet);
+					} else if (packet.isFin()) {
+						handleFin(packet);
+					} else if (packet.isAck()) {
+						handleAck(packet);
+					} else {
+					}
 				}
-//			}
-			
-			
-//		}
+			}
 		}
-//	}
+	}
 	
 	public void addRecipientToView(String recipient) {
 		view.addRecipient(recipient);
