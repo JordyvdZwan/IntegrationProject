@@ -107,8 +107,14 @@ public class Router {
 	}
 	
 		//TO BE IMPLEMENTED
-	public InetAddress getRouteIP(int client) {
-		return controller.getMulticastAddress();
+	public InetAddress getRouteIP(int destination) {
+		InetAddress result = null;
+		if(destination == Controller.multicastAddress) {
+			result = controller.getMulticastIAddress();
+		} else {
+			result =  table.getNextHop(destination);
+		}
+		return result;
 	}
 	
 	public ForwardingTable getForwardingTable() {

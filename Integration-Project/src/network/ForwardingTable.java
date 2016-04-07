@@ -17,14 +17,18 @@ public class ForwardingTable {
 		//Loops through all the paths to the destination and selects the one with the lowest cost
 		InetAddress result = null;
 		int resultcost = 0;
-		Map<InetAddress, Integer> possibilities = forwardingtable.get(destination);
 		
-		for(InetAddress e: possibilities.keySet()) {
-			if(possibilities.get(e) <= resultcost) {
-				result = e;
-				resultcost = possibilities.get(e);
+		if(forwardingtable.containsKey(destination)) {
+			Map<InetAddress, Integer> possibilities = forwardingtable.get(destination);
+			
+			for(InetAddress e: possibilities.keySet()) {
+				if(possibilities.get(e) <= resultcost) {
+					result = e;
+					resultcost = possibilities.get(e);
+				}
 			}
-		}
+		} 
+	
 		return result;
 	}
 	

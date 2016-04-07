@@ -176,6 +176,7 @@ public class Controller extends Thread {
 //			seqAckTable.registerOutgoingPackage(packet);
 //		}
 		DatagramPacket data = new DatagramPacket(packet.toByteArray(), packet.toByteArray().length, router.getRouteIP(packet.getDestination()), 2000);
+		//Is this a unicast? If not, just set it to multicast address and put it into the actual data
 		connection.send(data);
 	}
 	
@@ -212,15 +213,6 @@ public class Controller extends Thread {
 	public void handleMessage(DatagramPacket message) {
 		JRTVPacket packet = new JRTVPacket(message.getData());
 
-//		if (packet.getNextHop() == localIAddress) {
-//			retransmit(packet);
-//		}
-//
-//
-//		//if (packet.getSource() != localIAddress && (packet.getDestination() == localIAddress || (packet.getDestination() == multicastAddress && packet.isUpdate() ))) {
-////		if (packet.getSource() != localIAddress && (packet.getDestination() == localIAddress || (packet.getDestination() == multicastAddress))) {
-//
-//
 //		//System.out.println("Voor die leipe statement is ie een update? : " + packet.isUpdate());
 //		//System.out.println("Source ? : " + (packet.getSource() != localIAddress));
 //		//System.out.println("Destination? : " + (packet.getDestination() == localIAddress || (packet.getDestination() == multicastAddress && packet.isUpdate() )));
@@ -247,6 +239,8 @@ public class Controller extends Thread {
 				}
 //			}
 
+			
+			
 //		}
 		}
 //	}

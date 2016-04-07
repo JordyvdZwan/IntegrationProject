@@ -1,63 +1,76 @@
 package security;
 
-import java.math.BigInteger;
-import java.security.SecureRandom;
+import java.security.*;
+
+import javax.crypto.Cipher;
 
 public class RSA {
-	private BigInteger n;
-	private BigInteger d;
-	private BigInteger e;
 	
-	private static final int LENGTH = 1024;
-	
-	public RSA() {
-		SecureRandom r = new SecureRandom();
-		BigInteger p = new BigInteger("3");//new BigInteger(LENGTH / 2, 100, r);
-		BigInteger q = new BigInteger("11");//new BigInteger(LENGTH / 2, 100, r);
-		n = p.multiply(q);
-		BigInteger m = (p.subtract(BigInteger.ONE).multiply(q.subtract(BigInteger.ONE)));
-		e = new BigInteger("3");
-		while (m.gcd(e).intValue() > 1) {
-			e = e.add(new BigInteger("2"));
-		}
-		d = e.modInverse(m);
-		System.out.println("d: " + d);
-		System.out.println("e: " + e);
-		System.out.println("m: " + m);
-		System.out.println("n: " + n);
+	/**
+	 * Defining all finals
+	 * PublicKey
+	 * PrivateKey
+	 * 
+	 */
+	public static final String ALGORITHM = "RSA";	
+	private static final KeyPairGenerator kpg;
+	static {
+		KeyPairGenerator tmp = null;
+	    try {
+	   	 tmp =  KeyPairGenerator.getInstance(ALGORITHM);
+	    } catch (NoSuchAlgorithmException e) {
+	      e.printStackTrace();
+	    }
+	    kpg = tmp;
 	}
-	
-	public byte[] encrypt(byte[] message) {
-		return (new BigInteger(message)).modPow(e, n).toByteArray();
-	}
-	
-	public byte[] decrypt(byte[] message) {
-		return (new BigInteger(message)).modPow(d, n).toByteArray();
-	}
-	
-	
-	public String sign(String message) {
-		Integer hashed = message.hashCode(); 
+	private static final KeyPair KP = kpg.generateKeyPair();
+	private static final Key PUBLICKEY = KP.getPublic();
+	private static final Key PRIVATEKEY = KP.getPrivate();
 
-		
-		System.out.println(hashed);
-		System.out.println((new BigInteger(hashed.toString())).modPow(d, n).toString());
-		
-		
-		return (new BigInteger(hashed.toString())).modPow(d, n).toString(); 
+	/**
+	 * Using native Java methods to encrypt the given text
+	 * using RSA
+	 * @param text to sign/encrypt
+	 * @param key either private (for signing) or public (for encryption)
+	 * @return
+	 */
+	public static byte[] encrypt(String text, Key key) {
+	    byte[] cipherText = null;
+	    try {
+		    final Cipher cipher = Cipher.getInstance(ALGORITHM);
+		    cipher.init(Cipher.ENCRYPT_MODE, key);
+		    cipherText = cipher.doFinal(text.getBytes());
+	    } catch (Exception e) {
+	    	e.printStackTrace();
+	    }
+	return cipherText;
 	}
-	
-	public boolean verify(String signature, String message) {
-		Integer hashed = message.hashCode();
+	  
+	/**
+	 * Using native Java methods to decrypt the given text
+	 * using RSA
+	 * @param text to verify/decrypt
+	 * @param key either public (for verifying) or private (for decryption)
+	 * @return
+	 */
+	public static String decrypt(byte[] text, Key key) {
+	    byte[] dectyptedText = null;
+	    try {
+		    final Cipher cipher = Cipher.getInstance(ALGORITHM);
+		    cipher.init(Cipher.DECRYPT_MODE, key);
+		    dectyptedText = cipher.doFinal(text);
+	    } catch (Exception ex) {
+	    	ex.printStackTrace();
+	    }
+	    return new String(dectyptedText);
+	}
 
-		System.out.println(signature);
-		System.out.println(new BigInteger(signature.getBytes()).modPow(e, n));
-		System.out.println(new BigInteger(hashed.toString()));
-		
-		System.out.println(new BigInteger(hashed.toString()).mod(n));
-		
-		return (new BigInteger(signature.getBytes()).modPow(e, n))
-				== (new BigInteger(hashed.toString()));
+	
+	public static Key getPublicKey() {
+		return PUBLICKEY;
 	}
 	
+	public static Key getPrivateKey() {
+		return PRIVATEKEY;
+	}
 }
