@@ -18,7 +18,7 @@ public class SeqAckTable {
 	}
 	
 	Map<Integer, Integer> seqNrs = new HashMap<Integer, Integer>();
-	Map<Integer, Map<Integer, Boolean>> received = new HashMap<Integer, Map<Integer, Boolean>>();
+	Map<Integer, Map<Integer, Boolean>> send = new HashMap<Integer, Map<Integer, Boolean>>();
 	Map<Integer, List<Integer>> receivedSeqNrs = new HashMap<Integer, List<Integer>>();
 	
 	public void addReceivedSeqNr(Integer source, Integer seq) {
@@ -49,18 +49,18 @@ public class SeqAckTable {
 	
 	public Boolean isReceived(Integer address, Integer seq) {
 		Boolean res = null;
-		if (received.containsKey(address)) {
-			if (received.get(address).containsKey(seq)) {
-				res = received.get(address).get(seq);
+		if (send.containsKey(address)) {
+			if (send.get(address).containsKey(seq)) {
+				res = send.get(address).get(seq);
 			}
 		}
 		return res;
 	}
 	
 	public void removeReceived(Integer address, Integer seq) {
-		if (received.containsKey(address)) {
-			if (received.get(address).containsKey(seq)) {
-				received.get(address).remove(seq);
+		if (send.containsKey(address)) {
+			if (send.get(address).containsKey(seq)) {
+				send.get(address).remove(seq);
 			}
 		}
 	}
@@ -72,31 +72,32 @@ public class SeqAckTable {
 	public void registerAckPacket(JRTVPacket packet) {
 		int address = packet.getSource();
 		int seq = packet.getAcknr();
-		if (received.containsKey(address)) {
-			if (received.get(address).containsKey(seq)) {
-				received.get(address).put(seq, true);
+		if (send.containsKey(address)) {
+			if (send.get(address).containsKey(seq)) {
+				send.get(address).put(seq, true);
 			}
 		}
 	}
 	
 	public void registerSendPacket(JRTVPacket packet) {
 		if (packet.getDestination() == Controller.multicastAddress) {
-			System.out.println("peop");
 			for (Integer integer : controller.getForwardingTable().keySet()) {
 				if (integer != controller.getLocalIAddress()) {
-					if (!received.containsKey(packet.getDestination())) {
-						received.put(packet.getDestination(), new HashMap<Integer, Boolean>());
+					if (!send.containsKey(packet.getDestination())) {
+						send.put(packet.getDestination(), new HashMap<Integer, Boolean>());
 					}
-					received.get(packet.getDestination()).put(packet.getSeqnr(), false);
+					send.get(packet.getDestination()).put(packet.getSeqnr(), false);
 				}
 			}
 		} else {
-			System.out.println("poep");
-			if (!received.containsKey(packet.getDestination())) {
-				received.put(packet.getDestination(), new HashMap<Integer, Boolean>());
+			if (!send.containsKey(packet.getDestination())) {
+				send.put(packet.getDestination(), new HashMap<Integer, Boolean>());
 			}
-			received.get(packet.getDestination()).put(packet.getSeqnr(), false);
+			send.get(packet.getDestination()).put(packet.getSeqnr(), false);
+			
 		}
+		TimeOutTimer timeout = new TimeOutTimer(packet, this);
+		timeout.start();
 	}
 	
 	public Controller getController() {
