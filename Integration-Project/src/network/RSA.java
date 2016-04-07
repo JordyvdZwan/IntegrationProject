@@ -38,23 +38,23 @@ public class RSA {
 	
 	public String sign(String message) {
 		Integer hashed = message.hashCode(); 
-		
+
 		
 		System.out.println(hashed);
 		System.out.println((new BigInteger(hashed.toString())).modPow(d, n).toString());
 		
 		
-		return (new BigInteger(hashed.toString()).modPow(d, n).toString()); 
+		return (new BigInteger(hashed.toString())).modPow(d, n).toString(); 
 	}
 	
 	public boolean verify(String signature, String message) {
 		Integer hashed = message.hashCode();
-		
-		
+
 		System.out.println(signature);
-		System.out.println((new BigInteger(signature)).modPow(d,n));
+		System.out.println(new BigInteger(signature.getBytes()).modPow(e, n));
 		System.out.println(new BigInteger(hashed.toString()));
 		
+		System.out.println(new BigInteger(hashed.toString()).mod(n));
 		
 		return (new BigInteger(signature.getBytes()).modPow(e, n))
 				== (new BigInteger(hashed.toString()));
