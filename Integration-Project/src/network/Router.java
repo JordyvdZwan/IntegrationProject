@@ -1,6 +1,7 @@
 package network;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -21,7 +22,7 @@ public class Router {
 	Map<Integer, EntryTimeOut> timeouts = new HashMap<Integer, EntryTimeOut>();
 	
 	public void processUpdate(JRTVPacket packet) {
-		if (packet.getSource() != controller.getLocalIAddress()) {
+		if (packet.getSource() != controller.getLocalIAddress() && packet.getSource() != 0) {
 			//Puts true into the list with valid hops
 			table.getvalidhops().put(packet.getSource(), true);
 			
@@ -58,8 +59,10 @@ public class Router {
 					controller.removeRecipientToView(addresstable.get(packet.getSource()));
 					addresstable.remove(packet.getSource());
 				}
-				addresstable.put(packet.getSource(), "(" + packet.getSource() + ") " + name);
-				controller.addRecipientToView("(" + packet.getSource() + ") " + name);
+				addresstable.put(packet.getSource(), "(" + getStringIP(packet.getSource()) + ") " + name);
+				
+				controller.addRecipientToView("(" + getStringIP(packet.getSource()) + ") " + name);
+				
 			}
 		}
 	}
@@ -77,6 +80,25 @@ public class Router {
 	            (b[0] & 0xFF) << 24;
 	}
 	
+	private String getStringIP(int address) {
+		try {
+			return InetAddress.getByAddress(unpack(address)).getHostAddress().toString();
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			return null;
+		}
+	}
+	
+	
+	byte[] unpack(int bytes) {
+		return new byte[] {
+			(byte)((bytes >>> 24) & 0xff),
+			(byte)((bytes >>> 16) & 0xff),
+			(byte)((bytes >>>  8) & 0xff),
+			(byte)((bytes       ) & 0xff)
+		};
+	}
+	
 	//CHECK WHAT IS BELOW HERE!
 	
 	public Integer getIP(String client) {
@@ -85,11 +107,19 @@ public class Router {
 			result = Controller.multicastAddress;
 		} else { 
 			for(Integer e: addresstable.keySet()) {
+				System.out.println(e + ": " + addresstable.get(e));
 				if(addresstable.get(e).equals(client)) {
 					result = e;
 					break;
 				}
 			}
+		}
+		
+		try {
+			System.out.println("Router anwser:" + InetAddress.getByAddress(unpack(result)).getHostAddress().toString());
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		return result;
 	}
