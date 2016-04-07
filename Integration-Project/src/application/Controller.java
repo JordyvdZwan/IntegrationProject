@@ -228,28 +228,29 @@ public class Controller extends Thread {
 	public void handleMessage(DatagramPacket message) {
 		JRTVPacket packet = new JRTVPacket(message.getData());
 //TODO right order?
-		
-		if (packet.getNextHop() == localIAddress && packet.getDestination() != localIAddress) {
-			retransmit(packet);
-		} else {
-			if (packet.getDestination() == localIAddress || packet.getDestination() == multicastAddress) {
-				if (!seqAckTable.isReceivedSeqNr(packet.getSource(), packet.getSeqnr())) {
-					seqAckTable.addReceivedSeqNr(packet.getSource(), packet.getSeqnr());
-					System.out.println(packet.toString());
-					if(packet.isNormal()) {
-						handleNormal(packet);
-						sendAck(packet);
-					} else if (packet.isUpdate()) {
-						handleUpdate(packet);
-					} else if (packet.isSyn()) {
-						handleSyn(packet);
-					} else if (packet.isFin()) {
-						handleFin(packet);
-					} else if (packet.isAck()) {
-						handleAck(packet);
-					} else {
-						if (packet.getMessage().equals("ACK")) {
-							seqAckTable.registerAckPacket(packet);
+		if (packet.getSource() != localIAddress) {
+			if (packet.getNextHop() == localIAddress && packet.getDestination() != localIAddress) {
+				retransmit(packet);
+			} else {
+				if (packet.getDestination() == localIAddress || packet.getDestination() == multicastAddress) {
+					if (!seqAckTable.isReceivedSeqNr(packet.getSource(), packet.getSeqnr())) {
+						seqAckTable.addReceivedSeqNr(packet.getSource(), packet.getSeqnr());
+						System.out.println(packet.toString());
+						if(packet.isNormal()) {
+							handleNormal(packet);
+							sendAck(packet);
+						} else if (packet.isUpdate()) {
+							handleUpdate(packet);
+						} else if (packet.isSyn()) {
+							handleSyn(packet);
+						} else if (packet.isFin()) {
+							handleFin(packet);
+						} else if (packet.isAck()) {
+							handleAck(packet);
+						} else {
+							if (packet.getMessage().equals("ACK")) {
+								seqAckTable.registerAckPacket(packet);
+							}
 						}
 					}
 				}

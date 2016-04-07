@@ -24,7 +24,7 @@ public class ForwardingTable {
 	
 	public int getNextHop(Integer destination) {
 		//Loops through all the paths to the destination and selects the one with the lowest cost
-		System.out.println("hop input: " + destination);
+		System.out.println("hop input: " + Router.getStringIP(destination));
 		Integer result = null;
 		int resultcost = 200;
 		if (destination == Controller.multicastAddress) {
