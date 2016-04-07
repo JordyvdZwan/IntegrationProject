@@ -120,6 +120,10 @@ public class Router {
 		return result;
 	}
 	
+	public int getNextHop(Integer destination) {
+		return table.getNextHop(destination);
+	}
+	
 	public int getNextHopCost(Integer destination) {
 		return table.getNextHopCost(destination);
 	}
