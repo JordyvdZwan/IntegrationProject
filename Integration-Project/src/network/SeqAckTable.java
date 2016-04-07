@@ -48,7 +48,7 @@ public class SeqAckTable {
 	}
 	
 	public Boolean isReceived(Integer address, Integer seq) {
-		Boolean res = null;
+		Boolean res = false;
 		if (send.containsKey(address)) {
 			if (send.get(address).containsKey(seq)) {
 				res = send.get(address).get(seq);
@@ -96,8 +96,10 @@ public class SeqAckTable {
 			send.get(packet.getDestination()).put(packet.getSeqnr(), false);
 			
 		}
-		TimeOutTimer timeout = new TimeOutTimer(packet, this);
-		timeout.start();
+		if (controller.getForwardingTable().keySet().size() > 0) {
+			TimeOutTimer timeout = new TimeOutTimer(packet, this);
+			timeout.start();
+		}
 	}
 	
 	public Controller getController() {

@@ -29,15 +29,14 @@ public class TimeOutTimer extends Thread {
 		}
 		if (packet.getDestination() == Controller.multicastAddress) {
 			for (Integer integer : table.getController().getForwardingTable().keySet()) {
-				if (integer != table.getController().getLocalIAddress()) {
+				if (integer != table.getController().getLocalIAddress() && integer != table.getController().multicastAddress) {
 					if (!table.isReceived(integer, packet.getSeqnr())) {
 						table.retransmit(packet, integer);
-						
 					}
 				}
 			}
 		} else {
-			if (!table.isReceived(packet.getDestination(), packet.getSeqnr())) {
+			if (!table.isReceived(packet.getDestination(), packet.getSeqnr()) && table.getController().getForwardingTable().keySet().contains(packet.getDestination())) {
 				table.retransmit(packet, packet.getDestination());
 			}
 		}
