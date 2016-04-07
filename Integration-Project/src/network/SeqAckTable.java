@@ -90,7 +90,7 @@ public class SeqAckTable {
 				}
 			}
 		} else {
-			if (received.containsKey(packet.getDestination())) {
+			if (!received.containsKey(packet.getDestination())) {
 				received.put(packet.getDestination(), new HashMap<Integer, Boolean>());
 			}
 			received.get(packet.getDestination()).put(packet.getSeqnr(), false);
