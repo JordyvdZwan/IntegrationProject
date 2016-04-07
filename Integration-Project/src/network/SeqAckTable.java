@@ -83,14 +83,14 @@ public class SeqAckTable {
 		if (packet.getDestination() == Controller.multicastAddress) {
 			for (Integer integer : controller.getForwardingTable().keySet()) {
 				if (integer != controller.getLocalIAddress()) {
-					if (received.containsKey(packet.getDestination())) {
+					if (!received.containsKey(packet.getDestination())) {
 						received.put(packet.getDestination(), new HashMap<Integer, Boolean>());
 					}
 					received.get(packet.getDestination()).put(packet.getSeqnr(), false);
 				}
 			}
 		} else {
-			if (received.containsKey(packet.getDestination())) {
+			if (!received.containsKey(packet.getDestination())) {
 				received.put(packet.getDestination(), new HashMap<Integer, Boolean>());
 			}
 			received.get(packet.getDestination()).put(packet.getSeqnr(), false);

@@ -18,47 +18,54 @@ public class Router {
 		this.controller = controller;
 	}
 	
-	Map<InetAddress, EntryTimeOut> timeouts = new HashMap<InetAddress, EntryTimeOut>();
+	Map<Integer, EntryTimeOut> timeouts = new HashMap<Integer, EntryTimeOut>();
 	
-	public void processUpdate(JRTVPacket packet, InetAddress source) {
-		if (source != controller.getLocalInetAddress()) {
+	public void processUpdate(JRTVPacket packet) {
+		if (packet.getSource() != controller.getLocalIAddress()) {
 			//Puts true into the list with valid hops
-				table.getvalidhops().put(source, true);
+			table.getvalidhops().put(packet.getSource(), true);
 			
 			//TODO: Split at destination, next hop and put these into the forwardingtables
 			byte[] bytes = packet.getMessage().getBytes();
 			byte[] addresses = new byte[bytes.length - packet.getHashPayload()];
+			
 			System.arraycopy(bytes, packet.getHashPayload(), addresses, 0, bytes.length - packet.getHashPayload());
 			Integer[] integers = new Integer[addresses.length / 4];
+			
 			for (int i = 0; i < integers.length; i++) {
 				byte[] b = new byte[4];
 				System.arraycopy(addresses, (i * 4), b, 0, 4);
 				integers[i] = byteArrayToInt(b);
 			}
+			
 			for (int i = 0; i < integers.length / 2; i++) {
-				table.addHop(integers[i * 2], source, integers[(i * 2) + 1]);
+				table.addHop(integers[i * 2], packet.getSource(), integers[(i * 2) + 1]);
 			}
 			
-			
-			
 			//This creates a new timeout for the specified next hop
-			if (!timeouts.containsKey(source)) {
-				EntryTimeOut e = new EntryTimeOut(this, source);
-				timeouts.put(source, e);
+			if (!timeouts.containsKey(packet.getSource())) {
+				EntryTimeOut e = new EntryTimeOut(this, packet.getSource());
+				timeouts.put(packet.getSource(), e);
 			}
 			
 			byte[] nameBytes = new byte[packet.getHashPayload()];
 			System.arraycopy(packet.getMessage().getBytes(), 0, nameBytes, 0, packet.getHashPayload());
 			String name = new String(nameBytes);
 			if (!name.equals("Anonymous")) {
+				if (addresstable.containsKey(packet.getSource())) {
+					controller.removeRecipientToView(addresstable.get(packet.getSource()));
+					addresstable.remove(packet.getSource());
+				}
 				addresstable.put(packet.getSource(), name);
-				controller.addRecipientToView(name);
+				controller.addRecipientToView("(" + packet.getSource() + ") " + name);
 			}
 		}
 	}
 	
-	public void removeFromTimeout(InetAddress source) {
+	public void removeFromTimeout(Integer source) {
 		timeouts.remove(source);
+		controller.removeRecipientToView(getName(source));
+		addresstable.remove(source);
 	}
 	
 	private static int byteArrayToInt(byte[] b) {
@@ -67,6 +74,8 @@ public class Router {
 	            (b[1] & 0xFF) << 16 |
 	            (b[0] & 0xFF) << 24;
 	}
+	
+	//CHECK WHAT IS BELOW HERE!
 	
 	public Integer getIP(String client) {
 		Integer result = null;
@@ -94,7 +103,7 @@ public class Router {
 		return addresstable.get(address);
 	}
 	
-	public Map<Integer,Map<InetAddress, Integer>> getTable() {
+	public Map<Integer,Map<Integer, Integer>> getTable() {
 		return table.getTable();
 	}
 	
@@ -107,10 +116,10 @@ public class Router {
 	}
 	
 		//TO BE IMPLEMENTED
-	public InetAddress getRouteIP(int destination) {
-		InetAddress result = null;
+	public Integer getRouteIP(int destination) {
+		Integer result = null;
 		if(destination == Controller.multicastAddress) {
-			result = controller.getMulticastIAddress();
+			result = Controller.multicastAddress;
 		} else {
 			result =  table.getNextHop(destination);
 		}

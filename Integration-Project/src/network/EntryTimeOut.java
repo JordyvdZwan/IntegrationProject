@@ -6,10 +6,10 @@ import java.net.InetAddress;
 public class EntryTimeOut extends Thread {
 	
 	Router router;
-	InetAddress nexthop;
+	Integer nexthop;
 	boolean  receivednewroute = false;
 	
-	public EntryTimeOut(Router router, InetAddress nexthop) {
+	public EntryTimeOut(Router router, Integer nexthop) {
 		this.router = router;
 		this.nexthop = nexthop;
 	}
@@ -25,7 +25,6 @@ public class EntryTimeOut extends Thread {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-
 		}
 		for(Integer i: router.getForwardingTable().getTable().keySet()) {
 			if(router.getForwardingTable().getTable().get(i).keySet().contains(nexthop)) {

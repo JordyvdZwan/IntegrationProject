@@ -6,22 +6,22 @@ import java.net.InetAddress;
 public class ForwardingTable {
 	
 	//Map<Destination, Map<Nexthop, cost>>
-	Map<Integer, Map<InetAddress, Integer>> forwardingtable = new HashMap<Integer, Map<InetAddress, Integer>>();
-	Map<InetAddress, Boolean> validhops = new HashMap<InetAddress, Boolean>();
+	Map<Integer, Map<Integer, Integer>> forwardingtable = new HashMap<Integer, Map<Integer, Integer>>();
+	Map<Integer, Boolean> validhops = new HashMap<Integer, Boolean>();
 	
-	public Map<Integer, Map<InetAddress, Integer>> getTable() {
+	public Map<Integer, Map<Integer, Integer>> getTable() {
 		return forwardingtable;
 	}
 	
-	public InetAddress getNextHop(Integer destination) {
+	public int getNextHop(Integer destination) {
 		//Loops through all the paths to the destination and selects the one with the lowest cost
-		InetAddress result = null;
+		Integer result = null;
 		int resultcost = 0;
 		
 		if(forwardingtable.containsKey(destination)) {
-			Map<InetAddress, Integer> possibilities = forwardingtable.get(destination);
+			Map<Integer, Integer> possibilities = forwardingtable.get(destination);
 			
-			for(InetAddress e: possibilities.keySet()) {
+			for(Integer e: possibilities.keySet()) {
 				if(possibilities.get(e) <= resultcost) {
 					result = e;
 					resultcost = possibilities.get(e);
@@ -34,11 +34,11 @@ public class ForwardingTable {
 	
 	public int getNextHopCost(Integer destination) {
 		//Loops through all the paths to the destination and selects the one with the lowest cost
-		InetAddress result = null;
+		Integer result = null;
 		int resultcost = 0;
-		Map<InetAddress, Integer> possibilities = forwardingtable.get(destination);
+		Map<Integer, Integer> possibilities = forwardingtable.get(destination);
 		
-		for(InetAddress e: possibilities.keySet()) {
+		for(Integer e: possibilities.keySet()) {
 			if(possibilities.get(e) <= resultcost) {
 				result = e;
 				resultcost = possibilities.get(e);
@@ -47,23 +47,23 @@ public class ForwardingTable {
 		return resultcost;
 	}
 	
-	public void addHop(Integer destination, InetAddress nexthop, int cost) {
+	public void addHop(Integer destination, Integer nexthop, int cost) {
 		if (forwardingtable.containsKey(destination)) {
 			forwardingtable.get(destination).put(nexthop, cost);
 		} else {
-			forwardingtable.put(destination, new HashMap<InetAddress, Integer>());
+			forwardingtable.put(destination, new HashMap<Integer, Integer>());
 			addHop(destination, nexthop, cost);
 		}
 	}
 	
-	public void removeNextHop(Integer destination, InetAddress nexthop) {
+	public void removeNextHop(Integer destination, Integer nexthop) {
 		forwardingtable.get(destination).remove(nexthop);
 		if(forwardingtable.get(destination).size() == 0) {
 			forwardingtable.remove(destination);
 		}
 	}
 	
-	public Map<InetAddress, Boolean> getvalidhops() {
+	public Map<Integer, Boolean> getvalidhops() {
 		return validhops;
 	}
 }

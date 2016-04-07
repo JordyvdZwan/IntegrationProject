@@ -101,7 +101,7 @@ public class Controller extends Thread {
 		return (int) ipNumbers;
 	}
 	
-	public Map<Integer,Map<InetAddress, Integer>> getForwardingTable() {
+	public Map<Integer,Map<Integer, Integer>> getForwardingTable() {
 		return router.getTable();
 	}
 	
@@ -162,8 +162,12 @@ public class Controller extends Thread {
 	//CHANGE NEXTHOP ACCORDINGLY TODO
 	public void sendPacket(int client, JRTVPacket packet) {
 		packet.setSeqnr(seqAckTable.getNextSeq(packet.getDestination()));
+		
+		//INSERT NEXTHOP ROUTING (for unicast) AND ENCRYPTION HERE!
+		System.out.println(packet.toString());
+		
 		seqAckTable.registerSendPacket(packet);
-		DatagramPacket data = new DatagramPacket(packet.toByteArray(), packet.toByteArray().length, router.getRouteIP(packet.getDestination()), 2000);
+		DatagramPacket data = new DatagramPacket(packet.toByteArray(), packet.toByteArray().length, getMulticastIAddress(), 2000);
 		connection.send(data);
 	}
 	
@@ -174,7 +178,7 @@ public class Controller extends Thread {
 	public void retransmit(JRTVPacket packet, int destination) {
 		packet.setDestination(destination);
 		seqAckTable.registerSendPacket(packet);
-		DatagramPacket data = new DatagramPacket(packet.toByteArray(), packet.toByteArray().length, router.getRouteIP(packet.getDestination()), 2000);
+		DatagramPacket data = new DatagramPacket(packet.toByteArray(), packet.toByteArray().length, getMulticastIAddress(), 2000);
 		//Is this a unicast? If not, just set it to multicast address and put it into the actual data
 		connection.send(data);
 	}
@@ -184,7 +188,7 @@ public class Controller extends Thread {
 		p.setSource(localIAddress);
 		p.setDestination(packet.getSource());
 		p.setAcknr(packet.getSeqnr());
-		DatagramPacket data = new DatagramPacket(packet.toByteArray(), packet.toByteArray().length, router.getRouteIP(packet.getDestination()), 2000);
+		DatagramPacket data = new DatagramPacket(packet.toByteArray(), packet.toByteArray().length, getMulticastIAddress(), 2000);
 		connection.send(data);
 	}
 	
@@ -225,7 +229,7 @@ public class Controller extends Thread {
 						handleNormal(packet);
 						sendAck(packet);
 					} else if (packet.isUpdate()) {
-						handleUpdate(packet, message.getAddress());
+						handleUpdate(packet);
 					} else if (packet.isSyn()) {
 						handleSyn(packet);
 					} else if (packet.isFin()) {
@@ -260,8 +264,8 @@ public class Controller extends Thread {
 		return router.getName(source);
 	}
 	
-	public void handleUpdate(JRTVPacket p, InetAddress address) {
-		router.processUpdate(p, address);
+	public void handleUpdate(JRTVPacket p) {
+		router.processUpdate(p);
 	}
 	
 	public void handleSyn(JRTVPacket p) {

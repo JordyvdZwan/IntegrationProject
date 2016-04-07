@@ -48,35 +48,36 @@ public class JRTVPacket {
 	public String toString() {
 		String res = "";
 		try {
-		
-		res = res.concat("Addressing data:\n");
-		res = res.concat("Sequence number: " + seqnr + "\n");
-		res = res.concat("Acknowledgement number: " + acknr + "\n");
-		
+			res = res.concat("Addressing data:\n");
+			res = res.concat("Sequence number: " + seqnr + "\n");
+			res = res.concat("Acknowledgement number: " + acknr + "\n");
 			res = res.concat("Source Address: " + InetAddress.getByAddress(unpack(source)).getHostAddress().toString() + "\n");
+			res = res.concat("Destination Address: " + InetAddress.getByAddress(unpack(destination)).getHostAddress().toString() + "\n");
+			res = res.concat("Hash Payload Length: " + hashPayload + "\n");
+			res = res.concat("Payload Length: " + payloadLength + "\n");
+			res = res.concat("nextHop: " + nextHop + "\n");
+			res = res.concat("\n");
+			res = res.concat("Flaggs:\n");
+			res = res.concat("SYN: " + syn + "\n");
+			res = res.concat("ACK: " + ack + "\n");
+			res = res.concat("UPDATE: " + update + "\n");
+			res = res.concat("NORMAL: " + normal + "\n");
+			res = res.concat("FIN: " + fin + "\n");
+			res = res.concat("BROADCASTED: " + broadcasted + "\n");
+			res = res.concat("\n");
+			res = res.concat("DATA: \n");
+			res = res.concat(message + "\n");
+			res = res.concat("\n");
+			res = res.concat("Bytes\n");
+			for (int i = 0; i < HEADERLENGTH + payloadLength; i++) {
+				Integer j = (int) this.toByteArray()[i];
+				res = res.concat(i + ": " + j.toString());
+				res = res.concat("\n");
+				if ((i + 1) % 8 == 0) {
+					res = res.concat("----------------------\n");
+				}
+			}
 		
-		res = res.concat("Destination Address: " + InetAddress.getByAddress(unpack(destination)).getHostAddress().toString() + "\n");
-		res = res.concat("Hash Payload Length: " + hashPayload + "\n");
-		res = res.concat("Payload Length: " + payloadLength + "\n");
-		res = res.concat("nextHop: " + nextHop + "\n");
-		res = res.concat("\n");
-		res = res.concat("Flaggs:\n");
-		res = res.concat("SYN: " + syn + "\n");
-		res = res.concat("ACK: " + ack + "\n");
-		res = res.concat("UPDATE: " + update + "\n");
-		res = res.concat("NORMAL: " + normal + "\n");
-		res = res.concat("FIN: " + fin + "\n");
-		res = res.concat("BROADCASTED: " + broadcasted + "\n");
-		res = res.concat("\n");
-		res = res.concat("DATA: \n");
-		res = res.concat(message + "\n");
-//		res = res.concat("\n");
-//		res = res.concat("Bytes\n");
-//		for (int i = 0; i < 20; i++) {
-//			Integer j = (int) this.toByteArray()[i];
-//			res = res.concat(j.toString());
-//			res = res.concat("\n");
-//		}
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
