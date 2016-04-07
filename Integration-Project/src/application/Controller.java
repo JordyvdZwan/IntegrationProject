@@ -211,9 +211,7 @@ public class Controller extends Thread {
 		if (packet.getNextHop() == localIAddress) {
 			retransmit(packet);
 		}
-		//System.out.println("Voor die leipe statement is ie een update? : " + packet.isUpdate());
-		//System.out.println("Source ? : " + (packet.getSource() != localIAddress));
-		//System.out.println("Destination? : " + (packet.getDestination() == localIAddress || (packet.getDestination() == multicastAddress && packet.isUpdate() )));
+
 		if (packet.getSource() != localIAddress && (packet.getDestination() == localIAddress || (packet.getDestination() == multicastAddress && packet.isUpdate() ))) {
 			System.out.println("Na die leipe statement is ie een update? : " + packet.isUpdate());
 			seqAckTable.receivedPackage(packet);
@@ -225,7 +223,6 @@ public class Controller extends Thread {
 				if(packet.isNormal()) {
 					handleNormal(packet);
 				} else if (packet.isUpdate()) {
-					System.out.println("Ik krijg wel een update binnen");
 					handleUpdate(packet, message.getAddress());
 				} else if (packet.isSyn()) {
 					handleSyn(packet);
