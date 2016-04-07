@@ -39,7 +39,9 @@ public class Router {
 			}
 			
 			for (int i = 0; i < integers.length / 2; i++) {
-				table.addHop(integers[i * 2], packet.getSource(), integers[(i * 2) + 1]);
+				if (integers[i * 2] != controller.getLocalIAddress()) {
+					table.addHop(integers[i * 2], packet.getSource(), integers[(i * 2) + 1]);
+				}
 			}
 			
 			//This creates a new timeout for the specified next hop
