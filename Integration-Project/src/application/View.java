@@ -1,6 +1,7 @@
 package application;
 	
 import java.net.InetAddress;
+import java.sql.Connection;
 
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
@@ -9,6 +10,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.stage.WindowEvent;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.TextArea;
@@ -31,15 +33,14 @@ public class View extends Application {
 	Button nameButton = new Button();
 	TextField nameField = new TextField();
 	ComboBox<String> recipient = new ComboBox<String>();
+	View view = this;
 	
-	Controller controller = new Controller(this);
+	Controller controller;
 	
 	@Override
 	public void start(Stage primaryStage) {
 		try {
 			GridPane root = new GridPane();
-			
-			System.out.println(InetAddress.getLocalHost().toString());
 			
 			ColumnConstraints coll1 = new ColumnConstraints();
 			coll1.setPercentWidth(80);
@@ -70,6 +71,7 @@ public class View extends Application {
 			recipient.getItems().add("All");
 			recipient.setValue("All");
 			recipient.setPrefSize( Double.MAX_VALUE, Double.MAX_VALUE );
+			recipient.setDisable(true);
 			
 			//Finalize chatText
 			chatText.setEditable(false);
@@ -82,12 +84,10 @@ public class View extends Application {
 			    }
 			});
 			
-			
-			
-			
 			//Finalize nameField
 			nameField.setId("textfield");
 			nameField.setPrefSize( Double.MAX_VALUE, Double.MAX_VALUE );
+			nameField.setDisable(true);
 			nameField.setOnKeyPressed(new EventHandler<KeyEvent>()
 		    {
 		        @Override
@@ -104,6 +104,7 @@ public class View extends Application {
 			nameButton.setId("sendButton");
 			nameButton.setText("Set Name");
 			nameButton.setPrefSize( Double.MAX_VALUE, Double.MAX_VALUE );
+			nameButton.setDisable(true);
 			nameButton.setOnAction(new EventHandler<ActionEvent>() {
 			    @Override 
 			    public void handle(ActionEvent e) {
@@ -114,6 +115,7 @@ public class View extends Application {
 			//Finalize inputField
 			nameField.setId("textfield");
 			inputField.setPrefSize( Double.MAX_VALUE, Double.MAX_VALUE );
+			inputField.setDisable(true);
 			inputField.setOnKeyPressed(new EventHandler<KeyEvent>()
 		    {
 		        @Override
@@ -130,6 +132,7 @@ public class View extends Application {
 			sendButton.setId("sendButton");
 			sendButton.setText("Send");
 			sendButton.setPrefSize( Double.MAX_VALUE, Double.MAX_VALUE );
+			sendButton.setDisable(true);
 			sendButton.setOnAction(new EventHandler<ActionEvent>() {
 			    @Override 
 			    public void handle(ActionEvent e) {
@@ -151,13 +154,60 @@ public class View extends Application {
 			
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
+			
+			addMessage("SYS", "Setting up Connection...");
+			primaryStage.addEventHandler(WindowEvent.WINDOW_SHOWN, new  EventHandler<WindowEvent>() {
+				@Override
+				public void handle(WindowEvent window)
+				{
+					controller = new Controller(view);
+					controller.setDaemon(true);
+					controller.start();
+				}
+			});
 			primaryStage.show();
-			
-			controller.setDaemon(true);
-			controller.start();
-			
 		} catch(Exception e) {
 			e.printStackTrace();
+		}
+	}
+	
+	public void start() {
+		nameField.setDisable(false);
+		inputField.setDisable(false);
+		recipient.setDisable(false);
+		sendButton.setDisable(false);
+		nameButton.setDisable(false);
+		addMessage("SYS", "Connection Ready!");
+	}
+	
+	public void addRecipient(String recipient) {
+		try {
+			if (!this.recipient.getItems().contains(recipient) && !recipient.equals("Anonymous")) {
+				this.recipient.getItems().add(recipient);
+			}
+		} catch (IllegalStateException e) {
+			//TODO actualy do nothing...
+		}
+	}
+	
+	public void removeRecipient(String recipient) {
+		try {
+			if (this.recipient.getItems().contains(recipient)) {
+				this.recipient.getItems().remove(recipient);
+				this.recipient.setValue(null);
+			}
+		} catch (IllegalStateException e) {
+			//TODO actualy do nothing...
+		}
+	}
+	
+	public void removeAllRecipient() {
+		try {
+			this.recipient.getItems().clear();
+			this.recipient.setValue(null);
+			this.recipient.getItems().add("All");
+		} catch (IllegalStateException e) {
+			//TODO actualy do nothing...
 		}
 	}
 	
@@ -200,19 +250,6 @@ public class View extends Application {
 	
 	public static void main(String[] args) {
 		launch(args);
-	}
-	
-	public void addClient(String client) {
-		if (!recipient.getItems().contains(client)) {
-			recipient.getItems().add(client);
-		}
-	}
-	
-	public void removeClient(String client) {
-		if (recipient.getItems().contains(client)) {
-			recipient.getItems().remove(client);
-			recipient.setValue(null);
-		}
 	}
 	
 	public void addMessage(String client, String message) {

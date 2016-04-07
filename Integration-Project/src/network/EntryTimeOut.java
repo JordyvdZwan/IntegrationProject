@@ -12,7 +12,6 @@ public class EntryTimeOut extends Thread {
 	public EntryTimeOut(Router router, InetAddress nexthop) {
 		this.router = router;
 		this.nexthop = nexthop;
-		this.start();
 	}
 	
 	public void run() {
@@ -33,6 +32,7 @@ public class EntryTimeOut extends Thread {
 				router.getForwardingTable().getTable().get(i).remove(nexthop);
 			}
 		}
+		router.removeFromTimeout(nexthop);
 		this.interrupt();
 	}
 }

@@ -28,8 +28,28 @@ public class ForwardingTable {
 		return result;
 	}
 	
-	public void  addHop(Integer destination, InetAddress nexthop, int cost) {
-		forwardingtable.get(destination).put(nexthop, cost);
+	public int getNextHopCost(Integer destination) {
+		//Loops through all the paths to the destination and selects the one with the lowest cost
+		InetAddress result = null;
+		int resultcost = 0;
+		Map<InetAddress, Integer> possibilities = forwardingtable.get(destination);
+		
+		for(InetAddress e: possibilities.keySet()) {
+			if(possibilities.get(e) <= resultcost) {
+				result = e;
+				resultcost = possibilities.get(e);
+			}
+		}
+		return resultcost;
+	}
+	
+	public void addHop(Integer destination, InetAddress nexthop, int cost) {
+		if (forwardingtable.containsKey(destination)) {
+			forwardingtable.get(destination).put(nexthop, cost);
+		} else {
+			forwardingtable.put(destination, new HashMap<InetAddress, Integer>());
+			addHop(destination, nexthop, cost);
+		}
 	}
 	
 	public void removeNextHop(Integer destination, InetAddress nexthop) {

@@ -5,22 +5,35 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.SecureRandom;
+import java.util.Map;
 
 import network.Connection;
 import network.JRTVPacket;
 import network.Router;
+import network.SeqAckTable;
 import network.Update;
 public class Controller extends Thread {
 
 	private View view;
 	private Connection connection;
 	private InetAddress multicastIAddress;
-	private int localIAddress;
+	private int localIAddress = 0;
+	public static int multicastAddress = IPtoInt("224.0.0.2");
 	private Router router = new Router(this);
 	private Update update;
 	private boolean settingUp = true;
 	private String initString;
+	private SeqAckTable seqAckTable = new SeqAckTable(this);
+	private InetAddress localInetAddress;
 	
+	public InetAddress getMulticastIAddress() {
+		return multicastIAddress;
+	}
+
+	public int getLocalIAddress() {
+		return localIAddress;
+	}
+
 	private String clientName = "Anonymous";
 	
 	public Controller(View view) {
@@ -36,12 +49,13 @@ public class Controller extends Thread {
 		}
 		int port = 2000;
 		connection = new Connection(port, address);
-		update = new Update(this);
-		setupIP();
 	}
 	
+	public InetAddress getLocalInetAddress() {
+		return localInetAddress;
+	}
+
 	private void setupIP() {
-		boolean found = false;
 		initString = randomString();
 		while (settingUp) {
 			DatagramPacket data;
@@ -55,6 +69,7 @@ public class Controller extends Thread {
 					String address = add.toString();
 					address = address.replace("/", "");
 					localIAddress = IPtoInt(address);
+					localInetAddress = data.getAddress();
 					settingUp = false;
 				}
 			}
@@ -65,10 +80,10 @@ public class Controller extends Thread {
 				e.printStackTrace();
 			}
 		}
-		view.addMessage("SYS", "Your ip is: " + localIAddress);
+		view.start();
 	}
 	
-	private int IPtoInt(String ipaddress) {
+	private static int IPtoInt(String ipaddress) {
 		int[] ip = new int[4];
 		String[] parts = ipaddress.split("\\.");
 
@@ -80,6 +95,10 @@ public class Controller extends Thread {
 		    ipNumbers += ip[i] << (24 - (8 * i));
 		}
 		return (int) ipNumbers;
+	}
+	
+	public Map<Integer,Map<InetAddress, Integer>> getForwardingTable() {
+		return router.getTable();
 	}
 	
 	private SecureRandom random = new SecureRandom();
@@ -97,6 +116,8 @@ public class Controller extends Thread {
 	}
 	
 	public void run() {
+		update = new Update(this);
+		setupIP();
 		while (true) {
 			DatagramPacket data;
 			if((data = connection.getFirstInQueue()) != null) {
@@ -114,31 +135,51 @@ public class Controller extends Thread {
 	//TODO implement SEQ and ACK numbers.
 	//Sends the string message as payload to the client if it can see the client otherwise error
 	public void sendMessage(String client, String message) {
-		if (client.equals("Anonymous")) {
-			JRTVPacket packet = new JRTVPacket(message);
-			broadcastPacket(packet);
-		} else if (router.getIP(client) == null) {
+		if (router.getIP(client) == null) {
 			view.error("Recipient not valid!");
 		} else {
 			JRTVPacket packet = new JRTVPacket(message);
 			packet.setNormal(true);
-			packet.setSource(router.getLocalIntAddress());			
-			packet.setDestination(router.getIntIP(client));
 			
-			System.out.println(packet.toString()); //TODO
-			DatagramPacket data = new DatagramPacket(packet.toByteArray(), packet.toByteArray().length, router.getRouteIP(client), 2000);
-			connection.send(data);
+			sendPacket(client, packet);
 		}
 	}
 	
 	//sends the packet after processing the packet;
 	public void sendPacket(String client, JRTVPacket packet) {
-		packet.setSource(router.getLocalIntAddress());			
+		packet.setSource(localIAddress);			
 		packet.setDestination(router.getIntIP(client));
+		if (router.getIntIP(client) == Controller.multicastAddress) {
+			packet.setBroadcasted(true);
+		}
 		
-		System.out.println(packet.toString()); //TODO
-		DatagramPacket data = new DatagramPacket(packet.toByteArray(), packet.toByteArray().length, router.getRouteIP(client), 2000);
+		sendPacket(packet.getDestination(), packet);
+	}
+	
+	public void sendPacket(int client, JRTVPacket packet) {
+		int[] seqAck = seqAckTable.getSeqAck(client, packet.isBroadcasted());
+		packet.setSeqnr(seqAck[0] + packet.getPayloadLength());
+		packet.setAcknr(seqAck[1]);
+		if (!packet.getMessage().equals("ACK")) {
+			seqAckTable.registerOutgoingPackage(packet);
+		}
+		DatagramPacket data = new DatagramPacket(packet.toByteArray(), packet.toByteArray().length, router.getRouteIP(packet.getDestination()), 2000);
 		connection.send(data);
+	}
+	
+	public void retransmit(JRTVPacket packet) {
+		if (!packet.getMessage().equals("ACK")) {
+			seqAckTable.registerOutgoingPackage(packet);
+		}
+		DatagramPacket data = new DatagramPacket(packet.toByteArray(), packet.toByteArray().length, router.getRouteIP(packet.getDestination()), 2000);
+		connection.send(data);
+	}
+	
+	private void sendAck(JRTVPacket packet) {
+		JRTVPacket p = new JRTVPacket("ACK");
+		p.setDestination(localIAddress);//packet.getSource());
+		p.setSource(localIAddress);
+		sendPacket(packet.getSource(), p);
 	}
 	
 	//sends the packet after processing the packet;
@@ -151,6 +192,10 @@ public class Controller extends Thread {
 		sendMessage("Anonymous", message);
 	}
 	
+	public Router getRouter() {
+		return router;
+	}
+	
 	//HIERONDER IS SAFE VINCENT!
 	//-----------------VVVVVVVVVVVVVVVVVVVVVVVV-------------------------
 	
@@ -161,25 +206,47 @@ public class Controller extends Thread {
 	}
 	
 	public void handleMessage(DatagramPacket message) {
-		System.out.println(message.getAddress().toString());
-//		System.out.println(message.getAddress());
 		JRTVPacket packet = new JRTVPacket(message.getData());
-		String source = message.getAddress().toString();
-		System.out.println("is het een update? : " + packet.isUpdate());
-//		System.out.println(router.getName(message.getAddress()));
-		System.out.println("is het een normal? : " + packet.isNormal());
-		System.out.println(packet.toString());
-		if(packet.isNormal()) {
-			handleNormal(packet);
-		} else if (packet.isUpdate()) {
-			handleUpdate(packet);
-		} else if (packet.isSyn()) {
-			handleSyn(packet);
-		} else if (packet.isFin()) {
-			handleFin(packet);
-		} else if (packet.isAck()) {
-			handleAck(packet);
+		
+		if (packet.getNextHop() == localIAddress) {
+			retransmit(packet);
 		}
+		System.out.println("Local controller IP" + localIAddress);
+		System.out.println("Packet Source" + packet.getSource());
+		System.out.println("Packet Destination" + packet.getDestination());
+		System.out.println("MultiCast IP" + multicastAddress);
+		if (packet.getSource() != localIAddress && (packet.getDestination() == localIAddress || (packet.getDestination() == multicastAddress && !packet.isUpdate() ))) {
+			
+			seqAckTable.receivedPackage(packet);
+			if (!packet.getMessage().equals("ACK") && !packet.isUpdate()){
+				sendAck(packet);
+			}
+			
+			if (!seqAckTable.received(packet.getSeqnr(), packet.getAcknr(), packet.isBroadcasted(), packet.getSource())) {
+				if(packet.isNormal()) {
+					handleNormal(packet);
+				} else if (packet.isUpdate()) {
+					handleUpdate(packet, message.getAddress());
+				} else if (packet.isSyn()) {
+					handleSyn(packet);
+				} else if (packet.isFin()) {
+					handleFin(packet);
+				} else if (packet.isAck()) {
+					handleAck(packet);
+				}
+			}
+			
+			
+			
+		}
+	}
+	
+	public void addRecipientToView(String recipient) {
+		view.addRecipient(recipient);
+	}
+	
+	public void removeRecipientToView(String recipient) {
+		view.removeRecipient(recipient);
 	}
 	
 	public void handleNormal(JRTVPacket p) {
@@ -192,8 +259,8 @@ public class Controller extends Thread {
 		return router.getName(source);
 	}
 	
-	public void handleUpdate(JRTVPacket p) {
-		router.processUpdate(p);
+	public void handleUpdate(JRTVPacket p, InetAddress address) {
+		router.processUpdate(p, address);
 	}
 	
 	public void handleSyn(JRTVPacket p) {

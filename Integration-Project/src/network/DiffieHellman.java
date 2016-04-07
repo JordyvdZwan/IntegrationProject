@@ -11,9 +11,8 @@ public class DiffieHellman {
 	
 	/**
 	 * Constructor to start a session.
-	 * @param bits
 	 */
-	public DiffieHellman(int bits) {
+	public DiffieHellman() {
 		SecureRandom r = new SecureRandom();
 		a = new BigInteger(LENGTH / 2, 100, r);
 		g = new BigInteger(LENGTH / 2, 100, r);
@@ -45,4 +44,18 @@ public class DiffieHellman {
 	public BigInteger getKey() {
 		return key;
 	}
+	
+	public BigInteger geta() {
+		return a;
+	}
+	
+	public BigInteger getg() {
+		return g;
+	}
+	
+	public BigInteger getp() {
+		return p;
+	}
+	
+	
 }
