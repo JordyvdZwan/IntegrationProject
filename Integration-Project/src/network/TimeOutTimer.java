@@ -1,28 +1,41 @@
 package network;
 
+import java.util.HashMap;
+
+import application.Controller;
+
 public class TimeOutTimer extends Thread {
 	
-	public static final int TIMEOUT = 1000;
-	SeqAckTable table;
-	Integer[] data;
+	private int timeout = 1000;
+	private SeqAckTable table;
+	private JRTVPacket packet;
 	
-	public TimeOutTimer(Integer[] data, SeqAckTable table) {
+	public TimeOutTimer(JRTVPacket packet, SeqAckTable table, int timeout) {
 		this.table = table;
-		this.data = data;
+		this.packet = packet;
+		this.timeout = timeout;
+	}
+	
+	public TimeOutTimer(JRTVPacket packet, SeqAckTable table) {
+		this.table = table;
+		this.packet = packet;
 	}
 	
 	public void run() {
 		try {
-			this.sleep(TIMEOUT);
+			this.sleep(timeout);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		if (table.checkIfAckReceived(data)) {
-			table.removePacket(data);
+		if (packet.getDestination() == Controller.multicastAddress) {
+			for (Integer integer : table.getController().getForwardingTable().keySet()) {
+				if (integer != table.getController().getLocalIAddress()) {
+					
+				}
+			}
 		} else {
-			table.retransmit(data);
+			table.get
 		}
-		this.interrupt();
 	}
 	
 }
