@@ -1,4 +1,4 @@
-package network;
+package security;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
@@ -21,6 +21,10 @@ public class RSA {
 			e = e.add(new BigInteger("2"));
 		}
 		d = e.modInverse(m);
+		System.out.println("d: " + d);
+		System.out.println("e: " + e);
+		System.out.println("m: " + m);
+		System.out.println("n: " + n);
 	}
 	
 	public byte[] encrypt(byte[] message) {
@@ -34,17 +38,26 @@ public class RSA {
 	
 	public String sign(String message) {
 		Integer hashed = message.hashCode(); 
+
+		
+		System.out.println(hashed);
+		System.out.println((new BigInteger(hashed.toString())).modPow(d, n).toString());
+		
+		
 		return (new BigInteger(hashed.toString())).modPow(d, n).toString(); 
 	}
 	
 	public boolean verify(String signature, String message) {
 		Integer hashed = message.hashCode();
+
 		System.out.println(signature);
 		System.out.println(new BigInteger(signature.getBytes()).modPow(e, n));
 		System.out.println(new BigInteger(hashed.toString()));
 		
-		return (new BigInteger(signature.getBytes()).modPow(e, n).toString()
-				== (new BigInteger(hashed.toString()).toString()));
+		System.out.println(new BigInteger(hashed.toString()).mod(n));
+		
+		return (new BigInteger(signature.getBytes()).modPow(e, n))
+				== (new BigInteger(hashed.toString()));
 	}
 	
 }

@@ -1,4 +1,4 @@
-package network;
+package security;
 
 public class ASCII {
 	
@@ -9,6 +9,7 @@ public class ASCII {
 			ascii = (int) message.charAt(i);
 			result.append(ascii);
 		}
+		//string -> bytearray -> number -> bytearray -> string
 		return result.toString();
 	}
 
