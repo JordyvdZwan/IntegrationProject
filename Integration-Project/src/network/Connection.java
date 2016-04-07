@@ -54,7 +54,6 @@ public class Connection extends Thread {
 	
 	//Sends a datagrampacket coming from the client
 	public void send(DatagramPacket packet) {
-		
 		try {
 			
 			socket.send(packet);

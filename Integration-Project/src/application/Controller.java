@@ -181,16 +181,20 @@ public class Controller extends Thread {
 	}
 	
 	private void sendAck(JRTVPacket packet) {
+		System.out.println("Aan het begin van deze functie");
 		JRTVPacket p = new JRTVPacket("ACK");
 		p.setSource(localIAddress);
 		p.setDestination(packet.getSource());
 		p.setAcknr(packet.getSeqnr());
-		
+		System.out.println(p.toString());
+		System.out.println("voor de nexthop");
 		if (p.getDestination() != multicastAddress) {
 			p.setNextHop(router.getNextHop(p.getDestination()));
 		}
-		
+		System.out.println(p.toString());
 		DatagramPacket data = new DatagramPacket(packet.toByteArray(), packet.toByteArray().length, getMulticastIAddress(), 2000);
+		System.out.println(p.toString());
+		System.out.println("Aan het einde van deze functie");
 		connection.send(data);
 	}
 	
