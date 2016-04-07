@@ -17,7 +17,7 @@ public class EcryptionTest {
 	byte[] text = {0,0,0,1,1,1,1,1};
 	String tekst = "GrumpyGinger";
 	OFB o = new OFB();
-	RSA r = new RSA();
+	//RSA2 r = new RSA2();
 	DiffieHellman d = new DiffieHellman();
 	DiffieHellman h = new DiffieHellman();
 	
@@ -41,52 +41,19 @@ public class EcryptionTest {
 		assertEquals(keyd, keyh);
 	}
 	
-//	@Test
-//	public void testRSA() {
-//		System.out.print("{");
-//		for (int i = 0; i < text.length; i++) {
-//			if (i != 0) {
-//				System.out.print(", ");
-//			}
-//		System.out.print(text[i]);
-//		}
-//		System.out.print("}");
-//		System.out.print("\n");
-//		
-//		byte[] encrypt = r.encrypt(text);
-//		
-//		System.out.print("{");
-//		for (int i = 0; i < encrypt.length; i++) {
-//			if (i != 0) {
-//				System.out.print(", ");
-//			}
-//		System.out.print(encrypt[i]);
-//		}
-//		System.out.print("}");
-//		System.out.print("\n");
-//		
-//		byte[] decrypt = r.decrypt(encrypt);
-//		
-//		System.out.print("{");
-//		for (int i = 0; i < decrypt.length; i++) {
-//			if (i != 0) {
-//				System.out.print(", ");
-//			}
-//		System.out.print(decrypt[i]);
-//		}
-//		System.out.print("}");
-//		System.out.print("\n");
-//		
-//		
-//		System.out.println(text);
-//		assertTrue(r.decrypt(r.encrypt(text)).equals(text));
-////		assertEquals(r.decrypt(r.encrypt(tekst)), tekst);
-//	}
-//	
-//	@Test
-//	public void testRSASigning() {
-//		String sign = r.sign(tekst);
-//		assertTrue(r.verify(sign, tekst));
-//	}
+	@Test
+	public void testRSA() {
+		assertTrue(RSA.decrypt(RSA.encrypt(tekst, RSA.getPublicKey()), RSA.getPrivateKey()).equals(tekst));
+	}
+
+	@Test
+	public void testRSASigning() {
+		String sign = ((Integer) tekst.hashCode()).toString();
+		byte[] signed = RSA.encrypt(sign, RSA.getPrivateKey());
+		String verify = RSA.decrypt(signed, RSA.getPublicKey());
+		
+		assertEquals(sign, verify);
+		//assertTrue(RSA2.verify(tekst, sign.getBytes(), RSA2.getPublicKey()));
+	}
 
 }
