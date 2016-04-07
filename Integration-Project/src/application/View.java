@@ -1,6 +1,7 @@
 package application;
 	
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.sql.Connection;
 
 import javafx.scene.media.Media;
@@ -174,13 +175,27 @@ public class View extends Application {
 		}
 	}
 	
-	public void start() {
+	byte[] unpack(int bytes) {
+		return new byte[] {
+			(byte)((bytes >>> 24) & 0xff),
+			(byte)((bytes >>> 16) & 0xff),
+			(byte)((bytes >>>  8) & 0xff),
+			(byte)((bytes       ) & 0xff)
+		};
+	}
+	
+	public void start(int address) {
 		nameField.setDisable(false);
 		inputField.setDisable(false);
 		recipient.setDisable(false);
 		sendButton.setDisable(false);
 		nameButton.setDisable(false);
 		addMessage("SYS", "Connection Ready!");
+		try {
+			addMessage("SYS", "Your IP is: " + InetAddress.getByAddress(unpack(address)).getHostAddress().toString());
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public void addRecipient(String recipient) {

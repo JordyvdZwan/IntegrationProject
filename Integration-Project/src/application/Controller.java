@@ -60,7 +60,10 @@ public class Controller extends Thread {
 		while (settingUp) {
 			DatagramPacket data;
 			if((data = connection.getFirstInQueue()) != null) {
-				System.out.println(new JRTVPacket(data.getData().toString()));
+
+				System.out.println(data.getAddress().toString());
+				System.out.println(new JRTVPacket(data.getData()).toString());
+
 				System.out.print("EQUAL: " +new JRTVPacket(data.getData()).getMessage().equals(initString));
 				JRTVPacket p = new JRTVPacket(data.getData());
 				System.out.print("1: " +p.getMessage());
@@ -81,7 +84,7 @@ public class Controller extends Thread {
 				e.printStackTrace();
 			}
 		}
-		view.start();
+		view.start(localIAddress);
 	}
 	
 	private static int IPtoInt(String ipaddress) {
@@ -214,7 +217,11 @@ public class Controller extends Thread {
 		}
 
 
+<<<<<<< HEAD
 		//if (packet.getSource() != localIAddress && (packet.getDestination() == localIAddress || (packet.getDestination() == multicastAddress && packet.isUpdate() ))) {
+=======
+//		if (packet.getSource() != localIAddress && (packet.getDestination() == localIAddress || (packet.getDestination() == multicastAddress))) {
+>>>>>>> branch 'master' of https://github.com/JordyvdZwan/IntegrationProject
 
 		//System.out.println("Voor die leipe statement is ie een update? : " + packet.isUpdate());
 		//System.out.println("Source ? : " + (packet.getSource() != localIAddress));
@@ -243,7 +250,11 @@ public class Controller extends Thread {
 //			}
 			
 			
+<<<<<<< HEAD
 		//}
+=======
+//		}
+>>>>>>> branch 'master' of https://github.com/JordyvdZwan/IntegrationProject
 		}
 	}
 	
