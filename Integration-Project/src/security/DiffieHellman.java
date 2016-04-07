@@ -41,6 +41,10 @@ public class DiffieHellman {
 		return g.modPow(a, p);
 	}
 	
+	public void setKey(BigInteger key) {
+		this.key = key;
+	}
+	
 	public BigInteger getKey() {
 		return key;
 	}
