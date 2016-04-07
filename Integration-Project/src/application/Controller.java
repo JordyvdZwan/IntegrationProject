@@ -164,17 +164,17 @@ public class Controller extends Thread {
 		int[] seqAck = seqAckTable.getSeqAck(client, packet.isBroadcasted());
 		packet.setSeqnr(seqAck[0] + packet.getPayloadLength());
 		packet.setAcknr(seqAck[1]);
-		if (!packet.getMessage().equals("ACK")) {
-			seqAckTable.registerOutgoingPackage(packet);
-		}
+//		if (!packet.getMessage().equals("ACK")) {
+//			seqAckTable.registerOutgoingPackage(packet);
+//		}
 		DatagramPacket data = new DatagramPacket(packet.toByteArray(), packet.toByteArray().length, router.getRouteIP(packet.getDestination()), 2000);
 		connection.send(data);
 	}
 	
 	public void retransmit(JRTVPacket packet) {
-		if (!packet.getMessage().equals("ACK")) {
-			seqAckTable.registerOutgoingPackage(packet);
-		}
+//		if (!packet.getMessage().equals("ACK")) {
+//			seqAckTable.registerOutgoingPackage(packet);
+//		}
 		DatagramPacket data = new DatagramPacket(packet.toByteArray(), packet.toByteArray().length, router.getRouteIP(packet.getDestination()), 2000);
 		connection.send(data);
 	}
@@ -212,28 +212,26 @@ public class Controller extends Thread {
 	public void handleMessage(DatagramPacket message) {
 		JRTVPacket packet = new JRTVPacket(message.getData());
 
-		if (packet.getNextHop() == localIAddress) {
-			retransmit(packet);
-		}
-
-
-<<<<<<< HEAD
-		//if (packet.getSource() != localIAddress && (packet.getDestination() == localIAddress || (packet.getDestination() == multicastAddress && packet.isUpdate() ))) {
-=======
+//		if (packet.getNextHop() == localIAddress) {
+//			retransmit(packet);
+//		}
+//
+//
+//		//if (packet.getSource() != localIAddress && (packet.getDestination() == localIAddress || (packet.getDestination() == multicastAddress && packet.isUpdate() ))) {
+////		if (packet.getSource() != localIAddress && (packet.getDestination() == localIAddress || (packet.getDestination() == multicastAddress))) {
+//
+//
+//		//System.out.println("Voor die leipe statement is ie een update? : " + packet.isUpdate());
+//		//System.out.println("Source ? : " + (packet.getSource() != localIAddress));
+//		//System.out.println("Destination? : " + (packet.getDestination() == localIAddress || (packet.getDestination() == multicastAddress && packet.isUpdate() )));
+//		//&& packet.isUpdate() Removed it
 //		if (packet.getSource() != localIAddress && (packet.getDestination() == localIAddress || (packet.getDestination() == multicastAddress))) {
->>>>>>> branch 'master' of https://github.com/JordyvdZwan/IntegrationProject
-
-		//System.out.println("Voor die leipe statement is ie een update? : " + packet.isUpdate());
-		//System.out.println("Source ? : " + (packet.getSource() != localIAddress));
-		//System.out.println("Destination? : " + (packet.getDestination() == localIAddress || (packet.getDestination() == multicastAddress && packet.isUpdate() )));
-		//&& packet.isUpdate() Removed it
-		if (packet.getSource() != localIAddress && (packet.getDestination() == localIAddress || (packet.getDestination() == multicastAddress))) {
-
-			System.out.println("Na die leipe statement is ie een update? : " + packet.isUpdate());
-			seqAckTable.receivedPackage(packet);
-			if (!packet.getMessage().equals("ACK") && !packet.isUpdate()){
-				sendAck(packet);
-			}
+//
+//			System.out.println("Na die leipe statement is ie een update? : " + packet.isUpdate());
+//			seqAckTable.receivedPackage(packet);
+//			if (!packet.getMessage().equals("ACK") && !packet.isUpdate()){
+//				sendAck(packet);
+//			}
 			System.out.println(packet.toString()); //TODO
 //			if (!seqAckTable.received(packet.getSeqnr(), packet.getAcknr(), packet.isBroadcasted(), packet.getSource())) {
 				if(packet.isNormal()) {
@@ -248,15 +246,10 @@ public class Controller extends Thread {
 					handleAck(packet);
 				}
 //			}
-			
-			
-<<<<<<< HEAD
-		//}
-=======
+
 //		}
->>>>>>> branch 'master' of https://github.com/JordyvdZwan/IntegrationProject
 		}
-	}
+//	}
 	
 	public void addRecipientToView(String recipient) {
 		view.addRecipient(recipient);
