@@ -213,17 +213,17 @@ public class Controller extends Thread {
 	
 	public void handleMessage(DatagramPacket message) {
 		JRTVPacket packet = new JRTVPacket(message.getData());
-
+//TODO right order?
 		if (packet.getNextHop() == localIAddress && packet.getDestination() != localIAddress) {
 			retransmit(packet);
 		} else {
 			if (packet.getDestination() == localIAddress || packet.getDestination() == multicastAddress) {
-				sendAck(packet);
 				if (!seqAckTable.isReceivedSeqNr(packet.getSource(), packet.getSeqnr())) {
 					seqAckTable.addReceivedSeqNr(packet.getSource(), packet.getSeqnr());
-					//TODO right order?
+					
 					if(packet.isNormal()) {
 						handleNormal(packet);
+						sendAck(packet);
 					} else if (packet.isUpdate()) {
 						handleUpdate(packet, message.getAddress());
 					} else if (packet.isSyn()) {
@@ -233,6 +233,9 @@ public class Controller extends Thread {
 					} else if (packet.isAck()) {
 						handleAck(packet);
 					} else {
+						if (packet.getMessage().equals("ACK")) {
+							seqAckTable.registerAckPacket(packet);
+						}
 					}
 				}
 			}
