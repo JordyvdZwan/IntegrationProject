@@ -37,8 +37,7 @@ public class CreateEncryptedSessionPacket {
 			// wait
 			keyDiffieHellmanFinal(//nummer uit packet from the other side);
 		}
-		o.setKey(diffie.getKey().toByteArray());
-		byte[] encrypt = o.EnDecrypt(data.getBytes());
+		byte[] encrypt = OFB.EnDecrypt(data.getBytes(), diffie.getKey().toByteArray());
 		String sign = ((Integer) data.hashCode()).toString();
 		byte[] signed = RSA.encrypt(sign, privatekey);
 		byte[] encrypted = new byte[encrypt.length + signed.length];
@@ -64,7 +63,7 @@ public class CreateEncryptedSessionPacket {
 		String sign = ((Integer) encrypt.toString().hashCode()).toString();
 		String verify = RSA.decrypt(hash, publickey);
 		if (sign.equals(verify)) {
-			result = o.EnDecrypt(encrypt).toString();
+			result = OFB.EnDecrypt(encrypt, diffie.getKey().toByteArray()).toString();
 		} else {
 			result = "error, bedieger";
 		}
