@@ -82,7 +82,7 @@ public class Router {
 	            (b[0] & 0xFF) << 24;
 	}
 	
-	private String getStringIP(int address) {
+	public static String getStringIP(int address) {
 		try {
 			return InetAddress.getByAddress(unpack(address)).getHostAddress().toString();
 		} catch (UnknownHostException e) {
@@ -92,7 +92,7 @@ public class Router {
 	}
 	
 	
-	byte[] unpack(int bytes) {
+	static byte[] unpack(int bytes) {
 		return new byte[] {
 			(byte)((bytes >>> 24) & 0xff),
 			(byte)((bytes >>> 16) & 0xff),
