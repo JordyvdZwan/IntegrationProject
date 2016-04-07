@@ -44,7 +44,7 @@ public class Connection extends Thread {
 			}
 
 			System.out.println("Received packet from " + recv.getAddress() + "with " + recv.getLength() +  " bytes of data");
-
+//			System.out.println(new JRTVPacket(recv.getData()).toString());
 			queuedpackets.add(recv);
 			recv.setLength(buffer.length);
 		}
@@ -57,6 +57,9 @@ public class Connection extends Thread {
 		try {
 			
 			socket.send(packet);
+			
+			System.out.println("Send packet with " + packet.getLength() +  " bytes of data");
+//			System.out.println(new JRTVPacket(packet.getData()).toString());
 			
 		} catch (IOException e) {
 			

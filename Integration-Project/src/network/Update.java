@@ -23,7 +23,6 @@ public class Update extends Thread {
 		while(true) {
 			JRTVPacket packet = null;
 			if (controller.getSettingUp()) {
-//				System.out.println(controller.getInitString());
 				if (controller.getInitString() != null) {
 					packet = new JRTVPacket(controller.getInitString());
 				}

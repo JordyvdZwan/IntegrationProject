@@ -23,6 +23,7 @@ public class Router {
 	
 	public void processUpdate(JRTVPacket packet) {
 		if (packet.getSource() != controller.getLocalIAddress() && packet.getSource() != 0) {
+			System.out.println(getStringIP(packet.getSource()));
 			//Puts true into the list with valid hops
 			table.getvalidhops().put(packet.getSource(), true);
 			
@@ -59,6 +60,7 @@ public class Router {
 					controller.removeRecipientToView(addresstable.get(packet.getSource()));
 					addresstable.remove(packet.getSource());
 				}
+				System.out.println("Putting in new entry: " + getStringIP(packet.getSource()) + ", " +  "(" + getStringIP(packet.getSource()) + ") " + name);
 				addresstable.put(packet.getSource(), "(" + getStringIP(packet.getSource()) + ") " + name);
 				
 				controller.addRecipientToView("(" + getStringIP(packet.getSource()) + ") " + name);
@@ -102,25 +104,19 @@ public class Router {
 	//CHECK WHAT IS BELOW HERE!
 	
 	public Integer getIP(String client) {
+		System.out.println("Input: " + client);
 		Integer result = null;
 		if (client.equals("Anonymous")) {
 			result = Controller.multicastAddress;
 		} else { 
 			for(Integer e: addresstable.keySet()) {
-				System.out.println(e + ": " + addresstable.get(e));
 				if(addresstable.get(e).equals(client)) {
 					result = e;
 					break;
 				}
 			}
 		}
-		
-		try {
-			System.out.println("Router anwser:" + InetAddress.getByAddress(unpack(result)).getHostAddress().toString());
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		System.out.println("Output: " + getStringIP(result));
 		return result;
 	}
 	

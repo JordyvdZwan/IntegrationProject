@@ -218,13 +218,14 @@ public class Controller extends Thread {
 	public void handleMessage(DatagramPacket message) {
 		JRTVPacket packet = new JRTVPacket(message.getData());
 //TODO right order?
+		
 		if (packet.getNextHop() == localIAddress && packet.getDestination() != localIAddress) {
 			retransmit(packet);
 		} else {
 			if (packet.getDestination() == localIAddress || packet.getDestination() == multicastAddress) {
 				if (!seqAckTable.isReceivedSeqNr(packet.getSource(), packet.getSeqnr())) {
 					seqAckTable.addReceivedSeqNr(packet.getSource(), packet.getSeqnr());
-					
+					System.out.println(packet.toString());
 					if(packet.isNormal()) {
 						handleNormal(packet);
 						sendAck(packet);
