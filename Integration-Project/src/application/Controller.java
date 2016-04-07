@@ -212,7 +212,15 @@ public class Controller extends Thread {
 			retransmit(packet);
 		}
 
+
 		if (packet.getSource() != localIAddress && (packet.getDestination() == localIAddress || (packet.getDestination() == multicastAddress && packet.isUpdate() ))) {
+
+		//System.out.println("Voor die leipe statement is ie een update? : " + packet.isUpdate());
+		//System.out.println("Source ? : " + (packet.getSource() != localIAddress));
+		//System.out.println("Destination? : " + (packet.getDestination() == localIAddress || (packet.getDestination() == multicastAddress && packet.isUpdate() )));
+		//&& packet.isUpdate() Removed it
+		if (packet.getSource() != localIAddress && (packet.getDestination() == localIAddress || (packet.getDestination() == multicastAddress))) {
+
 			System.out.println("Na die leipe statement is ie een update? : " + packet.isUpdate());
 			seqAckTable.receivedPackage(packet);
 			if (!packet.getMessage().equals("ACK") && !packet.isUpdate()){
