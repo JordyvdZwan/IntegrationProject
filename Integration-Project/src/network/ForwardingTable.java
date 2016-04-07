@@ -45,7 +45,7 @@ public class ForwardingTable {
 	
 	public int getNextHopCost(Integer destination) {
 		//Loops through all the paths to the destination and selects the one with the lowest cost
-		Integer result = null;
+		Integer result = 0;
 		int resultcost = 0;
 		Map<Integer, Integer> possibilities = forwardingtable.get(destination);
 		
