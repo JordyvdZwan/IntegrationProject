@@ -24,7 +24,6 @@ public class ForwardingTable {
 	
 	public int getNextHop(Integer destination) {
 		//Loops through all the paths to the destination and selects the one with the lowest cost
-		System.out.println("hop input: " + Router.getStringIP(destination));
 		Integer result = null;
 		int resultcost = 200;
 		if (destination == Controller.multicastAddress) {
@@ -34,7 +33,6 @@ public class ForwardingTable {
 				Map<Integer, Integer> possibilities = forwardingtable.get(destination);
 				
 				for(Integer e: possibilities.keySet()) {
-					System.out.println("hop : " + Router.getStringIP(e) + " cost: " + possibilities.get(e));
 					if(possibilities.get(e) <= resultcost) {
 						result = e;
 						resultcost = possibilities.get(e);

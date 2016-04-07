@@ -60,14 +60,7 @@ public class Controller extends Thread {
 		while (settingUp) {
 			DatagramPacket data;
 			if((data = connection.getFirstInQueue()) != null) {
-
-				System.out.println(data.getAddress().toString());
-				System.out.println(new JRTVPacket(data.getData()).toString());
-
-				System.out.print("EQUAL: " +new JRTVPacket(data.getData()).getMessage().equals(initString));
 				JRTVPacket p = new JRTVPacket(data.getData());
-				System.out.print("1: " +p.getMessage());
-				System.out.print("1: " +initString);
 				if (new JRTVPacket(data.getData()).getMessage().equals(initString)) {
 					InetAddress add = data.getAddress(); 
 					String address = add.toString();
@@ -80,7 +73,6 @@ public class Controller extends Thread {
 			try {
 				this.sleep(500);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -235,7 +227,6 @@ public class Controller extends Thread {
 				if (packet.getDestination() == localIAddress || packet.getDestination() == multicastAddress) {
 					if (!seqAckTable.isReceivedSeqNr(packet.getSource(), packet.getSeqnr())) {
 						seqAckTable.addReceivedSeqNr(packet.getSource(), packet.getSeqnr());
-						System.out.println(packet.toString());
 						if(packet.isNormal()) {
 							handleNormal(packet);
 							sendAck(packet);
