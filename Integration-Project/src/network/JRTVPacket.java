@@ -1,5 +1,8 @@
 package network;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 public class JRTVPacket {
 
 	static final int HEADERLENGTH = 28;
@@ -29,13 +32,30 @@ public class JRTVPacket {
 	private boolean fin = false;
 	private boolean broadcasted = false;
 
+	byte[] unpack(int bytes) {
+		return new byte[] {
+			(byte)((bytes >>> 24) & 0xff),
+			(byte)((bytes >>> 16) & 0xff),
+			(byte)((bytes >>>  8) & 0xff),
+			(byte)((bytes       ) & 0xff)
+		};
+	}
+
+
+
+			
+	
 	public String toString() {
 		String res = "";
+		try {
+		
 		res = res.concat("Addressing data:\n");
 		res = res.concat("Sequence number: " + seqnr + "\n");
 		res = res.concat("Acknowledgement number: " + acknr + "\n");
-		res = res.concat("Source Address: " + source + "\n");
-		res = res.concat("Destination Address: " + destination + "\n");
+		
+			res = res.concat("Source Address: " + InetAddress.getByAddress(unpack(source)).getHostAddress().toString() + "\n");
+		
+		res = res.concat("Destination Address: " + InetAddress.getByAddress(unpack(destination)).getHostAddress().toString() + "\n");
 		res = res.concat("Hash Payload Length: " + hashPayload + "\n");
 		res = res.concat("Payload Length: " + payloadLength + "\n");
 		res = res.concat("nextHop: " + nextHop + "\n");
@@ -57,7 +77,9 @@ public class JRTVPacket {
 //			res = res.concat(j.toString());
 //			res = res.concat("\n");
 //		}
-		
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
 		
 		return res;
 	}
