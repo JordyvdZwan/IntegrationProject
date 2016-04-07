@@ -60,6 +60,10 @@ public class Controller extends Thread {
 		while (settingUp) {
 			DatagramPacket data;
 			if((data = connection.getFirstInQueue()) != null) {
+
+				System.out.println(data.getAddress().toString());
+				System.out.println(new JRTVPacket(data.getData()).toString());
+
 				System.out.print("EQUAL: " +new JRTVPacket(data.getData()).getMessage().equals(initString));
 				JRTVPacket p = new JRTVPacket(data.getData());
 				System.out.print("1: " +p.getMessage());
@@ -80,7 +84,7 @@ public class Controller extends Thread {
 				e.printStackTrace();
 			}
 		}
-		view.start();
+		view.start(localIAddress);
 	}
 	
 	private static int IPtoInt(String ipaddress) {
@@ -207,22 +211,31 @@ public class Controller extends Thread {
 	
 	public void handleMessage(DatagramPacket message) {
 		JRTVPacket packet = new JRTVPacket(message.getData());
-		
+
 		if (packet.getNextHop() == localIAddress) {
 			retransmit(packet);
 		}
-		System.out.println("Local controller IP" + localIAddress);
-		System.out.println("Packet Source" + packet.getSource());
-		System.out.println("Packet Destination" + packet.getDestination());
-		System.out.println("MultiCast IP" + multicastAddress);
-		if (packet.getSource() != localIAddress && (packet.getDestination() == localIAddress || (packet.getDestination() == multicastAddress && !packet.isUpdate() ))) {
-			
+
+
+<<<<<<< HEAD
+		//if (packet.getSource() != localIAddress && (packet.getDestination() == localIAddress || (packet.getDestination() == multicastAddress && packet.isUpdate() ))) {
+=======
+//		if (packet.getSource() != localIAddress && (packet.getDestination() == localIAddress || (packet.getDestination() == multicastAddress))) {
+>>>>>>> branch 'master' of https://github.com/JordyvdZwan/IntegrationProject
+
+		//System.out.println("Voor die leipe statement is ie een update? : " + packet.isUpdate());
+		//System.out.println("Source ? : " + (packet.getSource() != localIAddress));
+		//System.out.println("Destination? : " + (packet.getDestination() == localIAddress || (packet.getDestination() == multicastAddress && packet.isUpdate() )));
+		//&& packet.isUpdate() Removed it
+		if (packet.getSource() != localIAddress && (packet.getDestination() == localIAddress || (packet.getDestination() == multicastAddress))) {
+
+			System.out.println("Na die leipe statement is ie een update? : " + packet.isUpdate());
 			seqAckTable.receivedPackage(packet);
 			if (!packet.getMessage().equals("ACK") && !packet.isUpdate()){
 				sendAck(packet);
 			}
-			
-			if (!seqAckTable.received(packet.getSeqnr(), packet.getAcknr(), packet.isBroadcasted(), packet.getSource())) {
+			System.out.println(packet.toString()); //TODO
+//			if (!seqAckTable.received(packet.getSeqnr(), packet.getAcknr(), packet.isBroadcasted(), packet.getSource())) {
 				if(packet.isNormal()) {
 					handleNormal(packet);
 				} else if (packet.isUpdate()) {
@@ -234,10 +247,14 @@ public class Controller extends Thread {
 				} else if (packet.isAck()) {
 					handleAck(packet);
 				}
-			}
+//			}
 			
 			
-			
+<<<<<<< HEAD
+		//}
+=======
+//		}
+>>>>>>> branch 'master' of https://github.com/JordyvdZwan/IntegrationProject
 		}
 	}
 	
