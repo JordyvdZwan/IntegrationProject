@@ -4,8 +4,6 @@ import static org.junit.Assert.*;
 
 import java.math.BigInteger;
 import java.util.Arrays;
-
-import org.junit.Before;
 import org.junit.Test;
 
 public class EcryptionTest {
@@ -21,15 +19,10 @@ public class EcryptionTest {
 	DiffieHellman d = new DiffieHellman();
 	DiffieHellman h = new DiffieHellman();
 	
-	@Before
-	public void setup() {
-		o.setKey(key);
-	}
-	
 	@Test
 	public void testOFBEnDecrypt() {
-		byte[] encrypt = o.EnDecrypt(text);
-		assertTrue(Arrays.equals(o.EnDecrypt(encrypt), (text)));
+		byte[] encrypt = OFB.EnDecrypt(text, key);
+		assertTrue(Arrays.equals(OFB.EnDecrypt(encrypt, key), (text)));
 	}
 	
 	@Test
