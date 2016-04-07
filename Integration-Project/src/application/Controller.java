@@ -231,10 +231,14 @@ public class Controller extends Thread {
 				retransmit(packet);
 			} else {
 				if (packet.getDestination() == localIAddress || packet.getDestination() == multicastAddress) {
+					
+					if (packet.isNormal()) {
+						sendAck(packet);
+					}
+					
 					if (!seqAckTable.isReceivedSeqNr(packet.getSource(), packet.getSeqnr())) {
 						seqAckTable.addReceivedSeqNr(packet.getSource(), packet.getSeqnr());
 						if(packet.isNormal()) {
-							sendAck(packet);
 							handleNormal(packet);
 						} else if (packet.isUpdate()) {
 							handleUpdate(packet);
