@@ -56,7 +56,7 @@ public class Router {
 					controller.removeRecipientToView(addresstable.get(packet.getSource()));
 					addresstable.remove(packet.getSource());
 				}
-				addresstable.put(packet.getSource(), name);
+				addresstable.put(packet.getSource(), "(" + packet.getSource() + ") " + name);
 				controller.addRecipientToView("(" + packet.getSource() + ") " + name);
 			}
 		}
