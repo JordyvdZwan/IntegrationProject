@@ -1,5 +1,8 @@
 package network;
 import java.util.Map;
+
+import application.Controller;
+
 import java.util.HashMap;
 import java.net.InetAddress;
 
@@ -17,19 +20,21 @@ public class ForwardingTable {
 		//Loops through all the paths to the destination and selects the one with the lowest cost
 		Integer result = null;
 		int resultcost = 0;
-		
-		if(forwardingtable.containsKey(destination)) {
-			Map<Integer, Integer> possibilities = forwardingtable.get(destination);
-			
-			for(Integer e: possibilities.keySet()) {
-				if(possibilities.get(e) <= resultcost) {
-					result = e;
-					resultcost = possibilities.get(e);
+		if (destination == Controller.multicastAddress) {
+			return Controller.multicastAddress;
+		} else {
+			if(forwardingtable.containsKey(destination)) {
+				Map<Integer, Integer> possibilities = forwardingtable.get(destination);
+				
+				for(Integer e: possibilities.keySet()) {
+					if(possibilities.get(e) <= resultcost) {
+						result = e;
+						resultcost = possibilities.get(e);
+					}
 				}
-			}
-		} 
-	
-		return result;
+			} 
+			return result;
+		}
 	}
 	
 	public int getNextHopCost(Integer destination) {
