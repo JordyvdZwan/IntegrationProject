@@ -114,6 +114,9 @@ public class SeqAckTable {
 	
 	public void registerOutgoingPackage(JRTVPacket packet) {
 		Integer[] data = new Integer[4];
+		System.out.println("Table: " + table.size());
+		System.out.println("History: " + history.size());
+		System.out.println("Packets: " + packets.size());
 		if (packet.getDestination() == Controller.multicastAddress) {
 			for (Integer integer : controller.getForwardingTable().keySet()) {
 				if (integer != controller.getLocalIAddress()) {

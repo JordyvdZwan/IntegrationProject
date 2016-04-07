@@ -158,7 +158,7 @@ public class Controller extends Thread {
 	
 	public void sendPacket(int client, JRTVPacket packet) {
 		int[] seqAck = seqAckTable.getSeqAck(client, packet.isBroadcasted());
-		packet.setSeqnr((int) Math.random() * 200000 + packet.getPayloadLength());
+		packet.setSeqnr(seqAck[0] + packet.getPayloadLength());
 		packet.setAcknr(seqAck[1]);
 		if (!packet.getMessage().equals("ACK")) {
 			seqAckTable.registerOutgoingPackage(packet);
