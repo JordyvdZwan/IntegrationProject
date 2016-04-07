@@ -1,4 +1,4 @@
-package network;
+package security;
 
 import static org.junit.Assert.*;
 

@@ -1,4 +1,4 @@
-package network;
+package security;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
