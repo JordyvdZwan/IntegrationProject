@@ -69,14 +69,14 @@ public class JRTVPacket {
 			res = res.concat(message + "\n");
 			res = res.concat("\n");
 			res = res.concat("Bytes\n");
-			for (int i = 0; i < HEADERLENGTH + payloadLength; i++) {
-				Integer j = (int) this.toByteArray()[i];
-				res = res.concat(i + ": " + j.toString());
-				res = res.concat("\n");
-				if ((i + 1) % 8 == 0) {
-					res = res.concat("----------------------\n");
-				}
-			}
+//			for (int i = 0; i < HEADERLENGTH + payloadLength; i++) {
+//				Integer j = (int) this.toByteArray()[i];
+//				res = res.concat(i + ": " + j.toString());
+//				res = res.concat("\n");
+//				if ((i + 1) % 8 == 0) {
+//					res = res.concat("----------------------\n");
+//				}
+//			}
 		
 		} catch (UnknownHostException e) {
 			e.printStackTrace();

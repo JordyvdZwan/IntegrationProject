@@ -81,6 +81,7 @@ public class SeqAckTable {
 	
 	public void registerSendPacket(JRTVPacket packet) {
 		if (packet.getDestination() == Controller.multicastAddress) {
+			System.out.println("peop");
 			for (Integer integer : controller.getForwardingTable().keySet()) {
 				if (integer != controller.getLocalIAddress()) {
 					if (!received.containsKey(packet.getDestination())) {
@@ -90,6 +91,7 @@ public class SeqAckTable {
 				}
 			}
 		} else {
+			System.out.println("poep");
 			if (!received.containsKey(packet.getDestination())) {
 				received.put(packet.getDestination(), new HashMap<Integer, Boolean>());
 			}

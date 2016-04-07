@@ -159,7 +159,10 @@ public class Controller extends Thread {
 			packet.setNextHop(router.getNextHop(packet.getDestination()));
 		}
 		
-		seqAckTable.registerSendPacket(packet);
+		if (packet.isNormal()) {
+			seqAckTable.registerSendPacket(packet);
+		}
+		
 		DatagramPacket data = new DatagramPacket(packet.toByteArray(), packet.toByteArray().length, getMulticastIAddress(), 2000);
 		connection.send(data);
 	}
@@ -175,7 +178,10 @@ public class Controller extends Thread {
 			packet.setNextHop(router.getNextHop(packet.getDestination()));
 		}
 		
-		seqAckTable.registerSendPacket(packet);
+		if (packet.isNormal()) {
+			seqAckTable.registerSendPacket(packet);
+		}
+		
 		DatagramPacket data = new DatagramPacket(packet.toByteArray(), packet.toByteArray().length, getMulticastIAddress(), 2000);
 		connection.send(data);
 	}
