@@ -48,8 +48,8 @@ public class Connection extends Thread {
 				System.out.println("Received packet from " + recv.getAddress() + "with " + recv.getLength() +  " bytes of data");
 				//System.out.println("RECV Message: " + new JRTVPacket(recv.getData()).getMessage());
 				JRTVPacket p = new JRTVPacket(recv.getData());
-				System.out.println("seq : " + p.getAcknr());
-				System.out.println("ack: " + p.getSeqnr());
+				System.out.println("seq : " + p.getSeqnr());
+				System.out.println("ack: " + p.getAcknr());
 				System.out.println("DATA : " + p.getMessage());
 				System.out.println("Destination : " + Router.getStringIP(p.getDestination()));
 				System.out.println("SOURCE: " + Router.getStringIP(p.getSource()));
@@ -70,17 +70,17 @@ public class Connection extends Thread {
 			
 			socket.send(packet);
 			
-			JRTVPacket p = new JRTVPacket(packet.getData());
-			if (!p.isUpdate()) {
-				System.out.println("Send packet with " + packet.getLength() +  " bytes of data");
-				//System.out.println("RECV Message: " + new JRTVPacket(recv.getData()).getMessage());
-				
-				System.out.println("seq : " + p.getAcknr());
-				System.out.println("ack: " + p.getSeqnr());
-				System.out.println("DATA : " + p.getMessage());
-				System.out.println("Destination : " + Router.getStringIP(p.getDestination()));
-				System.out.println("SOURCE: " + Router.getStringIP(p.getSource()));
-			}
+//			JRTVPacket p = new JRTVPacket(packet.getData());
+//			if (!p.isUpdate() && !p.getSource() == ) {
+//				System.out.println("Send packet with " + packet.getLength() +  " bytes of data");
+//				//System.out.println("RECV Message: " + new JRTVPacket(recv.getData()).getMessage());
+//				
+//				System.out.println("seq : " + p.getSeqnr());
+//				System.out.println("ack: " + p.getAcknr());
+//				System.out.println("DATA : " + p.getMessage());
+//				System.out.println("Destination : " + Router.getStringIP(p.getDestination()));
+//				System.out.println("SOURCE: " + Router.getStringIP(p.getSource()));
+//			}
 			
 		} catch (IOException e) {
 			

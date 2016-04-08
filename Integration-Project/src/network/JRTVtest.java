@@ -14,7 +14,7 @@ public class JRTVtest {
 		byte[] bytes = {00000000, 00000000, 00000000, 00000000, 00000000, 00000000, 00000000, 00000000, 
 				00000000, 00000000, 00000000, 00000000, 00000000, 00000000, 00000000, 00000000, 
 				00000000, 00000000, 00000000, 00000000, 00000000};
-		packet = new JRTVPacket(bytes);
+		packet = new JRTVPacket("Hello");
 		packet.setAcknr(500);
 		packet.setSeqnr(300);
 	}
