@@ -29,7 +29,6 @@ import javafx.scene.layout.RowConstraints;
 import javafx.scene.text.Text;
 
 
-
 public class View extends Application {
 	
 	//Initializing all controls on of the program
