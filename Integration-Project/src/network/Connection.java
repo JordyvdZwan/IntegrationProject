@@ -54,6 +54,7 @@ public class Connection extends Thread {
 				System.out.println("DATA : " + p.getMessage());
 				System.out.println("Destination : " + Router.getStringIP(p.getDestination()));
 				System.out.println("SOURCE: " + Router.getStringIP(p.getSource()));
+				System.out.println("NextHop: " + Router.getStringIP(p.getNextHop()));
 			}
 
 			
