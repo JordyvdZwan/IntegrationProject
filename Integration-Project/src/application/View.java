@@ -28,6 +28,8 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.text.Text;
 
+
+
 public class View extends Application {
 	
 	//Initializing all controls on of the program
@@ -40,6 +42,16 @@ public class View extends Application {
 	View view = this;
 	
 	Controller controller;
+	
+	String path = "Notification.mp3";
+	Media media = new Media(new File(path).toURI().toString());
+	MediaPlayer mediaPlayer = new MediaPlayer(media);
+	
+		
+	public void resetMedia() {
+		Media media = new Media(new File(path).toURI().toString());
+		mediaPlayer = new MediaPlayer(media);
+	}
 	
 	@Override
 	public void start(Stage primaryStage) {
@@ -272,9 +284,7 @@ public class View extends Application {
 	
 	public void addMessage(String client, String message) {
 		chatText.setText(chatText.getText() + "\n" + client + ": " + message);
-//		String ssound = "sound.mp3";
-//	    Media sound = new Media(ssound);
-//	    MediaPlayer mediaPlayer = new MediaPlayer(sound);
-//	    mediaPlayer.play();
+		mediaPlayer.play();
+		resetMedia();
 	}
 }
