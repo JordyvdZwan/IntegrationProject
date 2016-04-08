@@ -31,6 +31,9 @@ public class JRTVPacket {
 	private boolean normal = false;
 	private boolean fin = false;
 	private boolean broadcasted = false;
+	private boolean RSA = false;
+	private boolean diffie = false;
+	
 
 	public String toString() {
 		String res = "";
@@ -198,6 +201,14 @@ public class JRTVPacket {
 			broadcasted = true;
 			value -= 4;
 		}
+		if (value >= 4) {
+			RSA = true;
+			value -= 2;
+		}
+		if (value >= 4) {
+			diffie = true;
+			value -= 1;
+		}
 	}
 	
 	private byte getByteFlags() {
@@ -221,6 +232,12 @@ public class JRTVPacket {
 		if (broadcasted) {
 			value += 4;
 		}
+		if (RSA) {
+			value += 2;
+		}
+		if (diffie) {
+			value += 1;
+		}
 		b = (byte) value;
 		return b;
 	}
@@ -239,6 +256,22 @@ public class JRTVPacket {
 	        (byte) ((a >> 8) & 0xFF),   
 	        (byte) (a & 0xFF)
 	    };
+	}
+	
+	public boolean isRSA() {
+		return RSA;
+	}
+
+	public void setRSA(boolean rSA) {
+		RSA = rSA;
+	}
+
+	public boolean isDiffie() {
+		return diffie;
+	}
+
+	public void setDiffie(boolean diffie) {
+		this.diffie = diffie;
 	}
 	
 	public String getMessage() {

@@ -2,11 +2,13 @@ package network;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.security.Key;
 import java.util.Map;
 import java.util.HashMap;
 
 
 import application.Controller;
+import security.RSA;
 
 
 public class Router {
@@ -14,12 +16,17 @@ public class Router {
 	private Controller controller;
 	Map<Integer, String> addresstable = new HashMap<Integer, String>();
 	private ForwardingTable table = new ForwardingTable();
+	private Map<Integer, Key> rsaPublicKeys = new HashMap<Integer, Key>();
 	
 	public Router(Controller controller) {
 		this.controller = controller;
 	}
 	
 	Map<Integer, EntryTimeOut> timeouts = new HashMap<Integer, EntryTimeOut>();
+	
+	public void processRSA(JRTVPacket packet) {
+		rsaPublicKeys.put(packet.getSource(), RSA.toKey(packet.getMessage().getBytes()));
+	}
 	
 	public void processUpdate(JRTVPacket packet) {
 		if (packet.getSource() != controller.getLocalIAddress() && packet.getSource() != 0) {
