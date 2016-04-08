@@ -45,6 +45,10 @@ public class DiffieHellman {
 		return key;
 	}
 	
+	public void setKey(BigInteger key) {
+		this.key = key;
+	}
+	
 	public BigInteger geta() {
 		return a;
 	}
