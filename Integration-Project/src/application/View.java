@@ -58,7 +58,6 @@ public class View extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		try {
-			startMedia.play();
 			GridPane root = new GridPane();
 			
 			ColumnConstraints coll1 = new ColumnConstraints();
@@ -175,7 +174,7 @@ public class View extends Application {
 			primaryStage.setScene(scene);
 			
 			chatText.appendText("\nSYS Setting up Connection...");
-			
+			startMedia.play();
 			primaryStage.addEventHandler(WindowEvent.WINDOW_SHOWN, new  EventHandler<WindowEvent>() {
 				@Override
 				public void handle(WindowEvent window)
