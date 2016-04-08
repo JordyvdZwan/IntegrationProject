@@ -49,11 +49,11 @@ public class SeqAckTable {
 	
 	public Boolean isReceived(Integer address, Integer seq) {
 		Boolean res = false;
-		System.out.println("Zit hij in de send ? : " + send.containsKey(address));
+//		System.out.println("Zit hij in de send ? : " + send.containsKey(address));
 		if (send.containsKey(address)) {
-			System.out.println("Zit de seq in de keyset? " + send.get(address).containsKey(seq));
+//			System.out.println("Zit de seq in de keyset? " + send.get(address).containsKey(seq));
 			if (send.get(address).containsKey(seq)) {
-				System.out.println("Wat is deze value dan? " + send.get(address).get(seq));
+//				System.out.println("Wat is deze value dan? " + send.get(address).get(seq));
 				res = send.get(address).get(seq);
 			}
 		}
@@ -73,10 +73,10 @@ public class SeqAckTable {
 	}
 	
 	public void registerAckPacket(JRTVPacket packet) {
-		System.out.println("In de registerAck is dit de data : \n" + packet.toString());
+//		System.out.println("In de registerAck is dit de data : \n" + packet.toString());
 		int address = packet.getSource();
 		int seq = packet.getAcknr();
-		System.out.println("Zit deze source in de send list? " + send.containsKey(address));
+//		System.out.println("Zit deze source in de send list? " + send.containsKey(address));
 		if (send.containsKey(address)) {
 			if (send.get(address).containsKey(seq)) {
 				send.get(address).put(seq, true);
@@ -85,14 +85,14 @@ public class SeqAckTable {
 	}
 	
 	public void registerSendPacket(JRTVPacket packet) {
-		System.out.println("REGISTER PACKET:");
+//		System.out.println("REGISTER PACKET:");
 		if (packet.getDestination() == Controller.multicastAddress) {
 			for (Integer integer : controller.getForwardingTable().keySet()) {
 				if (integer != controller.getLocalIAddress() && integer != Controller.multicastAddress) {
 					if (!send.containsKey(integer)) {
 						send.put(integer, new HashMap<Integer, Boolean>());
 					}
-					System.out.println("putting in: " + Router.getStringIP(integer) + " " + packet.getSeqnr());
+//					System.out.println("putting in: " + Router.getStringIP(integer) + " " + packet.getSeqnr());
 					send.get(integer).put(packet.getSeqnr(), false);
 				}
 			}

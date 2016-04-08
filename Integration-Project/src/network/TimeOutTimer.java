@@ -27,13 +27,13 @@ public class TimeOutTimer extends Thread {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		System.out.println("Is the destination the multicast address? : " + (packet.getDestination() == Controller.multicastAddress));
+//		System.out.println("Is the destination the multicast address? : " + (packet.getDestination() == Controller.multicastAddress));
 		if (packet.getDestination() == Controller.multicastAddress) {
-			System.out.println("Forwarding table keys : " + table.getController().getForwardingTable().keySet().toString() );
+//			System.out.println("Forwarding table keys : " + table.getController().getForwardingTable().keySet().toString() );
 			for (Integer integer : table.getController().getForwardingTable().keySet()) {
-				System.out.println("Is it a valid address?" + (integer != table.getController().getLocalIAddress() && integer != table.getController().multicastAddress));
+//				System.out.println("Is it a valid address?" + (integer != table.getController().getLocalIAddress() && integer != table.getController().multicastAddress));
 				if (integer != table.getController().getLocalIAddress() && integer != table.getController().multicastAddress) {
-					System.out.println("Is the packet received? : " + !table.isReceived(integer, packet.getSeqnr()));
+//					System.out.println("Is the packet received? : " + !table.isReceived(integer, packet.getSeqnr()));
 					if (!table.isReceived(integer, packet.getSeqnr())) {
 						table.retransmit(packet, integer);
 					}
