@@ -20,6 +20,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.control.ComboBox;
@@ -58,6 +59,8 @@ public class View extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		try {
+			startMedia.play();
+			primaryStage.getIcons().add(new Image("file:icon.png"));
 			GridPane root = new GridPane();
 			
 			ColumnConstraints coll1 = new ColumnConstraints();
