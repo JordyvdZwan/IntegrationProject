@@ -227,7 +227,7 @@ public class Controller extends Thread {
 		JRTVPacket packet = new JRTVPacket(message.getData());
 //TODO right order?
 		if (packet.getSource() != localIAddress) {
-			if (packet.getNextHop() == localIAddress && packet.getDestination() != localIAddress) {
+			if (packet.getNextHop() == localIAddress && packet.getDestination() != localIAddress && packet.getDestination() != multicastAddress) {
 				retransmit(packet);
 			} else {
 				if (packet.getDestination() == localIAddress || packet.getDestination() == multicastAddress) {
