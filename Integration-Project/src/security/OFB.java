@@ -4,9 +4,7 @@ public class OFB {
 
 	private static final int BLOCKSIZE = 63;
 	private static final byte[] Oj =
-					{1,1,0,1,1,1,0,1,1,0,0,1,1,0,1,1,0,1,0,1,0,
-					 1,1,0,1,0,1,1,0,0,1,1,1,0,1,0,0,1,0,1,0,0,
-					 1,0,1,0,0,1,0,0,1,1,0,0,1,0,1,1,0,1,0,0,0}; 
+					AE6498ABC09EF9077AABC634EED98732987A1120934598BBBEEA093247897239.to
 
 	
 	public static byte[] EnDecrypt(byte[] message, byte[] key) {
