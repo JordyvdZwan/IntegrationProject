@@ -12,6 +12,7 @@ import network.JRTVPacket;
 import network.Router;
 import network.SeqAckTable;
 import network.Update;
+import security.RSA;
 public class Controller extends Thread {
 
 	private View view;
@@ -272,7 +273,7 @@ public class Controller extends Thread {
 	
 	public void handleNormal(JRTVPacket p) {
 		String message = p.getMessage();
-		view.addMessage(router.getName(p.getSource()), message);
+		view.addMessage(router.getName(p.getSource()), message, p.isBroadcasted());
 		//TODO: implement setting the right sequence and acknowledgement numbers
 	}
 	
@@ -280,19 +281,19 @@ public class Controller extends Thread {
 		return router.getName(source);
 	}
 	
-	public void handleUpdate(JRTVPacket p) {
+	private void handleUpdate(JRTVPacket p) {
 		router.processUpdate(p);
 	}
 	
-	public void handleSyn(JRTVPacket p) {
+	private void handleSyn(JRTVPacket p) {
 		//TODO: read sequencenumber, set that as ack, give appropiate ack, set syn and ack flag
 	}
 	
-	public void handleFin(JRTVPacket p) {
+	private void handleFin(JRTVPacket p) {
 		//TODO: send Fin + ack
 	}
 	
-	public void handleAck(JRTVPacket p) {
+	private void handleAck(JRTVPacket p) {
 		//TODO: start sending data
 	}
 	
