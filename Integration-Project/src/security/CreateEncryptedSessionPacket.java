@@ -8,7 +8,6 @@ public class CreateEncryptedSessionPacket {
 	
 	private boolean presentkey = false;
 	private DiffieHellman diffie = new DiffieHellman();
-	private OFB o = new OFB();
 
 	/**
 	 * Krijgen tekst binnen
