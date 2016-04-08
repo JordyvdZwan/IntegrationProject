@@ -69,6 +69,10 @@ public class ForwardingTable {
 			}
 			forwardingtable.put(destination, new HashMap<Integer, Integer>());
 			addHop(destination, nexthop, cost);
+			for(Integer i: forwardingtable.keySet()) {
+				System.out.println(Router.getStringIP(i));
+				System.out.println(forwardingtable.get(i).toString());
+			}
 		}
 	}
 	

@@ -290,6 +290,7 @@ public class Controller extends Thread {
 	}
 	
 	private void handleUpdate(JRTVPacket p) {
+		System.out.println(" Hij handelt die update");
 		router.processUpdate(p);
 	}
 	
