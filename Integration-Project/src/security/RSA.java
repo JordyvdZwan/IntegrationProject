@@ -1,8 +1,12 @@
 package security;
 
 import java.security.*;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
 
 import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 public class RSA {
 	
@@ -67,10 +71,26 @@ public class RSA {
 
 	
 	public static Key getPublicKey() {
+		//System.out.println("Length: " + PUBLICKEY.toString().getBytes().length + "    " + PUBLICKEY.toString());
 		return PUBLICKEY;
 	}
 	
 	public static Key getPrivateKey() {
 		return PRIVATEKEY;
+	}
+	
+	public static byte[] toBytes() {
+		return PUBLICKEY.getEncoded();
+	}
+	
+	public static Key toKey(byte[] bytes) {
+		//SecretKey newkey = new SecretKeySpec(key, 0, key.length, ALGORITHM); 
+		Key key = null;
+		try {
+			key = KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(bytes));
+		} catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
+		return key;
 	}
 }
