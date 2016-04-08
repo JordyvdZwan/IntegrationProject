@@ -173,7 +173,7 @@ public class View extends Application {
 			addMessage("SYS", "Setting up Connection...", false);
 			primaryStage.addEventHandler(WindowEvent.WINDOW_SHOWN, new  EventHandler<WindowEvent>() {
 				@Override
-				public void handle(WindowEvent window)s
+				public void handle(WindowEvent window)
 				{
 					controller = new Controller(view);
 					controller.setDaemon(true);
