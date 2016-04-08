@@ -4,6 +4,7 @@ import java.math.BigInteger;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.security.Key;
 import java.security.SecureRandom;
 import java.util.Map;
 
@@ -13,6 +14,7 @@ import network.Router;
 import network.SeqAckTable;
 import network.Update;
 import security.RSA;
+
 public class Controller extends Thread {
 
 	private View view;
@@ -251,6 +253,10 @@ public class Controller extends Thread {
 							handleFin(packet);
 						} else if (packet.isAck()) {
 							handleAck(packet);
+						} else if (packet.isRSA()) {
+							handleRSA(packet);
+						} else if (packet.isDiffie()) {
+							handleDiffie(packet);
 						} else {
 							if (packet.getMessage().equals("ACK")) {
 								System.out.println("In de handle message komt ie wel");
@@ -296,6 +302,14 @@ public class Controller extends Thread {
 	
 	private void handleAck(JRTVPacket p) {
 		//TODO: start sending data
+	}
+	
+	private void handleRSA(JRTVPacket p) {
+		router.processRSA(p);
+	}
+	
+	private void handleDiffie(JRTVPacket p) {
+		//TODO: Diffie
 	}
 	
 	public void setClientName(String clientName) {
