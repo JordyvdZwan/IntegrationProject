@@ -44,7 +44,7 @@ public class TimeOutTimer extends Thread {
 				table.retransmit(packet, packet.getDestination());
 			}
 		}
-		table.removeReceived(packet.getDestination(), packet.getSeqnr());
+//		table.removeReceived(packet.getDestination(), packet.getSeqnr());
 		this.interrupt();
 	}
 	

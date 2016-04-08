@@ -120,7 +120,7 @@ public class Controller extends Thread {
 				handleMessage(data);
 			}
 			try {
-				this.sleep(100);
+				this.sleep(10);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
