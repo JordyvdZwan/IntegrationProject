@@ -3,6 +3,7 @@ package application;
 import java.math.BigInteger;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.net.UnknownHostException;
 import java.security.Key;
 import java.security.SecureRandom;
@@ -57,7 +58,7 @@ public class Controller extends Thread {
 	public InetAddress getLocalInetAddress() {
 		return localInetAddress;
 	}
-
+	//NetworkInterface.getNetworkInterfaces().  TODO
 	private void setupIP() {
 		initString = randomString();
 		while (settingUp) {
@@ -146,18 +147,19 @@ public class Controller extends Thread {
 	
 	//sends the packet after processing the packet;
 	public void sendPacket(String client, JRTVPacket packet) {
-		packet.setSource(localIAddress);			
-		packet.setDestination(router.getIntIP(client));
-		if (router.getIntIP(client) == Controller.multicastAddress) {
+		int destination = router.getIntIP(client);
+		if (destination == Controller.multicastAddress) {
 			packet.setBroadcasted(true);
 		}
 		
-		sendPacket(packet.getDestination(), packet);
+		sendPacket(destination, packet);
 	}
 	//CHANGE NEXTHOP ACCORDINGLY TODO
 	public void sendPacket(int client, JRTVPacket packet) {
 		packet.setSeqnr(seqAckTable.getNextSeq(packet.getDestination()));
-
+		packet.setSource(localIAddress);
+		packet.setDestination(client);
+		
 		if (packet.getDestination() != multicastAddress) {
 			packet.setNextHop(router.getNextHop(packet.getDestination()));
 		}

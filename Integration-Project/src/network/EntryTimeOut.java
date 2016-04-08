@@ -29,6 +29,9 @@ public class EntryTimeOut extends Thread {
 		for(Integer i: router.getForwardingTable().getTable().keySet()) {
 			if(router.getForwardingTable().getTable().get(i).keySet().contains(nexthop)) {
 				router.getForwardingTable().getTable().get(i).remove(nexthop);
+				if (router.getForwardingTable().getTable().get(i).keySet().isEmpty()) {
+					router.getForwardingTable().getTable().remove(i);
+				}
 			}
 		}
 		router.removeFromTimeout(nexthop);

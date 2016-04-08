@@ -11,8 +11,10 @@ public class ForwardingTable {
 	//Map<Destination, Map<Nexthop, cost>>
 	Map<Integer, Map<Integer, Integer>> forwardingtable = new HashMap<Integer, Map<Integer, Integer>>();
 	Map<Integer, Boolean> validhops = new HashMap<Integer, Boolean>();
+	Router router;
 	
-	public ForwardingTable() {
+	public ForwardingTable(Router router) {
+		this.router = router;
 		forwardingtable.put(Controller.multicastAddress, new HashMap<Integer, Integer>());
 		forwardingtable.get(Controller.multicastAddress).put(Controller.multicastAddress, 0);
 	}
@@ -62,6 +64,9 @@ public class ForwardingTable {
 		if (forwardingtable.containsKey(destination)) {
 			forwardingtable.get(destination).put(nexthop, cost);
 		} else {
+			if (destination != Controller.multicastAddress) {
+				router.sendRSAKey(destination);
+			}
 			forwardingtable.put(destination, new HashMap<Integer, Integer>());
 			addHop(destination, nexthop, cost);
 		}

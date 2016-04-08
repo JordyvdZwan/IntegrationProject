@@ -15,7 +15,7 @@ public class Router {
 	
 	private Controller controller;
 	Map<Integer, String> addresstable = new HashMap<Integer, String>();
-	private ForwardingTable table = new ForwardingTable();
+	private ForwardingTable table = new ForwardingTable(this);
 	private Map<Integer, Key> rsaPublicKeys = new HashMap<Integer, Key>();
 	
 	public Router(Controller controller) {
@@ -26,6 +26,12 @@ public class Router {
 	
 	public void processRSA(JRTVPacket packet) {
 		rsaPublicKeys.put(packet.getSource(), RSA.toKey(packet.getMessage().getBytes()));
+	}
+	
+	public void sendRSAKey(int destination) {
+		JRTVPacket packet = new JRTVPacket(new String(RSA.toBytes()));
+		packet.setRSA(true);
+		controller.sendPacket(destination, packet);
 	}
 	
 	public void processUpdate(JRTVPacket packet) {
@@ -78,6 +84,7 @@ public class Router {
 	
 	public void removeFromTimeout(Integer source) {
 		timeouts.remove(source);
+		rsaPublicKeys.remove(source);
 		controller.removeRecipientToView(getName(source));
 		addresstable.remove(source);
 	}
