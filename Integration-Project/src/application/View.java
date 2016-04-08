@@ -46,6 +46,9 @@ public class View extends Application {
 	Media media = new Media(new File(path).toURI().toString());
 	MediaPlayer mediaPlayer = new MediaPlayer(media);
 	
+	String path2 = "back_to_the_future.mp3";
+	Media media2 = new Media(new File(path2).toURI().toString());
+	MediaPlayer startMedia = new MediaPlayer(media2);
 		
 	public void resetMedia() {
 		Media media = new Media(new File(path).toURI().toString());
@@ -170,7 +173,8 @@ public class View extends Application {
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
 			
-			addMessage("SYS", "Setting up Connection...", false);
+			chatText.appendText("\nSYS Setting up Connection...");
+			startMedia.play();
 			primaryStage.addEventHandler(WindowEvent.WINDOW_SHOWN, new  EventHandler<WindowEvent>() {
 				@Override
 				public void handle(WindowEvent window)
@@ -201,9 +205,9 @@ public class View extends Application {
 		recipient.setDisable(false);
 		sendButton.setDisable(false);
 		nameButton.setDisable(false);
-		addMessage("SYS", "Connection Ready!", false);
+		chatText.appendText("\nSYS Connection Ready!");
 		try {
-			addMessage("SYS", "Your IP is: " + InetAddress.getByAddress(unpack(address)).getHostAddress().toString(), false);
+			chatText.appendText("\nSYS Your IP is: " + InetAddress.getByAddress(unpack(address)).getHostAddress().toString());
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
@@ -265,13 +269,11 @@ public class View extends Application {
 			if (!inputField.getText().isEmpty()) {
 				String dest;
 				if (recipient.getValue().equals("All")) {
-					System.out.println("If to: Anonymous");
 					dest = "Anonymous";
 				} else {
-					System.out.println("Else to: " + recipient.getValue());
 					dest = recipient.getValue();
 				}
-    			chatText.appendText("\n" + "You" + ": " + inputField.getText());
+    			chatText.appendText("\n" + "You [to: " + dest + "]: " + inputField.getText());
     			chatText.setScrollTop(Double.MIN_VALUE);
     			controller.receiveFromView(dest, inputField.getText());
     			inputField.requestFocus();
@@ -286,9 +288,9 @@ public class View extends Application {
 	
 	public void addMessage(String client, String message, boolean broadcasted) {
 		if (broadcasted) {
-			chatText.setText(chatText.getText() + "\n" + client + " [ALL]: " + message);
+			chatText.appendText("\n" + client + " [ALL]: " + message);
 		} else {
-			chatText.setText(chatText.getText() + "\n" + client + " [WHISPER]: " + message);
+			chatText.appendText("\n" + client + " [WHISPER]: " + message);
 		}
 		
 		mediaPlayer.play();
