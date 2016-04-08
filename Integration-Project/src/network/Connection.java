@@ -44,7 +44,13 @@ public class Connection extends Thread {
 			}
 
 			System.out.println("Received packet from " + recv.getAddress() + "with " + recv.getLength() +  " bytes of data");
-			System.out.println("RECV Message: " + new JRTVPacket(recv.getData()).getMessage());
+			//System.out.println("RECV Message: " + new JRTVPacket(recv.getData()).getMessage());
+			JRTVPacket p = new JRTVPacket(recv.getData());
+			System.out.println("DATA : " + p.getMessage());
+			System.out.println("Destination : " + Router.getStringIP(p.getDestination()));
+			System.out.println("SOURCE: " + Router.getStringIP(p.getSource()));
+			
+			
 			
 			queuedpackets.add(recv);
 			recv.setLength(buffer.length);
