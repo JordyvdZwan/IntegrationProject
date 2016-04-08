@@ -57,7 +57,7 @@ public class Router {
 			if (!name.equals("Anonymous")) {
 				if (addresstable.containsKey(packet.getSource())) {
 					addresstable.remove(packet.getSource());
-					if (!addresstable.get(packet.getSource()).equals("(" + getStringIP(packet.getSource()) + ") " + name)) {
+					if (addresstable.get(packet.getSource()) != null && !addresstable.get(packet.getSource()).equals("(" + getStringIP(packet.getSource()) + ") " + name)) {
 						controller.removeRecipientToView(getName(packet.getSource()));
 					}
 				}
