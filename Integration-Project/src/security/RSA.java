@@ -1,9 +1,15 @@
 package security;
 
+import java.io.BufferedReader;
+import java.io.EOFException;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Scanner;
+
 import javax.crypto.Cipher;
+
+import application.Controller;
 
 public class RSA {
 	
@@ -13,21 +19,16 @@ public class RSA {
 	 * PrivateKey
 	 * 
 	 */
+	//READER FIXEN
 	public static final String ALGORITHM = "RSA";	
-	private static final KeyPairGenerator kpg;
-	static {
-		KeyPairGenerator tmp = null;
-	    try {
-	   	 tmp =  KeyPairGenerator.getInstance(ALGORITHM);
-	    } catch (NoSuchAlgorithmException e) {
-	      e.printStackTrace();
-	    }
-	    kpg = tmp;
+	private static final int NUMBER = Controller.multicastAddress;
+	private static final Key PRIVATEKEY = ;
+	private static final Key PUBLICKEY = static {
+		if ( == Number) {
+			
+		};
 	}
-	private static final KeyPair KP = kpg.generateKeyPair();
-	private static final Key PUBLICKEY = KP.getPublic();
-	private static final Key PRIVATEKEY = KP.getPrivate();
-
+	
 	/**
 	 * Using native Java methods to encrypt the given text
 	 * using RSA
