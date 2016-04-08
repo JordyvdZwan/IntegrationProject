@@ -59,7 +59,8 @@ public class Connection extends Thread {
 			socket.send(packet);
 			
 			System.out.println("Send packet with " + packet.getLength() +  " bytes of data");
-			System.out.println("SEND Message: " + new JRTVPacket(packet.getData()).getMessage());
+//			System.out.println("SEND Message: " + new JRTVPacket(packet.getData()).getMessage());
+			System.out.println("Packet details: \n" + new JRTVPacket(packet.getData()));
 			
 		} catch (IOException e) {
 			

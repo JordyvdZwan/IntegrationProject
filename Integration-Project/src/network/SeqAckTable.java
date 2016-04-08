@@ -82,11 +82,11 @@ public class SeqAckTable {
 	public void registerSendPacket(JRTVPacket packet) {
 		if (packet.getDestination() == Controller.multicastAddress) {
 			for (Integer integer : controller.getForwardingTable().keySet()) {
-				if (integer != controller.getLocalIAddress()) {
-					if (!send.containsKey(packet.getDestination())) {
-						send.put(packet.getDestination(), new HashMap<Integer, Boolean>());
+				if (integer != controller.getLocalIAddress() && integer != Controller.multicastAddress) {
+					if (!send.containsKey(integer)) {
+						send.put(integer, new HashMap<Integer, Boolean>());
 					}
-					send.get(packet.getDestination()).put(packet.getSeqnr(), false);
+					send.get(integer).put(packet.getSeqnr(), false);
 				}
 			}
 		} else {
@@ -98,6 +98,7 @@ public class SeqAckTable {
 		}
 		if (controller.getForwardingTable().keySet().size() > 0) {
 			TimeOutTimer timeout = new TimeOutTimer(packet, this);
+			timeout.setDaemon(true);
 			timeout.start();
 		}
 	}
