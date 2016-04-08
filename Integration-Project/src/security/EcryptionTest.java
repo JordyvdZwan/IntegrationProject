@@ -37,6 +37,10 @@ public class EcryptionTest {
 	@Test
 	public void testRSA() {
 		assertTrue(RSA.decrypt(RSA.encrypt(tekst, RSA.getPublicKey()), RSA.getPrivateKey()).equals(tekst));
+		assertEquals(RSA.getPublicKey(), RSA.getPublicKey());
+
+		System.out.println(RSA.toKey(RSA.toBytes()) + "     " + RSA.getPublicKey());
+		assertTrue(RSA.toKey(RSA.toBytes()).equals(RSA.getPublicKey()));
 	}
 
 	@Test
