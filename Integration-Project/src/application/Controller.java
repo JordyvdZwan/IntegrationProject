@@ -219,6 +219,7 @@ public class Controller extends Thread {
 	//-----------------VVVVVVVVVVVVVVVVVVVVVVVV-------------------------
 	
 	public void receiveFromView(String client, String message) {
+		System.out.println("FROM VIEW TO: " + client);
 		JRTVPacket packet = new JRTVPacket(message);
 		packet.setNormal(true);
 		sendPacket(client, packet);
