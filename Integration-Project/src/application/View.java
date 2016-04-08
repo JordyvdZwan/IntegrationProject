@@ -85,8 +85,8 @@ public class View extends Application {
 			
 			//Finalize Combobox
 			recipient.getItems().add("All");
-			recipient.setValue("All");
 			recipient.setPrefSize( Double.MAX_VALUE, Double.MAX_VALUE );
+			recipient.setValue("All");
 			recipient.setDisable(true);
 			
 			//Finalize chatText
@@ -242,6 +242,7 @@ public class View extends Application {
 	}
 	
 	private void setName() {
+		System.out.println(recipient.getValue());
 		controller.setClientName(nameField.getText());
 		showDialog("Your name is set to: " + nameField.getText());
 	}
@@ -265,8 +266,10 @@ public class View extends Application {
 			if (!inputField.getText().isEmpty()) {
 				String dest;
 				if (recipient.getValue().equals("All")) {
+					System.out.println("If to: Anonymous");
 					dest = "Anonymous";
 				} else {
+					System.out.println("Else to: " + recipient.getValue());
 					dest = recipient.getValue();
 				}
     			chatText.appendText("\n" + "You" + ": " + inputField.getText());
