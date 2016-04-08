@@ -250,6 +250,7 @@ public class Controller extends Thread {
 							handleAck(packet);
 						} else {
 							if (packet.getMessage().equals("ACK")) {
+								System.out.println("In de handle message komt ie wel");
 								seqAckTable.registerAckPacket(packet);
 							}
 						}
