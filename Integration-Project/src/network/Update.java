@@ -10,7 +10,7 @@ import application.Controller;
 public class Update extends Thread {
 	
 	Controller controller;
-	public static final int TIMEOUT = 3;
+	public static final long TIMEOUT = 1500;
 	public Update(Controller controller) {
 		this.controller = controller;
 		this.setDaemon(true);
@@ -66,7 +66,7 @@ public class Update extends Thread {
 				controller.broadcastPacket(packet);
 			}
 			try {
-				TimeUnit.SECONDS.sleep(TIMEOUT);
+				this.sleep(TIMEOUT);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
