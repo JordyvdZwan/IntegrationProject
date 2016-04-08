@@ -6,7 +6,7 @@ import application.Controller;
 
 public class TimeOutTimer extends Thread {
 	
-	private int timeout = 5000;
+	private int timeout = 1000;
 	private SeqAckTable table;
 	private JRTVPacket packet;
 	
