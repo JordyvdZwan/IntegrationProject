@@ -17,7 +17,7 @@ public class Controller extends Thread {
 	private View view;
 	private Connection connection;
 	private InetAddress multicastIAddress;
-	private int localIAddress = 0;
+	public int localIAddress = 0;
 	public static int multicastAddress = IPtoInt("224.0.0.2");
 	private Router router = new Router(this);
 	private Update update;
@@ -191,6 +191,7 @@ public class Controller extends Thread {
 		p.setSource(localIAddress);
 		p.setDestination(packet.getSource());
 		p.setAcknr(packet.getSeqnr());
+		p.setSeqnr(seqAckTable.getNextSeq(packet.getDestination()));
 
 		if (p.getDestination() != multicastAddress) {
 			p.setNextHop(router.getNextHop(p.getDestination()));

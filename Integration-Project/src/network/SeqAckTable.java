@@ -60,13 +60,13 @@ public class SeqAckTable {
 		return res;
 	}
 	
-	public void removeReceived(Integer address, Integer seq) {
-		if (send.containsKey(address)) {
-			if (send.get(address).containsKey(seq)) {
-				send.get(address).remove(seq);
-			}
-		}
-	}
+//	public void removeReceived(Integer address, Integer seq) {
+//		if (send.containsKey(address)) {
+//			if (send.get(address).containsKey(seq)) {
+//				send.get(address).remove(seq);
+//			}
+//		}
+//	}
 	
 	public void retransmit(JRTVPacket packet, int destination) {
 		controller.retransmit(packet, destination);
@@ -76,9 +76,11 @@ public class SeqAckTable {
 //		System.out.println("In de registerAck is dit de data : \n" + packet.toString());
 		int address = packet.getSource();
 		int seq = packet.getAcknr();
-//		System.out.println("Zit deze source in de send list? " + send.containsKey(address));
+		System.out.println("Zit deze source in de send list? " + send.containsKey(address));
 		if (send.containsKey(address)) {
+			System.out.println("Zit deze seq in de send list? " + send.get(address).containsKey(seq));
 			if (send.get(address).containsKey(seq)) {
+				System.out.println("Registered ACK: " + Router.getStringIP(address) + " " + seq);
 				send.get(address).put(seq, true);
 			}
 		}
@@ -92,7 +94,7 @@ public class SeqAckTable {
 					if (!send.containsKey(integer)) {
 						send.put(integer, new HashMap<Integer, Boolean>());
 					}
-//					System.out.println("putting in: " + Router.getStringIP(integer) + " " + packet.getSeqnr());
+					System.out.println("putting in: " + Router.getStringIP(integer) + " " + packet.getSeqnr());
 					send.get(integer).put(packet.getSeqnr(), false);
 				}
 			}
