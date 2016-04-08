@@ -273,7 +273,7 @@ public class Controller extends Thread {
 	
 	public void handleNormal(JRTVPacket p) {
 		String message = p.getMessage();
-		view.addMessage(router.getName(p.getSource()), message);
+		view.addMessage(router.getName(p.getSource()), message, p.isBroadcasted());
 		//TODO: implement setting the right sequence and acknowledgement numbers
 	}
 	

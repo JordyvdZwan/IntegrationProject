@@ -170,10 +170,10 @@ public class View extends Application {
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
 			
-			addMessage("SYS", "Setting up Connection...");
+			addMessage("SYS", "Setting up Connection...", false);
 			primaryStage.addEventHandler(WindowEvent.WINDOW_SHOWN, new  EventHandler<WindowEvent>() {
 				@Override
-				public void handle(WindowEvent window)
+				public void handle(WindowEvent window)s
 				{
 					controller = new Controller(view);
 					controller.setDaemon(true);
@@ -201,9 +201,9 @@ public class View extends Application {
 		recipient.setDisable(false);
 		sendButton.setDisable(false);
 		nameButton.setDisable(false);
-		addMessage("SYS", "Connection Ready!");
+		addMessage("SYS", "Connection Ready!", false);
 		try {
-			addMessage("SYS", "Your IP is: " + InetAddress.getByAddress(unpack(address)).getHostAddress().toString());
+			addMessage("SYS", "Your IP is: " + InetAddress.getByAddress(unpack(address)).getHostAddress().toString(), false);
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
@@ -284,8 +284,13 @@ public class View extends Application {
 		launch(args);
 	}
 	
-	public void addMessage(String client, String message) {
-		chatText.setText(chatText.getText() + "\n" + client + ": " + message);
+	public void addMessage(String client, String message, boolean broadcasted) {
+		if (broadcasted) {
+			chatText.setText(chatText.getText() + "\n" + client + " [ALL]: " + message);
+		} else {
+			chatText.setText(chatText.getText() + "\n" + client + " [WHISPER]: " + message);
+		}
+		
 		mediaPlayer.play();
 		resetMedia();
 	}
