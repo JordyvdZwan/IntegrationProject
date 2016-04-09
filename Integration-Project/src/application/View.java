@@ -271,12 +271,14 @@ public class View extends Application {
 		} else {
 			if (!inputField.getText().isEmpty()) {
 				String dest;
+				
 				if (recipient.getValue().equals("All")) {
 					dest = "Anonymous";
 				} else {
 					dest = recipient.getValue();
 				}
-    			chatText.appendText("\n" + "You [to: " + dest + "]: " + inputField.getText());
+				
+				chatText.appendText("\n" + "You [to: " + recipient.getValue() + "]: " + inputField.getText());
     			chatText.setScrollTop(Double.MIN_VALUE);
     			controller.receiveFromView(dest, inputField.getText());
     			inputField.requestFocus();
