@@ -171,7 +171,7 @@ public class Controller extends Thread {
 			outgoingEncryptionPackets.add(packet);
 		} else {
 			//RSA Signing
-			packet.setMessage(new String(RSA.encrypt(packet.getMessage(), RSA)));//TODO RSA
+//			packet.setMessage(new String(RSA.encrypt(packet.getMessage(), RSA)));//TODO RSA
 			sendPacket(packet);
 		}
 	}
@@ -179,7 +179,7 @@ public class Controller extends Thread {
 	public void sendEncryptionMessages() {
 		for (JRTVPacket packet : outgoingEncryptionPackets) {
 			if (router.hasEncryptionKey(packet.getDestination())) {
-				packet.setMessage(new String(router.getEncryption(packet.getDestination()).encrypt(packet.getMessage(), RSA)));//TODO RSA ?
+//				packet.setMessage(new String(router.getEncryption(packet.getDestination()).encrypt(packet.getMessage(), RSA)));//TODO RSA ?
 				sendPacket(packet);
 			}
 		}
@@ -188,11 +188,11 @@ public class Controller extends Thread {
 	public void decryptMessages() {
 		for (JRTVPacket packet : incomingEncryptionPackets) {
 			if (packet.getDestination() == multicastAddress) {
-				packet.setMessage(RSA.decrypt(packet.getMessage().getBytes(), RSA.));//TODO rsa ok?
+//				packet.setMessage(RSA.decrypt(packet.getMessage().getBytes(), RSA));//TODO rsa ok?
 				handleMessage(packet, true);
 			} else {
 				if (router.hasEncryptionKey(packet.getSource())) {
-					packet.setMessage(new String(router.getEncryption(packet.getDestination()).decrypt(packet.getMessage().getBytes(), packet.getHashPayload(), RSA)));
+//					packet.setMessage(new String(router.getEncryption(packet.getDestination()).decrypt(packet.getMessage().getBytes(), packet.getHashPayload(), RSA)));
 					handleMessage(packet, true);
 				} 
 			}
@@ -275,12 +275,12 @@ public class Controller extends Thread {
 			} else {
 				if (packet.getDestination() == localIAddress || packet.getDestination() == multicastAddress) {
 					
-					if (!decrypted && !packet.isAck() && !packet.isUpdate()) {
-						incomingEncryptionPackets.add(packet);
+//					if (!decrypted && !packet.isAck()) {
+//						incomingEncryptionPackets.add(packet);
 						if (packet.isNormal()) {
 							sendAck(packet);
 						}
-					} else {
+//					} else {
 					
 						if (!seqAckTable.isReceivedSeqNr(packet.getSource(), packet.getSeqnr())) {
 							seqAckTable.addReceivedSeqNr(packet.getSource(), packet.getSeqnr());
@@ -302,7 +302,7 @@ public class Controller extends Thread {
 								}
 							}
 						}
-					}
+//					}
 				}
 			}
 		}
@@ -339,7 +339,7 @@ public class Controller extends Thread {
 	}
 	
 	private void handleAck(JRTVPacket packet) {
-		if (p.isDiffie()) {
+		if (packet.isDiffie()) {
 			router.processDiffie(packet);
 		}
 	}

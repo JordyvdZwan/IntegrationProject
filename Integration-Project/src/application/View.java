@@ -28,12 +28,13 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 
 
 public class View extends Application {
 	
 	//Initializing all controls on of the program
-	TextArea chatText = new TextArea();
+	TextFlow chatText = new TextFlow();
 	Button sendButton = new Button();
 	TextField inputField = new TextField();
 	Button nameButton = new Button();
@@ -95,15 +96,15 @@ public class View extends Application {
 			recipient.setDisable(true);
 			
 			//Finalize chatText
-			chatText.setEditable(false);
+//			chatText.setEditable(false);
 			chatText.setPrefSize( Double.MAX_VALUE, Double.MAX_VALUE );
-			chatText.textProperty().addListener(new ChangeListener<Object>() {
-			    @Override
-			    public void changed(ObservableValue<?> observable, Object oldValue,
-			            Object newValue) {
-			    	chatText.setScrollTop(Double.MIN_VALUE);
-			    }
-			});
+//			chatText.textProperty().addListener(new ChangeListener<Object>() {
+//			    @Override
+//			    public void changed(ObservableValue<?> observable, Object oldValue,
+//			            Object newValue) {
+//			    	chatText.setScrollTop(Double.MIN_VALUE);
+//			    }
+//			});
 			
 			//Finalize nameField
 			nameField.setId("textfield");
@@ -176,7 +177,7 @@ public class View extends Application {
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
 			
-			chatText.appendText("\nSYS Setting up Connection...");
+			chatText.getChildren().add(new Text("SYS Setting up Connection..."));
 			startMedia.play();
 			primaryStage.addEventHandler(WindowEvent.WINDOW_SHOWN, new  EventHandler<WindowEvent>() {
 				@Override
@@ -208,9 +209,9 @@ public class View extends Application {
 		recipient.setDisable(false);
 		sendButton.setDisable(false);
 		nameButton.setDisable(false);
-		chatText.appendText("\nSYS Connection Ready!");
+		chatText.getChildren().add(new Text("\nSYS Connection Ready!"));
 		try {
-			chatText.appendText("\nSYS Your IP is: " + InetAddress.getByAddress(unpack(address)).getHostAddress().toString());
+			chatText.getChildren().add(new Text("\nSYS Your IP is: " + InetAddress.getByAddress(unpack(address)).getHostAddress().toString()));
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
@@ -278,8 +279,7 @@ public class View extends Application {
 					dest = recipient.getValue();
 				}
 				
-				chatText.appendText("\n" + "You [to: " + recipient.getValue() + "]: " + inputField.getText());
-    			chatText.setScrollTop(Double.MIN_VALUE);
+				chatText.getChildren().add(new Text(("\n" + "You [to: " + recipient.getValue() + "]: " + inputField.getText())));
     			controller.receiveFromView(dest, inputField.getText());
     			inputField.requestFocus();
     			inputField.clear();
@@ -293,9 +293,9 @@ public class View extends Application {
 	
 	public void addMessage(String client, String message, boolean broadcasted) {
 		if (broadcasted) {
-			chatText.appendText("\n" + client + " [ALL]: " + message);
+			chatText.getChildren().add(new Text(("\n" + client + " [ALL]: " + message)));
 		} else {
-			chatText.appendText("\n" + client + " [WHISPER]: " + message);
+			chatText.getChildren().add(new Text(("\n" + client + " [WHISPER]: " + message)));
 		}
 		
 		mediaPlayer.play();

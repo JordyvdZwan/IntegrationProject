@@ -159,6 +159,8 @@ public class Router {
 				
 				controller.addRecipientToView("(" + getStringIP(packet.getSource()) + ") " + name);
 				//TODO name changing
+				
+				
 			}
 		}
 	}
