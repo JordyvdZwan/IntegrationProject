@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.security.Key;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 public class RSAInterperate {
 	
@@ -19,13 +20,12 @@ public class RSAInterperate {
 	
 	public static Key RSAInterperateKey(int number) throws NumberFormatException, IOException {
 		BufferedReader in = new BufferedReader(new FileReader("publickeys.txt"));
-		Scanner s = new Scanner(in);
-		if (in.read() == number) {
-			keys.put(Integer.parseInt(s.next()), RSA.toKey(s.findInLine("[B@.").getBytes()));
-
+		String string = in.readLine();
+		if (Integer.parseInt("" + (string.charAt(0))) == number) {
+			keys.put(number, RSA.toKey(string.substring(2).getBytes()));
 		}
+		in.close();	
 		System.out.println(keys);
-		s.close();
 		return null;
 	}
 	

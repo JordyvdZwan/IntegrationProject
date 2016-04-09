@@ -61,5 +61,8 @@ public class DiffieHellman {
 		return p;
 	}
 	
+	public boolean hasKey() {
+		return key != null;
+	}
 	
 }
