@@ -73,7 +73,7 @@ public class CreateEncryptedSessionPacket {
 	 * generates first number
 	 * @return g^a mod p
 	 */
-	private BigInteger[] keyDiffieHellmanFirst() {
+	public BigInteger[] keyDiffieHellmanFirst() {
 		BigInteger A = diffie.generate(diffie.geta(), diffie.getg(), diffie.getp());
 		BigInteger[] result = {A, diffie.getg(), diffie.getp()};
 		return result;
@@ -83,7 +83,7 @@ public class CreateEncryptedSessionPacket {
 	 * gets B from the other side and computes the key with it
 	 * @param B
 	 */
-	private void keyDiffieHellmanFinal(BigInteger B) {
+	public void keyDiffieHellmanFinal(BigInteger B) {
 		diffie.setKey(diffie.generate(diffie.geta(), B, diffie.getp()));
 		presentkey = true;
 	}

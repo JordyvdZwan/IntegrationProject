@@ -1,5 +1,6 @@
 package network;
 
+import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.Key;
@@ -8,20 +9,63 @@ import java.util.HashMap;
 
 
 import application.Controller;
+import security.CreateEncryptedSessionPacket;
 import security.RSA;
 
 
 public class Router {
 	
 	private Controller controller;
-	Map<Integer, String> addresstable = new HashMap<Integer, String>();
+	private Map<Integer, String> addresstable = new HashMap<Integer, String>();
 	private ForwardingTable table = new ForwardingTable(this);
+	private Map<Integer, EntryTimeOut> timeouts = new HashMap<Integer, EntryTimeOut>();
 	
 	public Router(Controller controller) {
 		this.controller = controller;
 	}
 	
-	Map<Integer, EntryTimeOut> timeouts = new HashMap<Integer, EntryTimeOut>();
+	private Map<Integer, CreateEncryptedSessionPacket> encryption = new HashMap<Integer, CreateEncryptedSessionPacket>();
+	private Map<Integer, Boolean> diffiePacketOutstanding = new HashMap<Integer, Boolean>();
+	private Map<Integer, Integer> sendDiffiePacketInt = new HashMap<Integer, Integer>();
+	
+	public void setupDiffie() {
+		CreateEncryptedSessionPacket encryption = new CreateEncryptedSessionPacket();
+		BigInteger[] keys = encryption.keyDiffieHellmanFirst();
+		int length1 = keys[0].toByteArray().length;
+		int length2 = keys[1].toByteArray().length;
+		int length3 = keys[2].toByteArray().length;
+		int random = (int) (Math.random() * Integer.MAX_VALUE);
+		int totalLength = length1 + length2 + length3;
+		byte[] bytes = new byte[4 + totalLength];
+		
+		String message = new String();
+		JRTVPacket packet = new JRTVPacket(message);
+		
+	}
+	
+	public void processDiffie(JRTVPacket packet) {
+		if (packet.isAck()) {
+			// send final after check if you have send something
+		} else {
+			
+			
+			if (diffiePacketOutstanding.get(packet.getSource()) && sendDiffiePacketInt.get(packet.getSource()) < ) {
+				
+			}
+		}
+	}
+	
+	public CreateEncryptedSessionPacket getEncryption(int destination) {
+		if (hasEncryptionKey(destination)) {
+			return encryption.get(destination);
+		} else {
+			return null;
+		}
+	}
+	
+	public boolean hasEncryptionKey(int destination) {
+		return encryption.containsKey(destination); //TODO and if ready
+	}
 	
 	public void processUpdate(JRTVPacket packet) {
 		if (packet.getSource() != controller.getLocalIAddress() && packet.getSource() != 0) {
