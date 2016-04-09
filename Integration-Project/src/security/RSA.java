@@ -21,7 +21,7 @@ public class RSA {
 	static {
 		Key temp = null;
 		try {
-			temp = RSAInterperate.RSAInterperateKey(NUMBER);
+			temp = RSAInterperate.RSAInterperateKey(NUMBER, "private.txt");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -32,7 +32,7 @@ public class RSA {
 	static {
 		Key temp = null;
 		try {
-			temp = RSAInterperate.RSAInterperateKey(NUMBER);
+			temp = RSAInterperate.RSAInterperateKey(NUMBER, "publickeys.txt");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

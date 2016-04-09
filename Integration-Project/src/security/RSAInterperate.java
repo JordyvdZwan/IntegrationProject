@@ -14,8 +14,8 @@ public class RSAInterperate {
 	
 	//TODO Deze shit fixen
 	
-	public static Key RSAInterperateKey(int number) throws NumberFormatException, IOException {
-		BufferedReader in = new BufferedReader(new FileReader("publickeys.txt"));
+	public static Key RSAInterperateKey(int number, String file) throws NumberFormatException, IOException {
+		BufferedReader in = new BufferedReader(new FileReader(file));
 		String string = in.readLine();
 		System.out.println(string);
 		if (Integer.parseInt("" + (string.charAt(0))) == number) {
@@ -24,13 +24,5 @@ public class RSAInterperate {
 		in.close();	
 		System.out.println(keys);
 		return null;
-	}
-	
-	public static void main(String[] args) {
-		try {
-			RSAInterperateKey(1);
-		} catch (NumberFormatException | IOException e) {
-			e.printStackTrace();
-		}
 	}
 }
