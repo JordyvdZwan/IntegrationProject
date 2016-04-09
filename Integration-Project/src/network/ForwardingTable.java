@@ -64,9 +64,7 @@ public class ForwardingTable {
 		if (forwardingtable.containsKey(destination)) {
 			forwardingtable.get(destination).put(nexthop, cost);
 		} else {
-			if (destination != Controller.multicastAddress) {
-				router.sendRSAKey(destination);
-			}
+			
 			forwardingtable.put(destination, new HashMap<Integer, Integer>());
 			addHop(destination, nexthop, cost);
 			for(Integer i: forwardingtable.keySet()) {
