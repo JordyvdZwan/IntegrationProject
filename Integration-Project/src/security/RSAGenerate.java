@@ -20,11 +20,11 @@ public class RSAGenerate {
 					Key PublicKey = kp.getPublic();
 					Key PrivateKey = kp.getPrivate();
 
-					printerpublic.println((i + 1) + " " + PublicKey.getEncoded());				
+					printerpublic.println((i + 1) + " " + PublicKey.getEncoded().toString());				
 					
 					File privatekey = new File("privatekey" + (i + 1) + ".txt");
 					PrintWriter printerprivate = new PrintWriter(privatekey);				
-					printerprivate.write((i + 1) + " " + PrivateKey.getEncoded());
+					printerprivate.write((i + 1) + " " + PrivateKey.getEncoded().toString());
 					
 					printerprivate.flush();
 					printerpublic.flush();

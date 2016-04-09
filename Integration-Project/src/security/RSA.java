@@ -81,10 +81,14 @@ public class RSA {
 		return PUBLICKEY.getEncoded();
 	}
 	
+	//TODO
 	public static Key toKey(byte[] bytes) { 
 		Key key = null;
+		System.out.println("0.5");	
 		try {
-			key = KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(bytes));
+			System.out.println("1");
+			key = KeyFactory.getInstance(ALGORITHM).generatePublic(new X509EncodedKeySpec(bytes));
+			System.out.println("2");
 		} catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		}
