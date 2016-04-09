@@ -255,8 +255,6 @@ public class Controller extends Thread {
 							handleFin(packet);
 						} else if (packet.isAck()) {
 							handleAck(packet);
-						} else if (packet.isRSA()) {
-							handleRSA(packet);
 						} else if (packet.isDiffie()) {
 							handleDiffie(packet);
 						} else {
@@ -304,10 +302,6 @@ public class Controller extends Thread {
 	
 	private void handleAck(JRTVPacket p) {
 		//TODO: start sending data
-	}
-	
-	private void handleRSA(JRTVPacket p) {
-		router.processRSA(p);
 	}
 	
 	private void handleDiffie(JRTVPacket p) {
