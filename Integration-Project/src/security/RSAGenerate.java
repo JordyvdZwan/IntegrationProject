@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.security.*;
-
 import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 
 public class RSAGenerate {
