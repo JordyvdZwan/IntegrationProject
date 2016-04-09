@@ -1,15 +1,10 @@
 package security;
 
-import java.io.BufferedReader;
-import java.io.EOFException;
+import java.io.IOException;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.Scanner;
-
 import javax.crypto.Cipher;
-
-import application.Controller;
 
 public class RSA {
 	
@@ -21,12 +16,27 @@ public class RSA {
 	 */
 	//READER FIXEN
 	public static final String ALGORITHM = "RSA";	
-	private static final int NUMBER = Controller.multicastAddress;
-	private static final Key PRIVATEKEY = ;
-	private static final Key PUBLICKEY = static {
-		if ( == Number) {
-			
-		};
+	private static final int NUMBER = 1;
+	private static final Key PRIVATEKEY;
+	static {
+		Key temp = null;
+		try {
+			temp = RSAInterperate.RSAInterperateKey(NUMBER, "private.txt");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		PRIVATEKEY = temp;
+	}
+	private static final Key PUBLICKEY;
+	static {
+		Key temp = null;
+		try {
+			temp = RSAInterperate.RSAInterperateKey(NUMBER, "publickeys.txt");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		PUBLICKEY = temp;
 	}
 	
 	/**
