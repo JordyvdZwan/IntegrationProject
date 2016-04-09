@@ -5,6 +5,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.Key;
 import java.util.Map;
+import java.util.Arrays;
 import java.util.HashMap;
 
 
@@ -28,29 +29,76 @@ public class Router {
 	private Map<Integer, Boolean> diffiePacketOutstanding = new HashMap<Integer, Boolean>();
 	private Map<Integer, Integer> sendDiffiePacketInt = new HashMap<Integer, Integer>();
 	
-	public void setupDiffie() {
-		CreateEncryptedSessionPacket encryption = new CreateEncryptedSessionPacket();
-		BigInteger[] keys = encryption.keyDiffieHellmanFirst();
-		int length1 = keys[0].toByteArray().length;
-		int length2 = keys[1].toByteArray().length;
-		int length3 = keys[2].toByteArray().length;
-		int random = (int) (Math.random() * Integer.MAX_VALUE);
-		int totalLength = length1 + length2 + length3;
-		byte[] bytes = new byte[4 + totalLength];
-		
-		String message = new String();
-		JRTVPacket packet = new JRTVPacket(message);
-		
+	public void setupDiffie(int destination) {
+		if (!diffiePacketOutstanding.containsKey(destination) || !diffiePacketOutstanding.get(destination)) {
+			CreateEncryptedSessionPacket encryption = new CreateEncryptedSessionPacket();
+			BigInteger[] keys = encryption.keyDiffieHellmanFirst();
+			int length1 = keys[0].toByteArray().length;
+			int length2 = keys[1].toByteArray().length;
+			int length3 = keys[2].toByteArray().length;
+			int random = (int) (Math.random() * Integer.MAX_VALUE);
+			int totalLength = length1 + length2 + length3;
+			byte[] bytes = new byte[4 + totalLength];
+			
+			byte[] randomBytes = unpack(random);
+			bytes[0] = randomBytes[0];
+			bytes[1] = randomBytes[1];
+			bytes[2] = randomBytes[2];
+			bytes[3] = randomBytes[3];
+			
+			byte[] length1Bytes = unpack(random);
+			bytes[4] = length1Bytes[0];
+			bytes[5] = length1Bytes[1];
+			bytes[6] = length1Bytes[2];
+			bytes[7] = length1Bytes[3];
+			
+			byte[] length2Bytes = unpack(random);
+			bytes[8] = length2Bytes[0];
+			bytes[9] = length2Bytes[1];
+			bytes[10] = length2Bytes[2];
+			bytes[11] = length2Bytes[3];
+			
+			byte[] length3Bytes = unpack(random);
+			bytes[12] = length3Bytes[0];
+			bytes[13] = length3Bytes[1];
+			bytes[14] = length3Bytes[2];
+			bytes[15] = length3Bytes[3];
+			
+			System.arraycopy(keys[0], 0, bytes, 16, length1);
+			System.arraycopy(keys[1], 0, bytes, 16 + length1, length2);
+			System.arraycopy(keys[2], 0, bytes, 16 + length1 + length2, length3);
+			
+			String message = new String(bytes);
+			JRTVPacket packet = new JRTVPacket(message);
+			packet.setDiffie(true);
+			controller.sendPacket(destination, packet);
+		}
 	}
 	
 	public void processDiffie(JRTVPacket packet) {
 		if (packet.isAck()) {
-			// send final after check if you have send something
+			BigInteger i = new BigInteger(packet.getMessage().getBytes());
+			encryption.get(packet.getSource()).keyDiffieHellmanFinal(i);
 		} else {
-			
-			
-			if (diffiePacketOutstanding.get(packet.getSource()) && sendDiffiePacketInt.get(packet.getSource()) < ) {
+			byte[] bytes = packet.getMessage().getBytes();
+			int random = byteArrayToInt(Arrays.copyOfRange(bytes, 0, 4));
+			if (diffiePacketOutstanding.get(packet.getSource()) && sendDiffiePacketInt.get(packet.getSource()) < random) { //TODO fix possible bug??
+				int length1 = byteArrayToInt(Arrays.copyOfRange(bytes, 4, 8));
+				int length2 = byteArrayToInt(Arrays.copyOfRange(bytes, 8, 12));
+				int length3 = byteArrayToInt(Arrays.copyOfRange(bytes, 12, 16));
 				
+				BigInteger[] numbers = new BigInteger[3];
+				
+				numbers[0] = new BigInteger(Arrays.copyOfRange(bytes, 16, length1));
+				numbers[1] = new BigInteger(Arrays.copyOfRange(bytes, 16 + length1, length2));
+				numbers[2] = new BigInteger(Arrays.copyOfRange(bytes, 16 + length1 + length2, length3));
+				
+				BigInteger reply = encryption.get(packet.getSource()).keyDiffieHellmanSecond(numbers);
+				
+				JRTVPacket p = new JRTVPacket(new String(reply.toByteArray()));
+				p.setAck(true);
+				p.setDiffie(true);
+				controller.sendPacket(packet.getSource(), p);
 			}
 		}
 	}
@@ -64,7 +112,7 @@ public class Router {
 	}
 	
 	public boolean hasEncryptionKey(int destination) {
-		return encryption.containsKey(destination); //TODO and if ready
+		return encryption.containsKey(destination) && encryption.get(destination).hasKey();
 	}
 	
 	public void processUpdate(JRTVPacket packet) {

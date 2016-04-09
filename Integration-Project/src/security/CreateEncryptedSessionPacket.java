@@ -29,13 +29,6 @@ public class CreateEncryptedSessionPacket {
 	 * @return
 	 */
 	public byte[] encrypt(String data, Key privatekey) {
-		if (!presentkey) {
-			//TODO
-			keyDiffieHellmanFirst();
-			// need to send these values to other side
-			// wait
-			keyDiffieHellmanFinal(//nummer uit packet from the other side);
-		}
 		byte[] encrypt = OFB.EnDecrypt(data.getBytes(), diffie.getKey().toByteArray());
 		String sign = ((Integer) data.hashCode()).toString();
 		byte[] signed = RSA.encrypt(sign, privatekey);
@@ -105,6 +98,10 @@ public class CreateEncryptedSessionPacket {
 		diffie.setKey(diffie.generate(diffie.geta(), A, p));
 		presentkey = true;
 		return B;
+	}
+	
+	public boolean hasKey() {
+		return diffie.hasKey();
 	}
 	
 }

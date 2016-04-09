@@ -7,6 +7,8 @@ import java.net.NetworkInterface;
 import java.net.UnknownHostException;
 import java.security.Key;
 import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import network.Connection;
@@ -123,6 +125,7 @@ public class Controller extends Thread {
 			if((data = connection.getFirstInQueue()) != null) {
 				handleMessage(data);
 			}
+			sendEncryptionMessages();
 			try {
 				this.sleep(10);
 			} catch (InterruptedException e) {
@@ -132,7 +135,8 @@ public class Controller extends Thread {
 		}
 	}
 	
-	//TODO implement SEQ and ACK numbers.
+	private List<JRTVPacket> outgoingEncryptionPackets = new ArrayList<JRTVPacket>();
+	
 	//Sends the string message as payload to the client if it can see the client otherwise error
 	public void sendMessage(String client, String message) {
 		if (router.getIP(client) == null) {
@@ -156,20 +160,30 @@ public class Controller extends Thread {
 	}
 	//CHANGE NEXTHOP ACCORDINGLY TODO
 	public void sendPacket(int client, JRTVPacket packet) {
-		packet.setSeqnr(seqAckTable.getNextSeq(packet.getDestination()));
 		packet.setSource(localIAddress);
 		packet.setDestination(client);
 		
 		if (packet.getDestination() != multicastAddress) {
 			packet.setNextHop(router.getNextHop(packet.getDestination()));
-		}
+			outgoingEncryptionPackets.add(packet);
+		} else {
 		
-		if (packet.isNormal()) {
-			seqAckTable.registerSendPacket(packet);
+			if (packet.isNormal()) {
+				packet.setSeqnr(seqAckTable.getNextSeq(packet.getDestination()));
+				seqAckTable.registerSendPacket(packet);
+			}
+			
+			DatagramPacket data = new DatagramPacket(packet.toByteArray(), packet.toByteArray().length, getMulticastIAddress(), 2000);
+			connection.send(data);
 		}
-		
-		DatagramPacket data = new DatagramPacket(packet.toByteArray(), packet.toByteArray().length, getMulticastIAddress(), 2000);
-		connection.send(data);
+	}
+	
+	public void sendEncryptionMessages() {
+		for (JRTVPacket packet : outgoingEncryptionPackets) {
+			if (router.hasEncryptionKey(packet.getDestination())) {
+				router.getEncryption(packet.getDestination()).encrypt(packet.getMessage(), privatekey)
+			}
+		}
 	}
 	
 	public void retransmit(JRTVPacket packet) {
