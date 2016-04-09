@@ -2,7 +2,9 @@ package application;
 	
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.sql.Connection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -17,13 +19,13 @@ import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextArea;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
@@ -34,7 +36,7 @@ import javafx.scene.text.TextFlow;
 public class View extends Application {
 	
 	//Initializing all controls on of the program
-	TextFlow chatText = new TextFlow();
+	TextArea chatText = new TextArea();
 	Button sendButton = new Button();
 	TextField inputField = new TextField();
 	Button nameButton = new Button();
@@ -94,17 +96,23 @@ public class View extends Application {
 			recipient.setPrefSize( Double.MAX_VALUE, Double.MAX_VALUE );
 			recipient.setValue("All");
 			recipient.setDisable(true);
+			recipient.setOnAction(new EventHandler<ActionEvent>() {
+			    @Override 
+			    public void handle(ActionEvent e) {
+			    	updateText(getRecipientValue());
+			    }
+			});
 			
 			//Finalize chatText
-//			chatText.setEditable(false);
+			chatText.setEditable(false);
 			chatText.setPrefSize( Double.MAX_VALUE, Double.MAX_VALUE );
-//			chatText.textProperty().addListener(new ChangeListener<Object>() {
-//			    @Override
-//			    public void changed(ObservableValue<?> observable, Object oldValue,
-//			            Object newValue) {
-//			    	chatText.setScrollTop(Double.MIN_VALUE);
-//			    }
-//			});
+			chatText.textProperty().addListener(new ChangeListener<Object>() {
+			    @Override
+			    public void changed(ObservableValue<?> observable, Object oldValue,
+			            Object newValue) {
+			    	chatText.setScrollTop(Double.MIN_VALUE);
+			    }
+			});
 			
 			//Finalize nameField
 			nameField.setId("textfield");
@@ -177,7 +185,8 @@ public class View extends Application {
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
 			
-			chatText.getChildren().add(new Text("SYS Setting up Connection..."));
+			conversations.put("Anonymous", "");
+			chatText.appendText("SYS Setting up Connection...");
 			startMedia.play();
 			primaryStage.addEventHandler(WindowEvent.WINDOW_SHOWN, new  EventHandler<WindowEvent>() {
 				@Override
@@ -209,18 +218,31 @@ public class View extends Application {
 		recipient.setDisable(false);
 		sendButton.setDisable(false);
 		nameButton.setDisable(false);
-		chatText.getChildren().add(new Text("\nSYS Connection Ready!"));
+		chatText.appendText("\nSYS Connection Ready!");
 		try {
-			chatText.getChildren().add(new Text("\nSYS Your IP is: " + InetAddress.getByAddress(unpack(address)).getHostAddress().toString()));
+			chatText.appendText("\nSYS Your IP is: " + InetAddress.getByAddress(unpack(address)).getHostAddress().toString());
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
 	}
 	
+	private Map<String, String> conversations = new HashMap<String, String>();
+	private String selectedRecipient = "Anonymous";
+	
+	
+	
 	public void addRecipient(String recipient) {
 		try {
-			if (!this.recipient.getItems().contains(recipient) && !recipient.equals("Anonymous")) {
+			boolean found = false;
+			for (String s : this.recipient.getItems()) {
+				if (s.contains(recipient)) {
+					found = true;
+					break;
+				}
+			}
+			if (!found && !recipient.equals("Anonymous")) {
 				this.recipient.getItems().add(recipient);
+				conversations.put(recipient, "");
 			}
 		} catch (IllegalStateException e) {
 			//TODO actualy do nothing...
@@ -229,9 +251,13 @@ public class View extends Application {
 	
 	public void removeRecipient(String recipient) {
 		try {
-			if (this.recipient.getItems().contains(recipient)) {
-				this.recipient.getItems().remove(recipient);
-				this.recipient.setValue(null);
+			boolean found = false;
+			for (String s : this.recipient.getItems()) {
+				if (s.contains(recipient)) {
+					this.recipient.getItems().remove(recipient);
+					this.recipient.setValue(null);
+					break;
+				}
 			}
 		} catch (IllegalStateException e) {
 			//TODO actualy do nothing...
@@ -249,9 +275,12 @@ public class View extends Application {
 	}
 	
 	private void setName() {
-		System.out.println(recipient.getValue());
-		controller.setClientName(nameField.getText());
-		showDialog("Your name is set to: " + nameField.getText());
+		if (nameField.getText().contains("(")) {
+			error("Cant use the sign: '(' ");
+		} else {
+			controller.setClientName(nameField.getText());
+			showDialog("Your name is set to: " + nameField.getText());
+		}
 	}
 	
 	private void showDialog(String message) {
@@ -266,23 +295,52 @@ public class View extends Application {
 		showDialog("ERROR: " + message);
 	}
 	
+	public String getRecipientValue() {
+		return recipient.getValue().split(Pattern.quote(" ("))[0];
+	}
+	
+	public int getRecipientValue(String recipient) {
+		for (String s : this.recipient.getItems()) {
+			if (s.contains(recipient)) {
+				if (s.split(" [").length > 1) {
+					return Integer.parseInt(s.split(Pattern.quote(" ("))[1].replace(")", ""));
+				}
+				break;
+			}
+		}
+		return 0;
+	}
+	
 	private void send() {
-		if (recipient.getValue() == null) {
+		if (getRecipientValue() == null) {
 			showDialog("You did not select a recipient.");
 		} else {
 			if (!inputField.getText().isEmpty()) {
 				String dest;
 				
-				if (recipient.getValue().equals("All")) {
+				if (getRecipientValue().equals("All")) {
 					dest = "Anonymous";
 				} else {
-					dest = recipient.getValue();
+					dest = getRecipientValue();
 				}
 				
-				chatText.getChildren().add(new Text(("\n" + "You [to: " + recipient.getValue() + "]: " + inputField.getText())));
+				chatText.appendText(("\n" + "You: " + inputField.getText()));
     			controller.receiveFromView(dest, inputField.getText());
     			inputField.requestFocus();
     			inputField.clear();
+			}
+		}
+	}
+	
+	private void changeRecipientAmount(String recipient, int amount) {
+		for (String s : this.recipient.getItems()) {
+			if (s.contains(recipient)) {
+				if (amount == 0) {
+					s = recipient;
+				} else {
+					s = recipient + " (" + amount + ")";
+				}
+				break;
 			}
 		}
 	}
@@ -291,13 +349,32 @@ public class View extends Application {
 		launch(args);
 	}
 	
+	public void updateText(String recipient) {
+		if (recipient.equals("All")) {
+			recipient = "Anonymous";
+		}
+		conversations.put(selectedRecipient, chatText.getText());
+		chatText.setText(conversations.get(recipient));
+		selectedRecipient = recipient;
+		changeRecipientAmount(recipient, 0);
+	}
+	
 	public void addMessage(String client, String message, boolean broadcasted) {
 		if (broadcasted) {
-			chatText.getChildren().add(new Text(("\n" + client + " [ALL]: " + message)));
+			if (selectedRecipient.equals("Anonymous")) {
+				chatText.appendText(("\n" + client + ": " + message));
+			} else {
+				conversations.put("Anonymous", conversations.get(client).concat(("\n" + client + ": " + message)));
+				changeRecipientAmount("All", getRecipientValue("All") + 1);
+			}
 		} else {
-			chatText.getChildren().add(new Text(("\n" + client + " [WHISPER]: " + message)));
+			if (selectedRecipient.equals(client)) {
+				chatText.appendText(("\n" + client + ": " + message));
+			} else {
+				conversations.put(client, conversations.get(client).concat(("\n" + client + ": " + message)));
+				changeRecipientAmount(client, getRecipientValue(client) + 1);
+			}
 		}
-		
 		mediaPlayer.play();
 		resetMedia();
 	}

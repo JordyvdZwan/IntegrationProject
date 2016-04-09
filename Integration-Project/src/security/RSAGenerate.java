@@ -4,7 +4,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.security.*;
-import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
+
+import org.apache.commons.codec.binary.Base64;
 
 public class RSAGenerate {
 	
@@ -21,12 +22,12 @@ public class RSAGenerate {
 					Key PublicKey = kp.getPublic();
 					Key PrivateKey = kp.getPrivate();
 					
-					System.out.println((i + 1) + " " + new String(Base64.encode(PublicKey.getEncoded())));
-					printerpublic.println((i + 1) + " " + new String(Base64.encode(PublicKey.getEncoded())));				
+					System.out.println((i + 1) + " " + new String(Base64.encodeBase64(PublicKey.getEncoded())));
+					printerpublic.println((i + 1) + " " + new String(Base64.encodeBase64(PublicKey.getEncoded())));				
 					
 					File privatekey = new File("privatekey" + (i + 1) + ".txt");
 					PrintWriter printerprivate = new PrintWriter(privatekey);				
-					printerprivate.write((i + 1) + " " + new String(Base64.encode(PrivateKey.getEncoded())));
+					printerprivate.write((i + 1) + " " + new String(Base64.encodeBase64(PrivateKey.getEncoded())));
 					
 					printerprivate.flush();
 					printerpublic.flush();

@@ -269,12 +269,11 @@ public class Controller extends Thread {
 	
 	public void handleMessage(JRTVPacket packet, boolean decrypted) {
 //TODO right order?
-		if (packet.getSource() != localIAddress) {
+//		if (packet.getSource() != localIAddress) {
 			if (packet.getNextHop() == localIAddress && packet.getDestination() != localIAddress && packet.getDestination() != multicastAddress) {
 				retransmit(packet);
 			} else {
 				if (packet.getDestination() == localIAddress || packet.getDestination() == multicastAddress) {
-					
 //					if (!decrypted && !packet.isAck()) {
 //						incomingEncryptionPackets.add(packet);
 						if (packet.isNormal()) {
@@ -282,7 +281,7 @@ public class Controller extends Thread {
 						}
 //					} else {
 					
-						if (!seqAckTable.isReceivedSeqNr(packet.getSource(), packet.getSeqnr())) {
+						if (!seqAckTable.isReceivedSeqNr(packet.getSource(), packet.getSeqnr()) || packet.isUpdate()) {
 							seqAckTable.addReceivedSeqNr(packet.getSource(), packet.getSeqnr());
 							if(packet.isNormal()) {
 								handleNormal(packet);
@@ -305,7 +304,7 @@ public class Controller extends Thread {
 //					}
 				}
 			}
-		}
+//		}
 	}
 	
 	public void addRecipientToView(String recipient) {

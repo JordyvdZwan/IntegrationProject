@@ -116,10 +116,9 @@ public class Router {
 	}
 	
 	public void processUpdate(JRTVPacket packet) {
-		if (packet.getSource() != controller.getLocalIAddress() && packet.getSource() != 0) {
+//		if (packet.getSource() != controller.getLocalIAddress() && packet.getSource() != 0) {
 			//Puts true into the list with valid hops
 			table.getvalidhops().put(packet.getSource(), true);
-			
 			//TODO: Split at destination, next hop and put these into the forwardingtables
 			byte[] bytes = packet.getMessage().getBytes();
 			byte[] addresses = new byte[bytes.length - packet.getHashPayload()];
@@ -162,7 +161,7 @@ public class Router {
 				
 				
 			}
-		}
+//		}
 	}
 	
 	public void removeFromTimeout(Integer source) {
