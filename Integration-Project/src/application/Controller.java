@@ -16,6 +16,7 @@ import network.JRTVPacket;
 import network.Router;
 import network.SeqAckTable;
 import network.Update;
+import security.CreateEncryptedSessionPacket;
 import security.RSA;
 
 public class Controller extends Thread {
@@ -123,9 +124,10 @@ public class Controller extends Thread {
 		while (true) {
 			DatagramPacket data;
 			if((data = connection.getFirstInQueue()) != null) {
-				handleMessage(data);
+				handleMessage(new JRTVPacket(data.getData()), false);
 			}
 			sendEncryptionMessages();
+			decryptMessages();
 			try {
 				this.sleep(10);
 			} catch (InterruptedException e) {
@@ -136,6 +138,7 @@ public class Controller extends Thread {
 	}
 	
 	private List<JRTVPacket> outgoingEncryptionPackets = new ArrayList<JRTVPacket>();
+	private List<JRTVPacket> incomingEncryptionPackets = new ArrayList<JRTVPacket>();
 	
 	//Sends the string message as payload to the client if it can see the client otherwise error
 	public void sendMessage(String client, String message) {
@@ -167,23 +170,43 @@ public class Controller extends Thread {
 			packet.setNextHop(router.getNextHop(packet.getDestination()));
 			outgoingEncryptionPackets.add(packet);
 		} else {
-		
-			if (packet.isNormal()) {
-				packet.setSeqnr(seqAckTable.getNextSeq(packet.getDestination()));
-				seqAckTable.registerSendPacket(packet);
-			}
-			
-			DatagramPacket data = new DatagramPacket(packet.toByteArray(), packet.toByteArray().length, getMulticastIAddress(), 2000);
-			connection.send(data);
+			//RSA Signing
+			packet.setMessage(new String(RSA.encrypt(packet.getMessage(), RSA)));//TODO RSA
+			sendPacket(packet);
 		}
 	}
 	
 	public void sendEncryptionMessages() {
 		for (JRTVPacket packet : outgoingEncryptionPackets) {
 			if (router.hasEncryptionKey(packet.getDestination())) {
-				router.getEncryption(packet.getDestination()).encrypt(packet.getMessage(), privatekey)
+				packet.setMessage(new String(router.getEncryption(packet.getDestination()).encrypt(packet.getMessage(), RSA)));//TODO RSA ?
+				sendPacket(packet);
 			}
 		}
+	}
+	
+	public void decryptMessages() {
+		for (JRTVPacket packet : incomingEncryptionPackets) {
+			if (packet.getDestination() == multicastAddress) {
+				packet.setMessage(RSA.decrypt(packet.getMessage().getBytes(), RSA.));//TODO rsa ok?
+				handleMessage(packet, true);
+			} else {
+				if (router.hasEncryptionKey(packet.getSource())) {
+					packet.setMessage(new String(router.getEncryption(packet.getDestination()).decrypt(packet.getMessage().getBytes(), packet.getHashPayload(), RSA)));
+					handleMessage(packet, true);
+				} 
+			}
+		}
+	}	
+	
+	public void sendPacket(JRTVPacket packet) {
+		if (packet.isNormal()) {
+			packet.setSeqnr(seqAckTable.getNextSeq(packet.getDestination()));
+			seqAckTable.registerSendPacket(packet);
+		}
+		
+		DatagramPacket data = new DatagramPacket(packet.toByteArray(), packet.toByteArray().length, getMulticastIAddress(), 2000);
+		connection.send(data);
 	}
 	
 	public void retransmit(JRTVPacket packet) {
@@ -244,8 +267,7 @@ public class Controller extends Thread {
 		sendPacket(client, packet);
 	}
 	
-	public void handleMessage(DatagramPacket message) {
-		JRTVPacket packet = new JRTVPacket(message.getData());
+	public void handleMessage(JRTVPacket packet, boolean decrypted) {
 //TODO right order?
 		if (packet.getSource() != localIAddress) {
 			if (packet.getNextHop() == localIAddress && packet.getDestination() != localIAddress && packet.getDestination() != multicastAddress) {
@@ -253,28 +275,31 @@ public class Controller extends Thread {
 			} else {
 				if (packet.getDestination() == localIAddress || packet.getDestination() == multicastAddress) {
 					
-					if (packet.isNormal()) {
-						sendAck(packet);
-					}
+					if (!decrypted && !packet.isAck() && !packet.isUpdate()) {
+						incomingEncryptionPackets.add(packet);
+						if (packet.isNormal()) {
+							sendAck(packet);
+						}
+					} else {
 					
-					if (!seqAckTable.isReceivedSeqNr(packet.getSource(), packet.getSeqnr())) {
-						seqAckTable.addReceivedSeqNr(packet.getSource(), packet.getSeqnr());
-						if(packet.isNormal()) {
-							handleNormal(packet);
-						} else if (packet.isUpdate()) {
-							handleUpdate(packet);
-						} else if (packet.isSyn()) {
-							handleSyn(packet);
-						} else if (packet.isFin()) {
-							handleFin(packet);
-						} else if (packet.isAck()) {
-							handleAck(packet);
-						} else if (packet.isDiffie()) {
-							handleDiffie(packet);
-						} else {
-							if (packet.getMessage().equals("ACK")) {
-								System.out.println("In de handle message komt ie wel");
-								seqAckTable.registerAckPacket(packet);
+						if (!seqAckTable.isReceivedSeqNr(packet.getSource(), packet.getSeqnr())) {
+							seqAckTable.addReceivedSeqNr(packet.getSource(), packet.getSeqnr());
+							if(packet.isNormal()) {
+								handleNormal(packet);
+							} else if (packet.isUpdate()) {
+								handleUpdate(packet);
+							} else if (packet.isSyn()) {
+								handleSyn(packet);
+							} else if (packet.isFin()) {
+								handleFin(packet);
+							} else if (packet.isAck()) {
+								handleAck(packet);
+							} else if (packet.isDiffie()) {
+								handleDiffie(packet);
+							} else {
+								if (packet.getMessage().equals("ACK")) {
+									seqAckTable.registerAckPacket(packet);
+								}
 							}
 						}
 					}
@@ -291,9 +316,9 @@ public class Controller extends Thread {
 		view.removeRecipient(recipient);
 	}
 	
-	public void handleNormal(JRTVPacket p) {
-		String message = p.getMessage();
-		view.addMessage(router.getName(p.getSource()), message, p.isBroadcasted());
+	public void handleNormal(JRTVPacket packet) {
+		String message = packet.getMessage();
+		view.addMessage(router.getName(packet.getSource()), message, packet.isBroadcasted());
 		//TODO: implement setting the right sequence and acknowledgement numbers
 	}
 	
@@ -301,24 +326,25 @@ public class Controller extends Thread {
 		return router.getName(source);
 	}
 	
-	private void handleUpdate(JRTVPacket p) {
-		System.out.println(" Hij handelt die update");
-		router.processUpdate(p);
+	private void handleUpdate(JRTVPacket packet) {
+		router.processUpdate(packet);
 	}
 	
-	private void handleSyn(JRTVPacket p) {
+	private void handleSyn(JRTVPacket packet) {
 		//TODO: read sequencenumber, set that as ack, give appropiate ack, set syn and ack flag
 	}
 	
-	private void handleFin(JRTVPacket p) {
+	private void handleFin(JRTVPacket packet) {
 		//TODO: send Fin + ack
 	}
 	
-	private void handleAck(JRTVPacket p) {
-		//TODO: start sending data
+	private void handleAck(JRTVPacket packet) {
+		if (p.isDiffie()) {
+			router.processDiffie(packet);
+		}
 	}
 	
-	private void handleDiffie(JRTVPacket p) {
+	private void handleDiffie(JRTVPacket packet) {
 		//TODO: Diffie
 	}
 	

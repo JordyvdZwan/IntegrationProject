@@ -166,6 +166,9 @@ public class Router {
 	public void removeFromTimeout(Integer source) {
 		timeouts.remove(source);
 		controller.removeRecipientToView(getName(source));
+		encryption.remove(source);
+		diffiePacketOutstanding.remove(source);
+		sendDiffiePacketInt.remove(source);
 		addresstable.remove(source);
 	}
 	
