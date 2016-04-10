@@ -45,6 +45,7 @@ public class View extends Application {
 	Button nameButton = new Button();
 	TextField nameField = new TextField();
 	ComboBox<String> recipient = new ComboBox<String>();
+	GridPane root = new GridPane();
 	View view = this;
 	
 	Controller controller;
@@ -67,7 +68,6 @@ public class View extends Application {
 		try {
 			startMedia.play();
 			primaryStage.getIcons().add(new Image("file:icon.png"));
-			GridPane root = new GridPane();
 			
 			ColumnConstraints coll1 = new ColumnConstraints();
 			coll1.setPercentWidth(80);
@@ -253,7 +253,7 @@ public class View extends Application {
 			}
 		}
 		for (String item : recipient.getItems()) {
-			if (item.contains(selectedRecipient)) {
+			if (selectedRecipient != null && item.contains(selectedRecipient)) {
 				recipient.setValue(item);
 			}
 		}
@@ -273,23 +273,23 @@ public class View extends Application {
 	}
 	
 	public void removeRecipient(String recipient) {
-		try {
-			if (recipients.contains(recipient)) {
-				recipients.remove(recipient);
-				if (selectedRecipient.contains(recipient)) {
-					selectedRecipient = null;
-					this.recipient.setValue(null);
+		if (recipient != null) {
+			try {
+				if (recipients.contains(recipient)) {
+					recipients.remove(recipient);
+					if (selectedRecipient != null && selectedRecipient.contains(recipient)) {
+						selectedRecipient = null;
+					}
 				}
+			} catch (IllegalStateException e) {
+				System.out.println("Zeikerds...");
 			}
-		} catch (IllegalStateException e) {
-			System.out.println("Zeikerds...");
 		}
 	}
 	
 	public void removeAllRecipient() {
 		try {
 			recipients.clear();
-			this.recipient.setValue(null);
 			selectedRecipient = null;
 			recipients.add("All");
 		} catch (IllegalStateException e) {
@@ -303,6 +303,10 @@ public class View extends Application {
 		} else {
 			controller.setClientName(nameField.getText());
 			showDialog("Your name is set to: " + nameField.getText());
+			root.getChildren().remove(nameButton);
+			root.getChildren().remove(nameField);
+			root.getChildren().remove(chatText);
+			root.add(chatText, 0, 0, 3, 3);
 		}
 	}
 	
@@ -329,7 +333,7 @@ public class View extends Application {
 	public int getRecipientValue(String recipient) {
 		for (String s : this.recipient.getItems()) {
 			if (s.contains(recipient)) {
-				if (s.split(" [").length > 1) {
+				if (s.split(Pattern.quote(" (")).length > 1) {
 					return Integer.parseInt(s.split(Pattern.quote(" ("))[1].replace(")", ""));
 				}
 				break;
@@ -340,7 +344,7 @@ public class View extends Application {
 	
 	private void send() {
 		if (selectedRecipient == null) {
-			showDialog("You did not select a recipient.");
+			showDialog("You did not select a recipient.\nIt might have changed its name");
 		} else {
 			if (!inputField.getText().isEmpty()) {
 				String dest;
@@ -387,7 +391,7 @@ public class View extends Application {
 	
 	public void addMessage(String client, String message, boolean broadcasted) {
 		if (broadcasted) {
-			if (selectedRecipient.equals("Anonymous")) {
+			if (selectedRecipient.equals("All")) {
 				chatText.appendText(("\n" + client + ": " + message));
 			} else {
 				conversations.put("Anonymous", conversations.get(client).concat(("\n" + client + ": " + message)));

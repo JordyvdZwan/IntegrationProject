@@ -16,21 +16,47 @@ import security.RSA;
 
 public class Router {
 	
+	/**
+	 * main controller needed for basic info and transmitting data.
+	 */
 	private Controller controller;
-	private Map<Integer, String> addresstable = new HashMap<Integer, String>();
-	private ForwardingTable table = new ForwardingTable(this);
-	private Map<Integer, EntryTimeOut> timeouts = new HashMap<Integer, EntryTimeOut>();
-	
+
+	/**
+	 * Class constructor which will store the given controller for acquiring data and transmitting data.
+	 * @param controller main controller which will be stored.
+	 */
 	public Router(Controller controller) {
 		this.controller = controller;
 	}
 	
+	//======================================================================================================================
+	//||                                         Encryption methods:                                                      ||  
+	//======================================================================================================================
+	
+	/**
+	 * Map which maps addresses of clients to their corresponding encryption classes.
+	 */
 	private Map<Integer, CreateEncryptedSessionPacket> encryption = new HashMap<Integer, CreateEncryptedSessionPacket>();
+	
+	/**
+	 * Map which maps addresses to a boolean value which tells if a diffie packet has been send to a person.
+	 */
 	private Map<Integer, Boolean> diffiePacketOutstanding = new HashMap<Integer, Boolean>();
+	
+	/**
+	 * Map which maps addresses to the send random number in the diffie packet.
+	 */
 	private Map<Integer, Integer> sendDiffiePacketInt = new HashMap<Integer, Integer>();
 	
+	/**
+	 * This method creates and sends a diffie packet with the generated values from the CreateEncryptedSessionPacket class for setting up a secured connection.
+	 * It will send out the packet and add the encryption to the encryption map.
+	 * It also sets the diffiePacketOutstanding to true and the sendDiffiePacketint to the correct value.
+	 * @param destination Address of the client with whom to set up a secured connection.
+	 */
 	public void setupDiffie(int destination) {
 		if (!diffiePacketOutstanding.containsKey(destination) || !diffiePacketOutstanding.get(destination)) {
+			//Creating encryption class and setting values that need to be added to the packet.
 			CreateEncryptedSessionPacket encryption = new CreateEncryptedSessionPacket();
 			BigInteger[] keys = encryption.keyDiffieHellmanFirst();
 			int length1 = keys[0].toByteArray().length;
@@ -38,6 +64,8 @@ public class Router {
 			int length3 = keys[2].toByteArray().length;
 			int random = (int) (Math.random() * Integer.MAX_VALUE);
 			int totalLength = length1 + length2 + length3;
+			
+			//Creating the byte array and putting in all data like lengths and keys.
 			byte[] bytes = new byte[4 + totalLength];
 			
 			byte[] randomBytes = unpack(random);
@@ -68,6 +96,7 @@ public class Router {
 			System.arraycopy(keys[1], 0, bytes, 16 + length1, length2);
 			System.arraycopy(keys[2], 0, bytes, 16 + length1 + length2, length3);
 			
+			//Putting data in new packet and sending it.
 			String message = new String(bytes);
 			JRTVPacket packet = new JRTVPacket(message);
 			packet.setDiffie(true);
@@ -75,14 +104,22 @@ public class Router {
 		}
 	}
 	
+	/**
+	 * This method will respond to a diffie packet with a diffie/ack packet and store away the encryption for the source of the diffie packet.
+	 * It will only do this when the random integer in the diffiepacket is bigger than the one it has send itself.
+	 * @param packet Received packet from a client, which wants to set up a secured connection.
+	 */
 	public void processDiffie(JRTVPacket packet) {
 		if (packet.isAck()) {
+			//Finish encryption setup.
 			BigInteger i = new BigInteger(packet.getMessage().getBytes());
 			encryption.get(packet.getSource()).keyDiffieHellmanFinal(i);
 		} else {
+			//Send diffie/ack message to the source of the diffie message if the random value is larger than the one send (if send).
 			byte[] bytes = packet.getMessage().getBytes();
 			int random = byteArrayToInt(Arrays.copyOfRange(bytes, 0, 4));
-			if (diffiePacketOutstanding.get(packet.getSource()) && sendDiffiePacketInt.get(packet.getSource()) < random) { //TODO fix possible bug??
+			if (!diffiePacketOutstanding.get(packet.getSource()) ) { //TODO fix possible bug??
+				//read data and put into variables.
 				int length1 = byteArrayToInt(Arrays.copyOfRange(bytes, 4, 8));
 				int length2 = byteArrayToInt(Arrays.copyOfRange(bytes, 8, 12));
 				int length3 = byteArrayToInt(Arrays.copyOfRange(bytes, 12, 16));
@@ -93,6 +130,28 @@ public class Router {
 				numbers[1] = new BigInteger(Arrays.copyOfRange(bytes, 16 + length1, length2));
 				numbers[2] = new BigInteger(Arrays.copyOfRange(bytes, 16 + length1 + length2, length3));
 				
+				//Create encryption
+				CreateEncryptedSessionPacket encryption = new CreateEncryptedSessionPacket();
+				BigInteger reply = encryption.keyDiffieHellmanSecond(numbers);
+				this.encryption.put(packet.getSource(), encryption);
+				
+				JRTVPacket p = new JRTVPacket(new String(reply.toByteArray()));
+				p.setAck(true);
+				p.setDiffie(true);
+				controller.sendPacket(packet.getSource(), p);
+			} else if (diffiePacketOutstanding.get(packet.getSource()) && sendDiffiePacketInt.get(packet.getSource()) < random) {
+				//read data and put into variables.
+				int length1 = byteArrayToInt(Arrays.copyOfRange(bytes, 4, 8));
+				int length2 = byteArrayToInt(Arrays.copyOfRange(bytes, 8, 12));
+				int length3 = byteArrayToInt(Arrays.copyOfRange(bytes, 12, 16));
+				
+				BigInteger[] numbers = new BigInteger[3];
+				
+				numbers[0] = new BigInteger(Arrays.copyOfRange(bytes, 16, length1));
+				numbers[1] = new BigInteger(Arrays.copyOfRange(bytes, 16 + length1, length2));
+				numbers[2] = new BigInteger(Arrays.copyOfRange(bytes, 16 + length1 + length2, length3));
+				
+				//Create encryption
 				BigInteger reply = encryption.get(packet.getSource()).keyDiffieHellmanSecond(numbers);
 				
 				JRTVPacket p = new JRTVPacket(new String(reply.toByteArray()));
@@ -114,6 +173,24 @@ public class Router {
 	public boolean hasEncryptionKey(int destination) {
 		return encryption.containsKey(destination) && encryption.get(destination).hasKey();
 	}
+	
+	public boolean isSettingUpDiffie(int destination) {
+		if (diffiePacketOutstanding.containsKey(destination)) {
+			return diffiePacketOutstanding.get(destination);
+		} else {
+			return false;
+		}
+	}
+	
+	
+	//======================================================================================================================
+	//||                                           Routing methods:                                                       ||  
+	//======================================================================================================================
+		
+	
+	private Map<Integer, String> addresstable = new HashMap<Integer, String>();
+	private ForwardingTable table = new ForwardingTable(this);
+	private Map<Integer, EntryTimeOut> timeouts = new HashMap<Integer, EntryTimeOut>();
 	
 	public void processUpdate(JRTVPacket packet) {
 		if (!controller.getSettingUp()) {
@@ -142,6 +219,7 @@ public class Router {
 				//This creates a new timeout for the specified next hop
 				if (!timeouts.containsKey(packet.getSource())) {
 					EntryTimeOut e = new EntryTimeOut(this, packet.getSource());
+					e.setDaemon(true);
 					timeouts.put(packet.getSource(), e);
 					timeouts.get(packet.getSource()).start();
 				}
@@ -174,34 +252,6 @@ public class Router {
 		addresstable.remove(source);
 	}
 	
-	private static int byteArrayToInt(byte[] b) {
-	    return   b[3] & 0xFF |
-	            (b[2] & 0xFF) << 8 |
-	            (b[1] & 0xFF) << 16 |
-	            (b[0] & 0xFF) << 24;
-	}
-	
-	public static String getStringIP(int address) {
-		try {
-			return InetAddress.getByAddress(unpack(address)).getHostAddress().toString();
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			return null;
-		}
-	}
-	
-	
-	static byte[] unpack(int bytes) {
-		return new byte[] {
-			(byte)((bytes >>> 24) & 0xff),
-			(byte)((bytes >>> 16) & 0xff),
-			(byte)((bytes >>>  8) & 0xff),
-			(byte)((bytes       ) & 0xff)
-		};
-	}
-	
-	//CHECK WHAT IS BELOW HERE!
-	
 	public Integer getIP(String client) {
 		Integer result = null;
 		if (client.equals("Anonymous")) {
@@ -232,31 +282,52 @@ public class Router {
 		return addresstable.get(address);
 	}
 	
-	public Map<Integer,Map<Integer, Integer>> getTable() {
-		return table.getTable();
-	}
-	
-	public int getLocalIntAddress() {
-		return controller.getLocalIAddress();
-	}
-	
 	public int getIntIP(String client) {
 		return getIP(client);
 	}
 	
-		//TO BE IMPLEMENTED
-	public Integer getRouteIP(int destination) {
-		Integer result = null;
-		if(destination == Controller.multicastAddress) {
-			result = Controller.multicastAddress;
-		} else {
-			result =  table.getNextHop(destination);
-		}
-		return result;
+	//======================================================================================================================
+	//||                                              Util methods:                                                       ||  
+	//======================================================================================================================
+
+	private static int byteArrayToInt(byte[] b) {
+	    return   b[3] & 0xFF |
+	            (b[2] & 0xFF) << 8 |
+	            (b[1] & 0xFF) << 16 |
+	            (b[0] & 0xFF) << 24;
 	}
+	
+	static byte[] unpack(int bytes) {
+		return new byte[] {
+			(byte)((bytes >>> 24) & 0xff),
+			(byte)((bytes >>> 16) & 0xff),
+			(byte)((bytes >>>  8) & 0xff),
+			(byte)((bytes       ) & 0xff)
+		};
+	}
+	
+	public static String getStringIP(int address) {
+		try {
+			return InetAddress.getByAddress(unpack(address)).getHostAddress().toString();
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			return null;
+		}
+	}
+	
+	//======================================================================================================================
+	//||                                           get/set methods:                                                       ||  
+	//======================================================================================================================
 	
 	public ForwardingTable getForwardingTable() {
 		return table;
 	}
+	
+	public Map<Integer,Map<Integer, Integer>> getTable() {
+		return table.getTable();
+	}
 
+	public int getLocalIntAddress() {
+		return controller.getLocalIAddress();
+	}
 }
