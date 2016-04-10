@@ -6,6 +6,8 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import javax.crypto.Cipher;
 
+import network.Router;
+
 public class RSA {
 	
 	/**
@@ -78,13 +80,42 @@ public class RSA {
 	}
 
 	
-	public static Key getPublicKey() {
-		//System.out.println("Length: " + PUBLICKEY.toString().getBytes().length + "    " + PUBLICKEY.toString());
-		return PUBLICKEY;
+	public static Key getPublicKey(int source) {
+		Key key = null;
+		try {
+			//System.out.println("Length: " + PUBLICKEY.toString().getBytes().length + "    " + PUBLICKEY.toString());
+			String file;
+			
+			file = "publickeys.txt";
+			int number = Router.getStringIP(source).charAt(Router.getStringIP(source).length() - 1);
+		
+			key =  RSAInterperate.RSAInterperateKey(number, file);
+		} catch (NumberFormatException e) {
+			//TODO error
+		} catch (IOException e) {
+			//TODO error
+		}
+		return key;
 	}
 	
-	public static Key getPrivateKey() {
-		return PRIVATEKEY;
+	public static Key getPrivateKey(int ip) {
+		Key key = null;
+		try {
+			//System.out.println("Length: " + PUBLICKEY.toString().getBytes().length + "    " + PUBLICKEY.toString());
+			String file;
+			
+			int number = Router.getStringIP(ip).charAt(Router.getStringIP(ip).length() - 1);
+			file = "privatekey" + number + ".txt";
+			System.out.println(number);
+			System.out.println(Router.getStringIP(ip).charAt(Router.getStringIP(ip).length() - 1));
+			System.out.println(file);
+			key =  RSAInterperate.RSAInterperateKey(number, file);
+		} catch (NumberFormatException e) {
+			//TODO error
+		} catch (IOException e) {
+			//TODO error
+		}
+		return key;
 	}
 	
 	public static byte[] toBytes() {
