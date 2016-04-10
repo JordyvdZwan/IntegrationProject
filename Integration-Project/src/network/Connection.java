@@ -44,17 +44,17 @@ public class Connection extends Thread {
 			}
 			
 			JRTVPacket packet = new JRTVPacket(recv.getData());
-			if (!packet.isUpdate()) {
+			if (packet.isUpdate()) {
 				
-				System.out.println("Received packet from " + recv.getAddress() + "with " + recv.getLength() +  " bytes of data");
-				//System.out.println("RECV Message: " + new JRTVPacket(recv.getData()).getMessage());
-				JRTVPacket p = new JRTVPacket(recv.getData());
-				System.out.println("seq : " + p.getSeqnr());
-				System.out.println("ack: " + p.getAcknr());
-				System.out.println("DATA : " + p.getMessage());
-				System.out.println("Destination : " + Router.getStringIP(p.getDestination()));
-				System.out.println("SOURCE: " + Router.getStringIP(p.getSource()));
-				System.out.println("NextHop: " + Router.getStringIP(p.getNextHop()));
+//				System.out.println("Received packet from " + recv.getAddress() + "with " + recv.getLength() +  " bytes of data");
+//				System.out.println("RECV Message: " + new JRTVPacket(recv.getData()).getMessage());
+//				JRTVPacket p = new JRTVPacket(recv.getData());
+//				System.out.println("seq : " + p.getSeqnr());
+//				System.out.println("ack: " + p.getAcknr());
+//				System.out.println("DATA : " + p.getMessage());
+//				System.out.println("Destination : " + Router.getStringIP(p.getDestination()));
+//				System.out.println("SOURCE: " + Router.getStringIP(p.getSource()));
+//				System.out.println("NextHop: " + Router.getStringIP(p.getNextHop()));
 			}
 
 			

@@ -116,52 +116,53 @@ public class Router {
 	}
 	
 	public void processUpdate(JRTVPacket packet) {
-//		if (packet.getSource() != controller.getLocalIAddress() && packet.getSource() != 0) {
-			//Puts true into the list with valid hops
-			table.getvalidhops().put(packet.getSource(), true);
-			//TODO: Split at destination, next hop and put these into the forwardingtables
-			byte[] bytes = packet.getMessage().getBytes();
-			byte[] addresses = new byte[bytes.length - packet.getHashPayload()];
-			
-			System.arraycopy(bytes, packet.getHashPayload(), addresses, 0, bytes.length - packet.getHashPayload());
-			Integer[] integers = new Integer[addresses.length / 4];
-			
-			for (int i = 0; i < integers.length; i++) {
-				byte[] b = new byte[4];
-				System.arraycopy(addresses, (i * 4), b, 0, 4);
-				integers[i] = byteArrayToInt(b);
-			}
-			
-			for (int i = 0; i < integers.length / 2; i++) {
-				if (integers[i * 2] != controller.getLocalIAddress()) {
-					table.addHop(integers[i * 2], packet.getSource(), integers[(i * 2) + 1]);
+		if (!controller.getSettingUp()) {
+	//		if (packet.getSource() != controller.getLocalIAddress() && packet.getSource() != 0) {
+				//Puts true into the list with valid hops
+				table.getvalidhops().put(packet.getSource(), true);
+				//TODO: Split at destination, next hop and put these into the forwardingtables
+				byte[] bytes = packet.getMessage().getBytes();
+				byte[] addresses = new byte[bytes.length - packet.getHashPayload()];
+				
+				System.arraycopy(bytes, packet.getHashPayload(), addresses, 0, bytes.length - packet.getHashPayload());
+				Integer[] integers = new Integer[addresses.length / 4];
+				
+				for (int i = 0; i < integers.length; i++) {
+					byte[] b = new byte[4];
+					System.arraycopy(addresses, (i * 4), b, 0, 4);
+					integers[i] = byteArrayToInt(b);
 				}
-			}
-			
-			//This creates a new timeout for the specified next hop
-			if (!timeouts.containsKey(packet.getSource())) {
-				EntryTimeOut e = new EntryTimeOut(this, packet.getSource());
-				timeouts.put(packet.getSource(), e);
-			}
-			
-			byte[] nameBytes = new byte[packet.getHashPayload()];
-			System.arraycopy(packet.getMessage().getBytes(), 0, nameBytes, 0, packet.getHashPayload());
-			String name = new String(nameBytes);
-			if (!name.equals("Anonymous")) {
-				if (addresstable.containsKey(packet.getSource())) {
-					addresstable.remove(packet.getSource());
-					if (addresstable.get(packet.getSource())!= null && !addresstable.get(packet.getSource()).equals("(" + getStringIP(packet.getSource()) + ") " + name)) {
-						controller.removeRecipientToView(getName(packet.getSource()));
+				
+				for (int i = 0; i < integers.length / 2; i++) {
+					if (integers[i * 2] != controller.getLocalIAddress()) {
+						table.addHop(integers[i * 2], packet.getSource(), integers[(i * 2) + 1]);
 					}
 				}
-				addresstable.put(packet.getSource(), "(" + getStringIP(packet.getSource()) + ") " + name);
 				
-				controller.addRecipientToView("(" + getStringIP(packet.getSource()) + ") " + name);
-				//TODO name changing
-				
-				
-			}
-//		}
+				//This creates a new timeout for the specified next hop
+				if (!timeouts.containsKey(packet.getSource())) {
+					EntryTimeOut e = new EntryTimeOut(this, packet.getSource());
+					timeouts.put(packet.getSource(), e);
+					timeouts.get(packet.getSource()).start();
+				}
+	
+				byte[] nameBytes = new byte[packet.getHashPayload()];
+				System.arraycopy(packet.getMessage().getBytes(), 0, nameBytes, 0, packet.getHashPayload());
+				String name = new String(nameBytes);
+				if (!name.equals("Anonymous")) {
+					if (addresstable.containsKey(packet.getSource())) {
+						if (addresstable.get(packet.getSource())!= null && !addresstable.get(packet.getSource()).equals("(" + getStringIP(packet.getSource()) + ") " + name)) {
+							controller.removeRecipientToView(getName(packet.getSource()));
+							System.out.println("Is it gone?");
+							addresstable.remove(packet.getSource());
+						}
+					}
+					addresstable.put(packet.getSource(), "(" + getStringIP(packet.getSource()) + ") " + name);
+					controller.addRecipientToView("(" + getStringIP(packet.getSource()) + ") " + name);
+					//TODO name changing
+				}
+	//		}
+		}
 	}
 	
 	public void removeFromTimeout(Integer source) {

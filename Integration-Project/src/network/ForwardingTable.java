@@ -15,8 +15,8 @@ public class ForwardingTable {
 	
 	public ForwardingTable(Router router) {
 		this.router = router;
-		forwardingtable.put(Controller.multicastAddress, new HashMap<Integer, Integer>());
-		forwardingtable.get(Controller.multicastAddress).put(Controller.multicastAddress, 0);
+//		forwardingtable.put(Controller.multicastAddress, new HashMap<Integer, Integer>());
+//		forwardingtable.get(Controller.multicastAddress).put(Controller.multicastAddress, 0);
 	}
 	
 	
@@ -67,10 +67,6 @@ public class ForwardingTable {
 			
 			forwardingtable.put(destination, new HashMap<Integer, Integer>());
 			addHop(destination, nexthop, cost);
-			for(Integer i: forwardingtable.keySet()) {
-				System.out.println(Router.getStringIP(i));
-				System.out.println(forwardingtable.get(i).toString());
-			}
 		}
 	}
 	

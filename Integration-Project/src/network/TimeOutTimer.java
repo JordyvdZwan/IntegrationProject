@@ -1,12 +1,13 @@
 package network;
 
 import java.util.HashMap;
+import java.util.Set;
 
 import application.Controller;
 
 public class TimeOutTimer extends Thread {
 	
-	private int timeout = 1000;
+	private int timeout = 10000;
 	private SeqAckTable table;
 	private JRTVPacket packet;
 	
@@ -30,12 +31,14 @@ public class TimeOutTimer extends Thread {
 //		System.out.println("Is the destination the multicast address? : " + (packet.getDestination() == Controller.multicastAddress));
 		if (packet.getDestination() == Controller.multicastAddress) {
 //			System.out.println("Forwarding table keys : " + table.getController().getForwardingTable().keySet().toString() );
-			for (Integer integer : table.getController().getForwardingTable().keySet()) {
+			Set<Integer> i = table.getController().getForwardingTable().keySet();
+			for (Integer integer : i) {
 //				System.out.println("Is it a valid address?" + (integer != table.getController().getLocalIAddress() && integer != table.getController().multicastAddress));
 				if (integer != table.getController().getLocalIAddress() && integer != table.getController().multicastAddress) {
 //					System.out.println("Is the packet received? : " + !table.isReceived(integer, packet.getSeqnr()));
 					if (!table.isReceived(integer, packet.getSeqnr())) {
 						table.retransmit(packet, integer);
+						
 					}
 				}
 			}

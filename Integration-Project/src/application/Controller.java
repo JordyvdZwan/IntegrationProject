@@ -223,7 +223,7 @@ public class Controller extends Thread {
 		if (packet.isNormal()) {
 			seqAckTable.registerSendPacket(packet);
 		}
-		
+		System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 		DatagramPacket data = new DatagramPacket(packet.toByteArray(), packet.toByteArray().length, getMulticastIAddress(), 2000);
 		connection.send(data);
 	}

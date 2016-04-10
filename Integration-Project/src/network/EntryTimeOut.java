@@ -15,7 +15,6 @@ public class EntryTimeOut extends Thread {
 	}
 	
 	public void run() {
-		
 		//Checks if the specified hop is still a valid hop, puts false, waits 3 seconds, if still false:
 		// remove all entries in the forwardingtable that contain this next hop as next hop. 
 		while (router.getForwardingTable().getvalidhops().get(nexthop)) {

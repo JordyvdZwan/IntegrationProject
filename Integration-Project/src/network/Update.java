@@ -26,6 +26,15 @@ public class Update extends Thread {
 				if (controller.getInitString() != null) {
 					packet = new JRTVPacket(controller.getInitString());
 				}
+				try {
+					this.sleep(TIMEOUT / 3);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				if (packet != null) {
+					packet.setSyn(true);
+					controller.broadcastPacket(packet);
+				}
 			} else {
 				packet = new JRTVPacket(controller.getClientName());
 				packet.setHashPayload(controller.getClientName().getBytes().length);
@@ -60,15 +69,15 @@ public class Update extends Thread {
 				}
 				
 				packet.setMessage(packet.getMessage() + new String(bytes));
-			}
-			if (packet != null) {
-				packet.setUpdate(true);
-				controller.broadcastPacket(packet);
-			}
-			try {
-				this.sleep(TIMEOUT);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+				try {
+					this.sleep(TIMEOUT);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				if (packet != null) {
+					packet.setUpdate(true);
+					controller.broadcastPacket(packet);
+				}
 			}
 		}
 	}

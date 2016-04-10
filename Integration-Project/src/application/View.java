@@ -2,7 +2,9 @@ package application;
 	
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -13,6 +15,7 @@ import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -100,6 +103,13 @@ public class View extends Application {
 			    @Override 
 			    public void handle(ActionEvent e) {
 			    	updateText(getRecipientValue());
+			    }
+			});
+			
+			recipient.setOnShowing(new EventHandler<Event>() {
+			    @Override 
+			    public void handle(Event e) {
+			    	updateRecipient();
 			    }
 			});
 			
@@ -227,22 +237,35 @@ public class View extends Application {
 	}
 	
 	private Map<String, String> conversations = new HashMap<String, String>();
-	private String selectedRecipient = "Anonymous";
+	private String selectedRecipient = "All";
 	
+	private List<String> recipients = new ArrayList<String>();
+	private Map<String, Integer> newMessagesAmount = new HashMap<String, Integer>();
 	
+	private void updateRecipient() {
+		recipient.getItems().clear();
+		recipient.getItems().add("All");
+		for (String name : recipients) {
+			if (newMessagesAmount.containsKey(name) && newMessagesAmount.get(name) != 0) {
+				recipient.getItems().add(name + " (" + newMessagesAmount.get(name) + ")");
+			} else {
+				recipient.getItems().add(name);
+			}
+		}
+		for (String item : recipient.getItems()) {
+			if (item.contains(selectedRecipient)) {
+				recipient.setValue(item);
+			}
+		}
+	}
 	
 	public void addRecipient(String recipient) {
 		try {
-			boolean found = false;
-			for (String s : this.recipient.getItems()) {
-				if (s.contains(recipient)) {
-					found = true;
-					break;
+			if (!recipients.contains(recipient) && !recipient.equals("Anonymous")) {
+				recipients.add(recipient);
+				if (!conversations.containsKey(recipient)) {
+					conversations.put(recipient, "");
 				}
-			}
-			if (!found && !recipient.equals("Anonymous")) {
-				this.recipient.getItems().add(recipient);
-				conversations.put(recipient, "");
 			}
 		} catch (IllegalStateException e) {
 			//TODO actualy do nothing...
@@ -251,24 +274,24 @@ public class View extends Application {
 	
 	public void removeRecipient(String recipient) {
 		try {
-			boolean found = false;
-			for (String s : this.recipient.getItems()) {
-				if (s.contains(recipient)) {
-					this.recipient.getItems().remove(recipient);
+			if (recipients.contains(recipient)) {
+				recipients.remove(recipient);
+				if (selectedRecipient.contains(recipient)) {
+					selectedRecipient = null;
 					this.recipient.setValue(null);
-					break;
 				}
 			}
 		} catch (IllegalStateException e) {
-			//TODO actualy do nothing...
+			System.out.println("Zeikerds...");
 		}
 	}
 	
 	public void removeAllRecipient() {
 		try {
-			this.recipient.getItems().clear();
+			recipients.clear();
 			this.recipient.setValue(null);
-			this.recipient.getItems().add("All");
+			selectedRecipient = null;
+			recipients.add("All");
 		} catch (IllegalStateException e) {
 			//TODO actualy do nothing...
 		}
@@ -296,7 +319,11 @@ public class View extends Application {
 	}
 	
 	public String getRecipientValue() {
-		return recipient.getValue().split(Pattern.quote(" ("))[0];
+		if (recipient.getValue() != null) {
+			return recipient.getValue().split(Pattern.quote(" ("))[0];
+		} else {
+			return null;
+		}
 	}
 	
 	public int getRecipientValue(String recipient) {
@@ -312,16 +339,16 @@ public class View extends Application {
 	}
 	
 	private void send() {
-		if (getRecipientValue() == null) {
+		if (selectedRecipient == null) {
 			showDialog("You did not select a recipient.");
 		} else {
 			if (!inputField.getText().isEmpty()) {
 				String dest;
 				
-				if (getRecipientValue().equals("All")) {
+				if (selectedRecipient.equals("All")) {
 					dest = "Anonymous";
 				} else {
-					dest = getRecipientValue();
+					dest = selectedRecipient;
 				}
 				
 				chatText.appendText(("\n" + "You: " + inputField.getText()));
@@ -350,13 +377,12 @@ public class View extends Application {
 	}
 	
 	public void updateText(String recipient) {
-		if (recipient.equals("All")) {
-			recipient = "Anonymous";
+		if (recipient != null) {
+			conversations.put(selectedRecipient, chatText.getText());
+			chatText.setText(conversations.get(recipient));
+			selectedRecipient = recipient;
+			changeRecipientAmount(recipient, 0);
 		}
-		conversations.put(selectedRecipient, chatText.getText());
-		chatText.setText(conversations.get(recipient));
-		selectedRecipient = recipient;
-		changeRecipientAmount(recipient, 0);
 	}
 	
 	public void addMessage(String client, String message, boolean broadcasted) {
