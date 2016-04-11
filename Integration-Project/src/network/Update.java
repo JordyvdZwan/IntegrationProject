@@ -76,7 +76,9 @@ public class Update extends Thread {
 				}
 				if (packet != null) {
 					packet.setUpdate(true);
-					controller.broadcastPacket(packet);
+					packet.setDestination(Controller.multicastAddress);
+					packet.setSource(controller.getLocalIAddress());
+					controller.retransmit(packet);//TODO niet zo mooi
 				}
 			}
 		}

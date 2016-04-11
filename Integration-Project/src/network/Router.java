@@ -56,6 +56,9 @@ public class Router {
 	 */
 	public void setupDiffie(int destination) {
 		if (!diffiePacketOutstanding.containsKey(destination) || !diffiePacketOutstanding.get(destination)) {
+			
+			
+			
 			//Creating encryption class and setting values that need to be added to the packet.
 			CreateEncryptedSessionPacket encryption = new CreateEncryptedSessionPacket();
 			BigInteger[] keys = encryption.keyDiffieHellmanFirst();
@@ -66,7 +69,7 @@ public class Router {
 			int totalLength = length1 + length2 + length3;
 			
 			//Creating the byte array and putting in all data like lengths and keys.
-			byte[] bytes = new byte[4 + totalLength];
+			byte[] bytes = new byte[16 + totalLength];
 			
 			byte[] randomBytes = unpack(random);
 			bytes[0] = randomBytes[0];
@@ -92,14 +95,23 @@ public class Router {
 			bytes[14] = length3Bytes[2];
 			bytes[15] = length3Bytes[3];
 			
-			System.arraycopy(keys[0], 0, bytes, 16, length1);
-			System.arraycopy(keys[1], 0, bytes, 16 + length1, length2);
-			System.arraycopy(keys[2], 0, bytes, 16 + length1 + length2, length3);
+			byte[] one = keys[0].toByteArray();
+			byte[] two = keys[1].toByteArray();
+			byte[] three = keys[2].toByteArray();
+			
+			System.arraycopy(one, 0, bytes, 16, length1);
+			System.arraycopy(two, 0, bytes, 16 + length1, length2);
+			System.arraycopy(three, 0, bytes, 16 + length1 + length2, length3);
+			
+			this.encryption.put(destination, encryption);
+			this.diffiePacketOutstanding.put(destination, true);
+			this.sendDiffiePacketInt.put(destination, random);
 			
 			//Putting data in new packet and sending it.
 			String message = new String(bytes);
 			JRTVPacket packet = new JRTVPacket(message);
 			packet.setDiffie(true);
+			System.out.println("SENDING THE DIFFIE PACKET!!!! MUAUAHAHAHAHAH");
 			controller.sendPacket(destination, packet);
 		}
 	}
@@ -209,9 +221,9 @@ public class Router {
 					System.arraycopy(addresses, (i * 4), b, 0, 4);
 					integers[i] = byteArrayToInt(b);
 				}
-				
+//				integers[i * 2] != controller.getLocalIAddress() && 
 				for (int i = 0; i < integers.length / 2; i++) {
-					if (integers[i * 2] != controller.getLocalIAddress() && integers[i * 2] != controller.multicastAddress) {
+					if (integers[i * 2] != controller.multicastAddress) {//TODO CHANGE THIS BACK
 						table.addHop(integers[i * 2], packet.getSource(), integers[(i * 2) + 1]);
 					}
 				}
