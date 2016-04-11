@@ -15,7 +15,7 @@ public class JRTVPacket {
 	static final int PAYLOADLENGTH = 4;
 	static final int NEXTHOPLENGTH = 4;
 	
-	private String message;
+	private byte[] message;
 	private Byte flags = 0;
 	private int seqnr = 0;
 	private int acknr = 0;
@@ -55,7 +55,7 @@ public class JRTVPacket {
 			res = res.concat("BROADCASTED: " + broadcasted + "\n");
 			res = res.concat("\n");
 			res = res.concat("DATA: \n");
-			res = res.concat(message + "\n");
+			res = res.concat(new String(message));
 			res = res.concat("\n");
 			res = res.concat("Bytes\n");
 //			for (int i = 0; i < HEADERLENGTH + payloadLength; i++) {
@@ -71,7 +71,7 @@ public class JRTVPacket {
 	}
 	
 	public JRTVPacket(String message) {
-		this.message = message;
+		this.message = message.getBytes();
 		this.payloadLength = message.getBytes().length;
 	}
 	
@@ -107,9 +107,8 @@ public class JRTVPacket {
 		System.arraycopy(bytes, SOURCELENGTH + DESTINATIONLENGTH + SEQLENGTH + ACKLENGTH + HASHPAYLOADLENGTH + FLAGSLENGTH, payloadLength, 0, PAYLOADLENGTH);
 		this.payloadLength = byteArrayToInt(payloadLength);
 		
-		byte[] message = new byte[this.payloadLength];
+		message = new byte[this.payloadLength];
 		System.arraycopy(bytes, HEADERLENGTH, message, 0, this.payloadLength);
-		this.message = new String(message);
 		//
 		byte[] nextHop = new byte[NEXTHOPLENGTH];
 		System.arraycopy(bytes, SOURCELENGTH + DESTINATIONLENGTH + SEQLENGTH + ACKLENGTH + HASHPAYLOADLENGTH + FLAGSLENGTH + PAYLOADLENGTH, nextHop, 0, NEXTHOPLENGTH);
@@ -117,7 +116,7 @@ public class JRTVPacket {
 	}
 	
 	public byte[] toByteArray() {
-		byte[] result = new byte[HEADERLENGTH + message.getBytes().length];
+		byte[] result = new byte[HEADERLENGTH + message.length];
 		
 		byte[] src = intToByteArray(source);
 		result[0] = src[0];
@@ -162,7 +161,7 @@ public class JRTVPacket {
 		result[26] = nextHop[2];
 		result[27] = nextHop[3];
 		
-		System.arraycopy(message.getBytes(), 0, result, HEADERLENGTH, message.getBytes().length);
+		System.arraycopy(message, 0, result, HEADERLENGTH, message.length);
 		return result;
 	}
 	
@@ -275,12 +274,21 @@ public class JRTVPacket {
 	}
 	
 	public String getMessage() {
-		return message;
+		return new String(message);
 	}
 
 	public void setMessage(String message) {
-		this.message = message;
+		this.message = message.getBytes();
 		this.payloadLength = message.getBytes().length;
+	}
+	
+	public byte[] getByteMessage() {
+		return message;
+	}
+	
+	public void setByteMessage(byte[] message) {
+		this.message = message;
+		this.payloadLength = message.length;
 	}
 
 	public Byte getFlags() {

@@ -211,7 +211,7 @@ public class Router {
 				}
 				
 				for (int i = 0; i < integers.length / 2; i++) {
-					if (integers[i * 2] != controller.getLocalIAddress()) {
+					if (integers[i * 2] != controller.getLocalIAddress() && integers[i * 2] != controller.multicastAddress) {
 						table.addHop(integers[i * 2], packet.getSource(), integers[(i * 2) + 1]);
 					}
 				}
@@ -241,6 +241,7 @@ public class Router {
 				}
 	//		}
 		}
+		System.out.println(table.getTable());
 	}
 	
 	public void removeFromTimeout(Integer source) {

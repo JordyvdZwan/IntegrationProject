@@ -4,12 +4,17 @@ import java.math.BigInteger;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.security.Key;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import org.apache.commons.codec.binary.Base64;
 
 import network.Connection;
 import network.JRTVPacket;
@@ -61,28 +66,50 @@ public class Controller extends Thread {
 	public InetAddress getLocalInetAddress() {
 		return localInetAddress;
 	}
-	//NetworkInterface.getNetworkInterfaces().  TODO
+//	.  TODO
 	private void setupIP() {
-		initString = randomString();
-		while (settingUp) {
-			DatagramPacket data;
-			if((data = connection.getFirstInQueue()) != null) {
-				JRTVPacket p = new JRTVPacket(data.getData());
-				if (new JRTVPacket(data.getData()).getMessage().equals(initString)) {
-					InetAddress add = data.getAddress(); 
-					String address = add.toString();
-					address = address.replace("/", "");
-					localIAddress = IPtoInt(address);
-					localInetAddress = data.getAddress();
-					settingUp = false;
+		boolean found = false;
+		Enumeration<NetworkInterface> interfaces;
+		try {
+			interfaces = NetworkInterface.getNetworkInterfaces();
+			
+			while (interfaces.hasMoreElements()) {
+				NetworkInterface i = interfaces.nextElement();
+				Enumeration<InetAddress> ips = i.getInetAddresses();
+				while (ips.hasMoreElements()) {
+					InetAddress address = ips.nextElement();
+					if (address.toString().contains("192.168.5.")) {
+						localIAddress = IPtoInt(address.toString().replace("/", ""));
+						found = true;
+					}
 				}
 			}
-			try {
-				this.sleep(500);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+		} catch (SocketException e) {
+			e.printStackTrace();
+		}
+		if (!found) {
+			initString = randomString();
+			while (settingUp) {
+				DatagramPacket data;
+				if((data = connection.getFirstInQueue()) != null) {
+					JRTVPacket p = new JRTVPacket(data.getData());
+					if (new JRTVPacket(data.getData()).getMessage().equals(initString)) {
+						InetAddress add = data.getAddress(); 
+						String address = add.toString();
+						address = address.replace("/", "");
+						localIAddress = IPtoInt(address);
+						localInetAddress = data.getAddress();
+						settingUp = false;
+					}
+				}
+				try {
+					this.sleep(500);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
 		}
+		System.out.println(localIAddress);
 		view.start(localIAddress);
 	}
 	
@@ -172,7 +199,21 @@ public class Controller extends Thread {
 //			sendPacket(packet);
 		} else {
 			//RSA Signing
-			packet.setMessage(new String(RSA.encrypt(packet.getMessage(), RSA.getPrivateKey(localIAddress))));//TODO RSA
+			byte[] first = packet.getByteMessage();
+			byte[] second = RSA.encrypt(new String(first), RSA.getPrivateKey(localIAddress));//((Integer) first.hashCode()).toString()
+			byte[] message = new byte[first.length + second.length];
+			
+			System.arraycopy(first, 0, message, 0, first.length);
+			System.arraycopy(second, 0, message, message.length - second.length, second.length);
+			
+			packet.setByteMessage(message);//TODO RSA
+			packet.setHashPayload(second.length);
+			
+			System.out.println("first: " + first.length);
+			System.out.println("second: " + second.length);
+			System.out.println("message: " + message.length);
+			System.out.println("hashpayload" + packet.getHashPayload());
+			
 			sendPacket(packet);
 		}
 	}
@@ -191,13 +232,43 @@ public class Controller extends Thread {
 	}
 	
 	public void decryptMessages() {
-		for (JRTVPacket packet : incomingEncryptionPackets) {
+		for (int i = 0; i < incomingEncryptionPackets.size(); i++) {
+			JRTVPacket packet = incomingEncryptionPackets.get(i);
 			if (packet.getDestination() == multicastAddress) {
-				packet.setMessage(RSA.decrypt(packet.getMessage().getBytes(), RSA.getPublicKey(packet.getSource())));//TODO rsa ok?
+				byte[] message2 = packet.getByteMessage();
+				byte[] second2 = new byte[packet.getHashPayload()];
+				
+				System.out.println("first: " + (message2.length - packet.getHashPayload()));
+				System.out.println("second: " + second2.length);
+				System.out.println("message: " + message2.length);
+				System.out.println("hashpayload" + packet.getHashPayload());
+				System.out.println("==============================================================================================");
+				System.out.println(packet.toString());
+				System.out.println("==============================================================================================");
+				byte[] first2 = new byte[message2.length - packet.getHashPayload()]; 
+				
+
+				
+				System.arraycopy(message2, 0, first2, 0, first2.length);
+				System.arraycopy(message2, message2.length - second2.length, second2, 0, second2.length);
+				
+				System.out.println("First: " + first2.length);
+				System.out.println("Second: " + second2.length + " - " + second2.length);
+				
+				String decrypted = RSA.decrypt(second2, RSA.getPublicKey(packet.getSource()));//TODO rsa ok?
+				
+				if (decrypted.equals(new String(first2))) { //((Integer) first2.hashCode()).toString()
+					packet.setByteMessage(first2);
+				} else {
+					packet.setMessage("Sender not verified: \"" + new String(first2) + "\"");
+				}
+				incomingEncryptionPackets.remove(packet);
+				i--;
 				handleMessage(packet, true);
 			} else {
 				if (router.hasEncryptionKey(packet.getSource())) {
 					packet.setMessage(new String(router.getEncryption(packet.getDestination()).decrypt(packet.getMessage().getBytes(), packet.getHashPayload(), RSA.getPublicKey(packet.getSource()))));
+					incomingEncryptionPackets.remove(packet);
 					handleMessage(packet, true);
 				} 
 			}
@@ -228,7 +299,6 @@ public class Controller extends Thread {
 		if (packet.isNormal()) {
 			seqAckTable.registerSendPacket(packet);
 		}
-		System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 		DatagramPacket data = new DatagramPacket(packet.toByteArray(), packet.toByteArray().length, getMulticastIAddress(), 2000);
 		connection.send(data);
 	}
@@ -238,14 +308,15 @@ public class Controller extends Thread {
 		p.setSource(localIAddress);
 		p.setDestination(packet.getSource());
 		p.setAcknr(packet.getSeqnr());
-		p.setSeqnr(seqAckTable.getNextSeq(packet.getDestination()));
+//		p.setSeqnr(seqAckTable.getNextSeq(packet.getDestination()));
 
 		if (p.getDestination() != multicastAddress) {
 			p.setNextHop(router.getNextHop(p.getDestination()));
 		}
 		
-		DatagramPacket data = new DatagramPacket(p.toByteArray(), p.toByteArray().length, getMulticastIAddress(), 2000);
-		connection.send(data);
+		sendPacket(p.getDestination(), p);
+//		DatagramPacket data = new DatagramPacket(p.toByteArray(), p.toByteArray().length, getMulticastIAddress(), 2000);
+//		connection.send(data);
 	}
 	
 	//sends the packet after processing the packet;

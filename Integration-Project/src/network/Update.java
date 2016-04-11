@@ -33,7 +33,7 @@ public class Update extends Thread {
 				}
 				if (packet != null) {
 					packet.setSyn(true);
-					controller.broadcastPacket(packet);
+					controller.retransmit(packet);
 				}
 			} else {
 				packet = new JRTVPacket(controller.getClientName());
