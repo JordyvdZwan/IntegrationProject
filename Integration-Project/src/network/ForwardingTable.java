@@ -63,20 +63,20 @@ public class ForwardingTable {
 	}
 	
 	
-//	public int getNextHopCost(Integer destination) {
-//		//Loops through all the paths to the destination and selects the one with the lowest cost
-//		Integer result = 0;
-//		int resultcost = 0;
-//		Map<Integer, Integer> possibilities = forwardingtable.get(destination);
-//		
-//		for(Integer e: possibilities.keySet()) {
-//			if(possibilities.get(e) <= resultcost) {
-//				result = e;
-//				resultcost = possibilities.get(e);
-//			}
-//		}
-//		return resultcost;
-//	}
+	public int getNextHopCost(Integer destination) {
+		//Loops through all the paths to the destination and selects the one with the lowest cost
+		Integer result = 0;
+		int resultcost = 0;
+		Map<Integer, Integer> possibilities = forwardingtable.get(destination);
+		
+		for(Integer e: possibilities.keySet()) {
+			if(possibilities.get(e) <= resultcost) {
+				result = e;
+				resultcost = possibilities.get(e);
+			}
+		}
+		return resultcost;
+	}
 	
 	
 	/**
