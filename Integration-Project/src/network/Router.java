@@ -175,9 +175,9 @@ public class Router {
 			int random = byteArrayToInt(randomb);
 			
 			
-			if (!diffiePacketOutstanding.get(packet.getSource())) { //TODO fix possible bug??
+			if (!(diffiePacketOutstanding.containsKey(packet.getSource()) && diffiePacketOutstanding.get(packet.getSource()))) { //TODO fix possible bug??
 				sendDiffieResponse(bytes, packet);
-			} else if (diffiePacketOutstanding.get(packet.getSource()) && sendDiffiePacketInt.get(packet.getSource()) <= random) {//Changeg the ==
+			} else if (!(diffiePacketOutstanding.containsKey(packet.getSource()) && diffiePacketOutstanding.get(packet.getSource())) && sendDiffiePacketInt.get(packet.getSource()) <= random) {//Changeg the ==
 				sendDiffieResponse(bytes, packet);
 			}
 		}
