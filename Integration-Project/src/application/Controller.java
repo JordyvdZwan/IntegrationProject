@@ -188,7 +188,7 @@ public class Controller extends Thread {
 		
 		sendPacket(destination, packet);
 	}
-	//CHANGE NEXTHOP ACCORDINGLY TODO
+	
 	public void sendPacket(int client, JRTVPacket packet) {
 		packet.setSource(localIAddress);
 		packet.setDestination(client);
@@ -196,13 +196,10 @@ public class Controller extends Thread {
 		if (packet.getDestination() != multicastAddress && !packet.isDiffie()) {
 			packet.setNextHop(router.getNextHop(packet.getDestination()));
 			outgoingEncryptionPackets.add(packet);
-//			sendPacket(packet);
 		} else {
 			//RSA Signing
 			byte[] first = packet.getByteMessage();
-//			new String(first)
-			byte[] second = RSA.encrypt(new String(RSA.hash(first)), RSA.getPrivateKey(localIAddress));//((Integer) first.hashCode()).toString()
-			
+			byte[] second = RSA.encrypt(new String(RSA.hash(first)), RSA.getPrivateKey(localIAddress));
 			byte[] message = new byte[first.length + second.length];
 			
 			System.arraycopy(first, 0, message, 0, first.length);
@@ -210,19 +207,6 @@ public class Controller extends Thread {
 			
 			packet.setByteMessage(message);//TODO RSA
 			packet.setHashPayload(second.length);
-			System.out.println("==============================================================================================");
-			System.out.println("original hash: " + new String(RSA.hash(first)));
-			System.out.println("==============================================================================================");
-			
-//			System.out.println("Is Diffie: " + packet.isDiffie());
-//			System.out.println("first: " + first.length);
-//			System.out.println("second: " + second.length);
-//			System.out.println("message: " + message.length);
-//			System.out.println("hashpayload" + packet.getHashPayload());
-			
-			if (packet.isDiffie()) {
-				System.out.println("HALLO deze is diffie hoor en word verzonden!!!");
-			}
 			
 			sendPacket(packet);
 		}
@@ -250,7 +234,7 @@ public class Controller extends Thread {
 		}
 	}
 	
-	public void decryptMessages() {
+	private void decryptMessages() {
 		for (int i = 0; i < incomingEncryptionPackets.size(); i++) {
 			JRTVPacket packet = incomingEncryptionPackets.get(i);
 			if (packet.getDestination() == multicastAddress || packet.isDiffie()) {
@@ -293,7 +277,7 @@ public class Controller extends Thread {
 		}
 	}	
 	
-	public void sendPacket(JRTVPacket packet) {
+	private void sendPacket(JRTVPacket packet) {
 		if (packet.isNormal() || packet.isDiffie()) {
 			packet.setSeqnr(seqAckTable.getNextSeq(packet.getDestination()));
 			seqAckTable.registerSendPacket(packet);
@@ -313,7 +297,7 @@ public class Controller extends Thread {
 			packet.setNextHop(router.getNextHop(packet.getDestination()));
 		}
 		
-		if (packet.isNormal()) {
+		if (packet.isNormal() || packet.isDiffie()) {
 			seqAckTable.registerSendPacket(packet);
 		}
 		DatagramPacket data = new DatagramPacket(packet.toByteArray(), packet.toByteArray().length, getMulticastIAddress(), 2000);
@@ -350,8 +334,6 @@ public class Controller extends Thread {
 		return router;
 	}
 	
-	//HIERONDER IS SAFE VINCENT!
-	//-----------------VVVVVVVVVVVVVVVVVVVVVVVV-------------------------
 	
 	public void receiveFromView(String client, String message) {
 		System.out.println("FROM VIEW TO: " + client);
@@ -361,7 +343,6 @@ public class Controller extends Thread {
 	}
 	
 	public void handleMessage(JRTVPacket packet, boolean decrypted) {
-		//TODO right order?
 		if (packet.getSource() != localIAddress) {
 			if (packet.getNextHop() == localIAddress && packet.getDestination() != localIAddress && packet.getDestination() != multicastAddress) {
 				retransmit(packet);
@@ -385,7 +366,6 @@ public class Controller extends Thread {
 								handleFin(packet);
 							} else if (packet.isAck()) {
 								handleAck(packet);
-								System.out.println("1000");
 							} else if (packet.isDiffie()) {
 								handleDiffie(packet);
 							} else {
@@ -409,13 +389,10 @@ public class Controller extends Thread {
 	}
 	
 	public void handleNormal(JRTVPacket packet) {
+		//TODO implement order sorting
 		String message = packet.getMessage();
 		view.addMessage(router.getName(packet.getSource()), message, packet.isBroadcasted());
 		//TODO: implement setting the right sequence and acknowledgement numbers
-	}
-	
-	public String getNameBySource(int source) {
-		return router.getName(source);
 	}
 	
 	private void handleUpdate(JRTVPacket packet) {
@@ -441,6 +418,8 @@ public class Controller extends Thread {
 		router.processDiffie(packet);
 	}
 	
+	
+	
 	public void setClientName(String clientName) {
 		this.clientName = clientName;
 	}
@@ -453,4 +432,7 @@ public class Controller extends Thread {
 		return multicastIAddress;
 	}
 	
+	public String getNameBySource(int source) {
+		return router.getName(source);
+	}
 }

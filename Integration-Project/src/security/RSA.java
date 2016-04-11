@@ -23,29 +23,6 @@ public class RSA {
 	 */
 	//READER FIXEN
 	public static final String ALGORITHM = "RSA";	
-//	private static final int NUMBER = 1;
-//	private static final Key PRIVATEKEY;
-//	static {
-//		Key temp = null;
-//		try {
-//			temp = RSAInterperate.RSAInterperateKey(NUMBER, "private.txt");
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//		
-//		PRIVATEKEY = temp;
-//	}
-//	
-//	private static final Key PUBLICKEY;
-//	static {
-//		Key temp = null;
-//		try {
-//			temp = RSAInterperate.RSAInterperateKey(NUMBER, "publickeys.txt");
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//		PUBLICKEY = temp;
-//	}
 	
 	/**
 	 * Using native Java methods to encrypt the given text

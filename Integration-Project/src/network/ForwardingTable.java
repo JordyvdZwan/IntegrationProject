@@ -8,11 +8,15 @@ import java.net.InetAddress;
 
 public class ForwardingTable {
 	
-	//Map<Destination, Map<Nexthop, cost>>
-	//stores all the destinations with the possible next hops
+	/**
+	 * Map<Destination, Map<Nexthop, cost>>
+	 * stores all the destinations with the possible next hops
+	 */
 	Map<Integer, Map<Integer, Integer>> forwardingtable = new HashMap<Integer, Map<Integer, Integer>>();
 	
-	//Stores all the nexthops that are a valid option (i.e. sent an update recently)
+	/**
+	 * Stores all the nexthops that are a valid option (i.e. sent an update recently).
+	 */
 	Map<Integer, Boolean> validhops = new HashMap<Integer, Boolean>();
 	Router router;
 	
@@ -23,8 +27,6 @@ public class ForwardingTable {
 	 */
 	public ForwardingTable(Router router) {
 		this.router = router;
-//		forwardingtable.put(Controller.multicastAddress, new HashMap<Integer, Integer>());
-//		forwardingtable.get(Controller.multicastAddress).put(Controller.multicastAddress, 0);
 	}
 	
 	/**
