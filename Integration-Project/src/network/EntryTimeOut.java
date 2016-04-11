@@ -9,11 +9,21 @@ public class EntryTimeOut extends Thread {
 	Integer nexthop;
 	boolean  receivednewroute = false;
 	
+	/**
+	 * Creates a new instance of the EntryTimeOut class
+	 * 
+	 * @param router the router to which this timeout is assigned
+	 * @param nexthop the nexthop for which this timeOut should be set
+	 */
 	public EntryTimeOut(Router router, Integer nexthop) {
 		this.router = router;
 		this.nexthop = nexthop;
 	}
 	
+	/**
+	 * First checks if the specified hop is still a valid option, sets it to false, and waits for 3 seconds
+	 * If the hop is still false, all it's entries will be deleted from the forwardingtable.
+	 */
 	public void run() {
 		//Checks if the specified hop is still a valid hop, puts false, waits 3 seconds, if still false:
 		// remove all entries in the forwardingtable that contain this next hop as next hop. 
