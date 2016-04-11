@@ -201,7 +201,7 @@ public class Controller extends Thread {
 			//RSA Signing
 			byte[] first = packet.getByteMessage();
 //			new String(first)
-			byte[] second = RSA.encrypt(((Integer) first.hashCode()).toString(), RSA.getPrivateKey(localIAddress));//((Integer) first.hashCode()).toString()
+			byte[] second = RSA.encrypt(new String(RSA.hash(first)), RSA.getPrivateKey(localIAddress));//((Integer) first.hashCode()).toString()
 			
 			byte[] message = new byte[first.length + second.length];
 			
@@ -272,11 +272,11 @@ public class Controller extends Thread {
 				
 				String decrypted = RSA.decrypt(second2, RSA.getPublicKey(packet.getSource()));//TODO rsa ok?
 				
-//				if (decrypted.equals(new String(first2))) { //((Integer) first2.hashCode()).toString()
+				if (decrypted.equals(new String(RSA.hash(first2)))) {
 					packet.setByteMessage(first2);
-//				} else {
-//					packet.setMessage("Sender not verified: \"" + new String(first2) + "\"");
-//				}
+				} else {
+					packet.setMessage("Sender not verified: \"" + new String(first2) + "\"");
+				}
 				incomingEncryptionPackets.remove(packet);
 				i--;
 				handleMessage(packet, true);

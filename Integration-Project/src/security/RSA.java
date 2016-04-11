@@ -1,6 +1,7 @@
 package security;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.security.*;
 import java.security.spec.EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
@@ -64,6 +65,21 @@ public class RSA {
 	    	e.printStackTrace();
 	    }
 	return cipherText;
+	}
+	
+	
+	public static byte[] hash(byte[] input) {
+		MessageDigest m;
+		BigInteger bi = null;
+		try {
+			m = MessageDigest.getInstance("MD5");
+			m.update(input, 0, input.length);
+			bi = new BigInteger(1,m.digest());
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return bi.mod(new BigInteger("1975846582458")).toString().getBytes();
 	}
 	  
 	/**
