@@ -38,7 +38,6 @@ public class CreateEncryptedSessionPacket {
 		byte[] encrypted = new byte[encrypt.length + signed.length];
 		System.arraycopy(encrypt, 0, encrypted, 0, encrypt.length);
 		System.arraycopy(signed, 0, encrypted, encrypt.length, signed.length);
-		
 		packet.setByteMessage(encrypted);
 		packet.setHashPayload(signed.length);
 		return packet;
@@ -54,21 +53,18 @@ public class CreateEncryptedSessionPacket {
 	 * @param rsa de public key van de afzender
 	 * @return
 	 */
-	public JRTVPacket decrypt(JRTVPacket packet, int length, Key publickey) {
+	public JRTVPacket decrypt(JRTVPacket packet, Key publickey) {
 		String result = null;
+		int length = packet.getHashPayload();
 		byte[] encrypted = packet.getByteMessage();
 		byte[] encrypt = Arrays.copyOfRange(encrypted, 0, encrypted.length - length);
 		byte[] hash = Arrays.copyOfRange(encrypted, encrypted.length - length, encrypted.length);
-		String sign = new String(RSA.hash(encrypt));
+		String sign = new String(RSA.hash(OFB.EnDecrypt(encrypt, diffie.getKey().toByteArray())));
 		String verify = RSA.decrypt(hash, publickey);
-		System.out.println("=======================================================================================================");
-		System.out.println(sign);
-		System.out.println(verify);
-		System.out.println("=======================================================================================================");
 		if (sign.equals(verify)) {
-			result = OFB.EnDecrypt(encrypt, diffie.getKey().toByteArray()).toString();
+			result = new String(OFB.EnDecrypt(encrypt, diffie.getKey().toByteArray()));
 		} else {
-			result = "error, bedieger";
+			result = "Data was not verified";
 		}
 		packet.setMessage(result);
 		return packet;

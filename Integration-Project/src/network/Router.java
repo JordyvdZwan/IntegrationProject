@@ -174,10 +174,12 @@ public class Router {
 			System.arraycopy(bytes, 0, randomb, 0, 4);
 			int random = byteArrayToInt(randomb);
 			
-			
+			System.out.println(random);
+			System.out.println(sendDiffiePacketInt.get(packet.getSource()));
 			if (!(diffiePacketOutstanding.containsKey(packet.getSource()) && diffiePacketOutstanding.get(packet.getSource()))) { //TODO fix possible bug??
 				sendDiffieResponse(bytes, packet);
-			} else if (!(diffiePacketOutstanding.containsKey(packet.getSource()) && diffiePacketOutstanding.get(packet.getSource())) && sendDiffiePacketInt.get(packet.getSource()) <= random) {//Changeg the ==
+			} else if ((diffiePacketOutstanding.containsKey(packet.getSource()) && diffiePacketOutstanding.get(packet.getSource())) && sendDiffiePacketInt.get(packet.getSource()) <= random) {//Changeg the ==
+				System.out.println("Going to send diffie response method");
 				sendDiffieResponse(bytes, packet);
 			}
 		}
@@ -260,7 +262,7 @@ public class Router {
 	
 	public void processUpdate(JRTVPacket packet) {
 		if (!controller.getSettingUp()) {
-	//		if (packet.getSource() != controller.getLocalIAddress() && packet.getSource() != 0) {
+			if (packet.getSource() != controller.getLocalIAddress() && packet.getSource() != 0) {
 				//Puts true into the list with valid hops
 				table.getvalidhops().put(packet.getSource(), true);
 				//TODO: Split at destination, next hop and put these into the forwardingtables
@@ -275,10 +277,10 @@ public class Router {
 					System.arraycopy(addresses, (i * 4), b, 0, 4);
 					integers[i] = byteArrayToInt(b);
 				}
-//				integers[i * 2] != controller.getLocalIAddress() && 
+//				
 //				 && packet.getSource() != controller.getLocalIAddress()
 				for (int i = 0; i < integers.length / 2; i++) {
-					if (integers[i * 2] != controller.multicastAddress) {//TODO CHANGE THIS BACK
+					if (integers[i * 2] != controller.getLocalIAddress() && integers[i * 2] != controller.multicastAddress && packet.getSource() != controller.getLocalIAddress()) {//TODO CHANGE THIS BACK
 						table.addHop(integers[i * 2], packet.getSource(), integers[(i * 2) + 1]);
 					}
 				}
@@ -306,7 +308,7 @@ public class Router {
 					controller.addRecipientToView("(" + getStringIP(packet.getSource()) + ") " + name);
 					//TODO name changing
 				}
-	//		}
+			}
 		}
 		System.out.println(table.getTable());
 	}

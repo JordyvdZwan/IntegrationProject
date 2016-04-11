@@ -210,11 +210,15 @@ public class Controller extends Thread {
 			
 			packet.setByteMessage(message);//TODO RSA
 			packet.setHashPayload(second.length);
-			System.out.println("Is Diffie: " + packet.isDiffie());
-			System.out.println("first: " + first.length);
-			System.out.println("second: " + second.length);
-			System.out.println("message: " + message.length);
-			System.out.println("hashpayload" + packet.getHashPayload());
+			System.out.println("==============================================================================================");
+			System.out.println("original hash: " + new String(RSA.hash(first)));
+			System.out.println("==============================================================================================");
+			
+//			System.out.println("Is Diffie: " + packet.isDiffie());
+//			System.out.println("first: " + first.length);
+//			System.out.println("second: " + second.length);
+//			System.out.println("message: " + message.length);
+//			System.out.println("hashpayload" + packet.getHashPayload());
 			
 			if (packet.isDiffie()) {
 				System.out.println("HALLO deze is diffie hoor en word verzonden!!!");
@@ -253,13 +257,6 @@ public class Controller extends Thread {
 				byte[] message2 = packet.getByteMessage();
 				byte[] second2 = new byte[packet.getHashPayload()];
 				
-				System.out.println("first: " + (message2.length - packet.getHashPayload()));
-				System.out.println("second: " + second2.length);
-				System.out.println("message: " + message2.length);
-				System.out.println("hashpayload" + packet.getHashPayload());
-				System.out.println("==============================================================================================");
-				System.out.println(packet.toString());
-				System.out.println("==============================================================================================");
 				byte[] first2 = new byte[message2.length - packet.getHashPayload()]; 
 				
 
@@ -272,17 +269,23 @@ public class Controller extends Thread {
 				
 				String decrypted = RSA.decrypt(second2, RSA.getPublicKey(packet.getSource()));//TODO rsa ok?
 				
+				System.out.println("==============================================================================================");
+				System.out.println("decrypted: " + decrypted);
+				System.out.println("first2: " + new String(RSA.hash(first2)));
+				System.out.println("==============================================================================================");
+				
 				if (decrypted.equals(new String(RSA.hash(first2)))) {
 					packet.setByteMessage(first2);
 				} else {
 					packet.setMessage("Sender not verified: \"" + new String(first2) + "\"");
 				}
+				
 				incomingEncryptionPackets.remove(packet);
 				i--;
 				handleMessage(packet, true);
 			} else {
 				if (router.hasEncryptionKey(packet.getSource())) {
-					packet = router.getEncryption(packet.getSource()).decrypt(packet, packet.getHashPayload(), RSA.getPublicKey(packet.getSource()));
+					packet = router.getEncryption(packet.getSource()).decrypt(packet, RSA.getPublicKey(packet.getSource()));
 					incomingEncryptionPackets.remove(packet);
 					handleMessage(packet, true);
 				} 
@@ -358,49 +361,19 @@ public class Controller extends Thread {
 	}
 	
 	public void handleMessage(JRTVPacket packet, boolean decrypted) {
-//TODO right order?
-//		if (packet.getSource() != localIAddress) {
-		if (packet.isDiffie()) {
-			System.out.println("Handle message did recieve the diffie packet");
-		}
-		if (packet.isDiffie()) {
-			System.out.println("1");
-		}
+		//TODO right order?
+		if (packet.getSource() != localIAddress) {
 			if (packet.getNextHop() == localIAddress && packet.getDestination() != localIAddress && packet.getDestination() != multicastAddress) {
 				retransmit(packet);
-				if (packet.isDiffie()) {
-					System.out.println("2");
-				}
 			} else {
-				if (packet.isDiffie()) {
-					System.out.println("3");
-				}
 				if (packet.getDestination() == localIAddress || packet.getDestination() == multicastAddress) {
-					if (packet.isDiffie()) {
-						System.out.println("4");
-					}
 					if (!decrypted && !packet.isAck() && !packet.isUpdate()) {
-						if (packet.isDiffie()) {
-							System.out.println("5");
-						}
 						incomingEncryptionPackets.add(packet);
-						if (packet.isDiffie()) {
-							System.out.println("6");
-						}
 						if (packet.isNormal()) {
 							sendAck(packet);
 						}
-						if (packet.isDiffie()) {
-							System.out.println("7");
-						}
 					} else {
-						if (packet.isDiffie()) {
-							System.out.println("8");
-						}
 						if (!seqAckTable.isReceivedSeqNr(packet.getSource(), packet.getSeqnr()) || packet.isUpdate()) {
-							if (packet.isDiffie()) {
-								System.out.println("9");
-							}
 							seqAckTable.addReceivedSeqNr(packet.getSource(), packet.getSeqnr());
 							if(packet.isNormal()) {
 								handleNormal(packet);
@@ -424,7 +397,7 @@ public class Controller extends Thread {
 					}
 				}
 			}
-//		}
+		}
 	}
 	
 	public void addRecipientToView(String recipient) {

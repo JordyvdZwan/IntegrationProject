@@ -46,7 +46,7 @@ public class EcryptionTest {
 
 	@Test
 	public void testRSASigning() {
-		String sign = ((Integer) tekst.hashCode()).toString();
+		String sign = new String(RSA.hash(tekst.getBytes()));
 		byte[] signed = RSA.encrypt(sign, RSA.getPrivateKey(-1062730494));
 		String verify = RSA.decrypt(signed, RSA.getPublicKey(-1062730494));
 		
