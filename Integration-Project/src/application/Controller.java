@@ -282,7 +282,7 @@ public class Controller extends Thread {
 				handleMessage(packet, true);
 			} else {
 				if (router.hasEncryptionKey(packet.getSource())) {
-					packet = router.getEncryption(packet.getDestination()).decrypt(packet, packet.getHashPayload(), RSA.getPublicKey(packet.getSource()));
+					packet = router.getEncryption(packet.getSource()).decrypt(packet, packet.getHashPayload(), RSA.getPublicKey(packet.getSource()));
 					incomingEncryptionPackets.remove(packet);
 					handleMessage(packet, true);
 				} 
