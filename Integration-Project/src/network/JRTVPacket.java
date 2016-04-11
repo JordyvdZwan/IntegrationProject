@@ -200,11 +200,11 @@ public class JRTVPacket {
 			broadcasted = true;
 			value -= 4;
 		}
-		if (value >= 4) {
+		if (value >= 2) {
 			RSA = true;
 			value -= 2;
 		}
-		if (value >= 4) {
+		if (value >= 1) {
 			diffie = true;
 			value -= 1;
 		}

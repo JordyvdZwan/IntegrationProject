@@ -6,7 +6,7 @@ public class OFB {
 
 	private static final int BLOCKSIZE = 63;
 	private static final byte[] Oj =
-					new BigInteger("AE6498ABC09EF9077AABC634EED98732987A1120934598BBBEEA093247897239").toByteArray();
+					new BigInteger("298345079823475098740958613240985613208746098236508736409182364099283464869320").toByteArray();
 
 	
 	public static byte[] EnDecrypt(byte[] message, byte[] key) {
@@ -86,8 +86,14 @@ public class OFB {
 	 * @return
 	 */
 	private static byte[] xor(byte[] a, byte[] b) {
-		byte[] result = new byte[a.length];
-		for (int i = 0; i < a.length; i++) {
+		int length;
+		if (a.length < b.length){
+			length = a.length;
+		} else {
+			length = b.length;
+		}
+		byte[] result = new byte[length];
+		for (int i = 0; i < length; i++) {
 			result[i] = (byte)((int)a[i] ^ (int)b[i]);
 		}
 		return result;

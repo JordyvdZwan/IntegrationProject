@@ -57,7 +57,10 @@ public class Connection extends Thread {
 	//Sends a datagrampacket coming from the client
 	public void send(DatagramPacket packet) {
 		try {
+			System.out.println("5");
+
 			JRTVPacket p = new JRTVPacket(packet.getData());
+			System.out.println(p.isDiffie());
 			if (p.isDiffie()) {
 				
 //				System.out.println("Received packet from " + recv.getAddress() + "with " + recv.getLength() +  " bytes of data");
@@ -70,8 +73,9 @@ public class Connection extends Thread {
 				System.out.println("SOURCE: " + p.getSource());//Router.getStringIP()
 				System.out.println("NextHop: " + Router.getStringIP(p.getNextHop()));
 			}
+			System.out.println("6");
 			socket.send(packet);
-			
+			System.out.println("7");
 		} catch (IOException e) {
 			
 			e.printStackTrace();

@@ -4,6 +4,8 @@ import java.math.BigInteger;
 import java.security.Key;
 import java.util.Arrays;
 
+import network.JRTVPacket;
+
 public class CreateEncryptedSessionPacket {
 	
 	private boolean presentkey = false;
@@ -28,14 +30,18 @@ public class CreateEncryptedSessionPacket {
 	 * @param data de tekst die verstuurd moet worden
 	 * @return
 	 */
-	public byte[] encrypt(String data, Key privatekey) {
-		byte[] encrypt = OFB.EnDecrypt(data.getBytes(), diffie.getKey().toByteArray());
+	public JRTVPacket encrypt(JRTVPacket packet, Key privatekey) {
+		byte[] data = packet.getByteMessage();
+		byte[] encrypt = OFB.EnDecrypt(data, diffie.getKey().toByteArray());
 		String sign = ((Integer) data.hashCode()).toString();
 		byte[] signed = RSA.encrypt(sign, privatekey);
 		byte[] encrypted = new byte[encrypt.length + signed.length];
 		System.arraycopy(encrypt, 0, encrypted, 0, encrypt.length);
 		System.arraycopy(signed, 0, encrypted, encrypt.length, signed.length);
-		return encrypted;
+		
+		packet.setByteMessage(encrypted);
+		packet.setHashPayload(signed.length);
+		return packet;
 	}
 	
 	/**
@@ -48,8 +54,9 @@ public class CreateEncryptedSessionPacket {
 	 * @param rsa de public key van de afzender
 	 * @return
 	 */
-	public String decrypt(byte[] encrypted, int length, Key publickey) {
+	public JRTVPacket decrypt(JRTVPacket packet, int length, Key publickey) {
 		String result = null;
+		byte[] encrypted = packet.getByteMessage();
 		byte[] encrypt = Arrays.copyOfRange(encrypted, 0, encrypted.length - length);
 		byte[] hash = Arrays.copyOfRange(encrypted, encrypted.length - length, encrypted.length);
 		String sign = ((Integer) encrypt.toString().hashCode()).toString();
@@ -59,7 +66,8 @@ public class CreateEncryptedSessionPacket {
 		} else {
 			result = "error, bedieger";
 		}
-		return result;
+		packet.setMessage(result);
+		return packet;
 	}
 	
 	/**
@@ -91,9 +99,9 @@ public class CreateEncryptedSessionPacket {
 	 * @return B to send to the other side
 	 */
 	public BigInteger keyDiffieHellmanSecond(BigInteger[] numbers) {
-		BigInteger A = numbers[1];
-		BigInteger g = numbers[2];
-		BigInteger p = numbers[3];
+		BigInteger A = numbers[0];
+		BigInteger g = numbers[1];
+		BigInteger p = numbers[2];
 		BigInteger B = diffie.generate(diffie.geta(), g, p);
 		diffie.setKey(diffie.generate(diffie.geta(), A, p));
 		presentkey = true;
