@@ -59,7 +59,7 @@ public class CreateEncryptedSessionPacket {
 		byte[] encrypted = packet.getByteMessage();
 		byte[] encrypt = Arrays.copyOfRange(encrypted, 0, encrypted.length - length);
 		byte[] hash = Arrays.copyOfRange(encrypted, encrypted.length - length, encrypted.length);
-		String sign = ((Integer) encrypt.toString().hashCode()).toString();
+		String sign = ((Integer) encrypt.hashCode()).toString();
 		String verify = RSA.decrypt(hash, publickey);
 		if (sign.equals(verify)) {
 			result = OFB.EnDecrypt(encrypt, diffie.getKey().toByteArray()).toString();
