@@ -174,9 +174,6 @@ public class Router {
 			System.arraycopy(bytes, 0, randomb, 0, 4);
 			int random = byteArrayToInt(randomb);
 			
-			System.out.println(!diffiePacketOutstanding.get(packet.getSource()));
-			System.out.println(diffiePacketOutstanding.get(packet.getSource()) && sendDiffiePacketInt.get(packet.getSource()) <= random);
-			System.out.println(random);
 			
 			if (!diffiePacketOutstanding.get(packet.getSource())) { //TODO fix possible bug??
 				sendDiffieResponse(bytes, packet);
