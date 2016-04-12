@@ -10,7 +10,7 @@ import application.Controller;
 public class Update extends Thread {
 	
 	Controller controller;
-	public static final long TIMEOUT = 1500;
+	public static final long TIMEOUT = 1200;
 	public Update(Controller controller) {
 		this.controller = controller;
 		this.setDaemon(true);
