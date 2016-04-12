@@ -151,6 +151,10 @@ public class Controller extends Thread {
 		while (true) {
 			DatagramPacket data;
 			if((data = connection.getFirstInQueue()) != null) {
+				System.out.println("=======================================================================");
+				System.out.println("HIJ KOMT HIER VANDAAN: " + data.getAddress().toString());
+				System.out.println(new JRTVPacket(data.getData()).toString());
+				System.out.println("=======================================================================");
 				handleMessage(new JRTVPacket(data.getData()), false);
 			}
 			sendEncryptionMessages();
@@ -164,6 +168,7 @@ public class Controller extends Thread {
 		}
 	}
 	
+	//&& !data.getAddress().toString().contains("192.168.5.2")
 	private List<JRTVPacket> outgoingEncryptionPackets = new ArrayList<JRTVPacket>();
 	private List<JRTVPacket> incomingEncryptionPackets = new ArrayList<JRTVPacket>();
 	
@@ -372,7 +377,7 @@ public class Controller extends Thread {
 	}
 	
 	public void handleMessage(JRTVPacket packet, boolean decrypted) {
-		if (packet.getSource() != localIAddress && packet.getSource() != -1062730493) {
+		if (packet.getSource() != localIAddress) {
 			if (packet.getNextHop() == localIAddress && packet.getDestination() != localIAddress && packet.getDestination() != multicastAddress) {
 				relay(packet);
 			} else {
