@@ -195,7 +195,6 @@ public class Controller extends Thread {
 		
 		if (packet.isNormal() || packet.isDiffie()) {
 			packet.setSeqnr(seqAckTable.getNextSeq(packet.getDestination()));
-
 			seqAckTable.registerSendPacket(packet);
 		}
 		packet.setNextHop(router.getNextHop(packet.getDestination()));
@@ -225,9 +224,9 @@ public class Controller extends Thread {
 		for (int i = 0; i < outgoingEncryptionPackets.size(); i++) {
 			JRTVPacket packet = outgoingEncryptionPackets.get(i);
 			if (router.hasEncryptionKey(packet.getDestination())) {
-//				System.out.println("======================== Before the encryption ==============================================");
-//				System.out.println(packet.toString());
-//				System.out.println("=============================================================================================");
+				System.out.println("======================== Before the encryption ==============================================");
+				System.out.println(packet.getMessage());
+				System.out.println("=============================================================================================");
 				packet = router.getEncryption(packet.getDestination()).encrypt(packet, RSA.getPrivateKey(localIAddress));//TODO RSA ?
 				outgoingEncryptionPackets.remove(packet);
 				sendPacket(packet);
@@ -290,9 +289,9 @@ public class Controller extends Thread {
 		packet.setDestination(destination);
 		
 		if (packet.isNormal() || packet.isDiffie()) {
-//			System.out.println("========================== Before registering in retransmit =================================");
-//			System.out.println(packet.getMessage());
-//			System.out.println("=============================================================================================");
+			System.out.println("========================== Before registering in retransmit =================================");
+			System.out.println(packet.getMessage());
+			System.out.println("=============================================================================================");
 			seqAckTable.registerSendPacket(packet);
 		}
 		
@@ -383,9 +382,9 @@ public class Controller extends Thread {
 							sendAck(packet);
 						}
 					} else {
-//						System.out.println(packet.toString());
-//						System.out.println("Received: " + (!seqAckTable.isReceivedSeqNr(packet.getSource(), packet.getSeqnr())));
-//						System.out.println("Is Update: " + packet.isUpdate());
+						System.out.println(packet.toString());
+						System.out.println("Received: " + (!seqAckTable.isReceivedSeqNr(packet.getSource(), packet.getSeqnr())));
+						System.out.println("Is Update: " + packet.isUpdate());
 						if (!seqAckTable.isReceivedSeqNr(packet.getSource(), packet.getSeqnr()) || packet.isUpdate()) {
 							seqAckTable.addReceivedSeqNr(packet.getSource(), packet.getSeqnr());
 							if(packet.isNormal()) {
