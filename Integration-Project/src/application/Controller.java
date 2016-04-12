@@ -193,6 +193,11 @@ public class Controller extends Thread {
 		packet.setSource(localIAddress);
 		packet.setDestination(client);
 		
+		if (packet.isNormal() || packet.isDiffie()) {
+			packet.setSeqnr(seqAckTable.getNextSeq(packet.getDestination()));
+			seqAckTable.registerSendPacket(packet);
+		}
+		
 		if (packet.getDestination() != multicastAddress && !packet.isDiffie()) {
 			packet.setNextHop(router.getNextHop(packet.getDestination()));
 			outgoingEncryptionPackets.add(packet);
@@ -263,10 +268,6 @@ public class Controller extends Thread {
 	}	
 	
 	private void sendPacket(JRTVPacket packet) {
-		if (packet.isNormal() || packet.isDiffie()) {
-			packet.setSeqnr(seqAckTable.getNextSeq(packet.getDestination()));
-			seqAckTable.registerSendPacket(packet);
-		}
 		DatagramPacket data = new DatagramPacket(packet.toByteArray(), packet.toByteArray().length, getMulticastIAddress(), 2000);
 		connection.send(data);
 	}

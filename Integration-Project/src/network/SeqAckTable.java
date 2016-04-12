@@ -72,7 +72,7 @@ public class SeqAckTable {
 //	}
 	
 	public void retransmit(JRTVPacket packet, int destination) {
-		controller.retransmit(packet, destination);
+		controller.sendPacket(destination, packet);
 	}
 	
 	public void registerAckPacket(JRTVPacket packet) {
