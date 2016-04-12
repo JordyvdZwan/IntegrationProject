@@ -171,6 +171,7 @@ public class JRTVPacket {
 
 	public void setNextHop(int nextHop) {
 		this.nextHop = nextHop;
+		System.out.println("NExt hop setting to: " + this.nextHop);
 	}
 
 	private void setFlags(byte[] flags) {

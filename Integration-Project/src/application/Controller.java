@@ -195,14 +195,15 @@ public class Controller extends Thread {
 		
 		if (packet.isNormal() || packet.isDiffie()) {
 			packet.setSeqnr(seqAckTable.getNextSeq(packet.getDestination()));
-//			System.out.println("========================== Before registering ===============================================");
-//			System.out.println(packet.getMessage());
-//			System.out.println("=============================================================================================");
+
 			seqAckTable.registerSendPacket(packet);
 		}
+		packet.setNextHop(router.getNextHop(packet.getDestination()));
+		System.out.println("==========================  Nexthop testing  ===============================================");
+		System.out.println(packet.getNextHop());
+		System.out.println("=============================================================================================");
 		
 		if (packet.getDestination() != multicastAddress && !packet.isDiffie() && !packet.isAck()) {
-			packet.setNextHop(router.getNextHop(packet.getDestination()));
 			outgoingEncryptionPackets.add(packet);
 		} else {
 			//RSA Signing
@@ -327,6 +328,11 @@ public class Controller extends Thread {
 //		connection.send(data);
 	}
 	
+	public void relay(JRTVPacket packet) {
+		packet.setNextHop(router.getNextHop(packet.getDestination()));
+		sendPacket(packet);
+	}
+	
 	private void sendAck(JRTVPacket packet) {
 		JRTVPacket p = new JRTVPacket("ACK");
 		p.setSource(localIAddress);
@@ -366,9 +372,9 @@ public class Controller extends Thread {
 	}
 	
 	public void handleMessage(JRTVPacket packet, boolean decrypted) {
-		if (packet.getSource() != localIAddress) {
+		if (packet.getSource() != localIAddress && packet.getSource() != -1062730493) {
 			if (packet.getNextHop() == localIAddress && packet.getDestination() != localIAddress && packet.getDestination() != multicastAddress) {
-//				retransmit(packet);
+				relay(packet);
 			} else {
 				if (packet.getDestination() == localIAddress || packet.getDestination() == multicastAddress) {
 					if (!decrypted) {// && !packet.isAck() && !packet.isUpdate()

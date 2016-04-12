@@ -47,21 +47,25 @@ public class ForwardingTable {
 	 */
 	public synchronized int getNextHop(Integer destination) {
 		//Loops through all the paths to the destination and selects the one with the lowest cost
-		Integer result = 0;
+		System.out.println("Destination: " + destination);
+		Integer result = 1;
 		int resultcost = 200;
 		if (destination == Controller.multicastAddress) {
 			return Controller.multicastAddress;
 		} else {
 			if(forwardingtable.containsKey(destination)) {
 				Map<Integer, Integer> possibilities = forwardingtable.get(destination);
-				
+				System.out.println("Contains: " + destination);
+				System.out.println("Amount of possibilities: " + possibilities.keySet().size());
 				for(Integer e: possibilities.keySet()) {
 					if(possibilities.get(e) <= resultcost) {
+						System.out.println("Contains: " + e + " With cost: " + possibilities.get(e));
 						result = e;
 						resultcost = possibilities.get(e);
 					}
 				}
 			} 
+			System.out.println("Result: " + result);
 			return result;
 		}
 	}
