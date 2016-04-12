@@ -68,26 +68,27 @@ public class Controller extends Thread {
 	}
 //	.  TODO
 	private void setupIP() {
-//		boolean found = false;
-//		Enumeration<NetworkInterface> interfaces;
-//		try {
-//			interfaces = NetworkInterface.getNetworkInterfaces();
-//			
-//			while (interfaces.hasMoreElements()) {
-//				NetworkInterface i = interfaces.nextElement();
-//				Enumeration<InetAddress> ips = i.getInetAddresses();
-//				while (ips.hasMoreElements()) {
-//					InetAddress address = ips.nextElement();
-//					if (address.toString().contains("192.168.5.")) {
-//						localIAddress = IPtoInt(address.toString().replace("/", ""));
-//						found = true;
-//					}
-//				}
-//			}
-//		} catch (SocketException e) {
-//			e.printStackTrace();
-//		}
-//		if (!found) {
+		boolean found = false;
+		Enumeration<NetworkInterface> interfaces;
+		try {
+			interfaces = NetworkInterface.getNetworkInterfaces();
+			
+			while (interfaces.hasMoreElements()) {
+				NetworkInterface i = interfaces.nextElement();
+				Enumeration<InetAddress> ips = i.getInetAddresses();
+				while (ips.hasMoreElements()) {
+					InetAddress address = ips.nextElement();
+					if (address.toString().contains("192.168.5.")) {
+						localIAddress = IPtoInt(address.toString().replace("/", ""));
+						found = true;
+						settingUp = false;
+					}
+				}
+			}
+		} catch (SocketException e) {
+			e.printStackTrace();
+		}
+		if (!found) {
 			initString = randomString();
 			while (settingUp) {
 				DatagramPacket data;
@@ -108,7 +109,7 @@ public class Controller extends Thread {
 					e.printStackTrace();
 				}
 			}
-//		}
+		}
 		view.start(localIAddress);
 	}
 	
