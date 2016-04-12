@@ -259,7 +259,7 @@ public class Router {
 //				 && packet.getSource() != controller.getLocalIAddress()
 				for (int i = 0; i < integers.length / 2; i++) {
 					if (integers[i * 2] != controller.getLocalIAddress() && integers[i * 2] != controller.multicastAddress && packet.getSource() != controller.getLocalIAddress()) {//TODO CHANGE THIS BACK
-						table.addHop(integers[i * 2], packet.getSource(), integers[(i * 2) + 1]);
+						table.addHop(integers[i * 2], packet.getSource(), integers[(i * 2) + 1] + 1);
 					}
 				}
 				
