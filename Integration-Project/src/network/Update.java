@@ -37,22 +37,17 @@ public class Update extends Thread {
 				}
 			} else {
 				packet = new JRTVPacket(controller.getClientName());
-				byte[] bytes = new byte[4 * (3 + (2 * controller.getForwardingTable().keySet().size()))];
+				byte[] bytes = new byte[4 * (2 + (2 * controller.getForwardingTable().keySet().size()))];
 				
-				bytes[0] = intToByteArray(controller.getClientName().getBytes().length)[0];
-				bytes[1] = intToByteArray(controller.getClientName().getBytes().length)[1];
-				bytes[2] = intToByteArray(controller.getClientName().getBytes().length)[2];
-				bytes[3] = intToByteArray(controller.getClientName().getBytes().length)[3];
+				bytes[0] = intToByteArray(controller.getLocalIAddress())[0];
+				bytes[1] = intToByteArray(controller.getLocalIAddress())[1];
+				bytes[2] = intToByteArray(controller.getLocalIAddress())[2];
+				bytes[3] = intToByteArray(controller.getLocalIAddress())[3];
 				
-				bytes[4] = intToByteArray(controller.getLocalIAddress())[0];
-				bytes[5] = intToByteArray(controller.getLocalIAddress())[1];
-				bytes[6] = intToByteArray(controller.getLocalIAddress())[2];
-				bytes[7] = intToByteArray(controller.getLocalIAddress())[3];
-				
-				bytes[8] = intToByteArray(0)[0];
-				bytes[9] = intToByteArray(0)[1];
-				bytes[10] = intToByteArray(0)[2];
-				bytes[11] = intToByteArray(0)[3];
+				bytes[4] = intToByteArray(0)[0];
+				bytes[5] = intToByteArray(0)[1];
+				bytes[6] = intToByteArray(0)[2];
+				bytes[7] = intToByteArray(0)[3];
 				
 				int counter = 0;
 				for (Integer integer : controller.getForwardingTable().keySet()) {
@@ -72,7 +67,13 @@ public class Update extends Thread {
 					counter++;
 				}
 				
-				packet.setMessage(packet.getMessage() + new String(bytes));
+				byte[] lengthb = new byte[4];
+				lengthb[0] = intToByteArray(controller.getClientName().getBytes().length)[0];
+				lengthb[1] = intToByteArray(controller.getClientName().getBytes().length)[1];
+				lengthb[2] = intToByteArray(controller.getClientName().getBytes().length)[2];
+				lengthb[3] = intToByteArray(controller.getClientName().getBytes().length)[3];
+				
+				packet.setMessage(new String(lengthb) + packet.getMessage() + new String(bytes));
 				try {
 					this.sleep(TIMEOUT);
 				} catch (InterruptedException e) {

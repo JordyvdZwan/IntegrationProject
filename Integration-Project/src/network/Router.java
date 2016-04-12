@@ -268,6 +268,9 @@ public class Router {
 				//TODO: Split at destination, next hop and put these into the forwardingtables
 				byte[] bytes = packet.getMessage().getBytes();
 				int length = byteArrayToInt(Arrays.copyOfRange(bytes, 0, 4));
+				System.out.println(packet.getMessage());
+				System.out.println(bytes.length);
+				System.out.println(length);
 				byte[] addresses = new byte[bytes.length - length - 4];
 				
 				System.arraycopy(bytes, length + 4, addresses, 0, bytes.length - length - 4);
@@ -295,7 +298,7 @@ public class Router {
 				}
 	
 				byte[] nameBytes = new byte[length];
-				System.arraycopy(packet.getMessage().getBytes(), 0, nameBytes, 0, length);
+				System.arraycopy(packet.getMessage().getBytes(), 4, nameBytes, 0, length);
 				String name = new String(nameBytes);
 				if (!name.equals("Anonymous")) {
 					if (addresstable.containsKey(packet.getSource())) {
