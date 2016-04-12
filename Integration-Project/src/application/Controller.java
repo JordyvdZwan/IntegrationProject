@@ -333,7 +333,7 @@ public class Controller extends Thread {
 				if (packet.getDestination() == localIAddress || packet.getDestination() == multicastAddress) {
 					if (!decrypted) {// && !packet.isAck() && !packet.isUpdate()
 						incomingEncryptionPackets.add(packet);
-						if (packet.isNormal()) {
+						if (packet.isNormal() || packet.isDiffie()) {
 							sendAck(packet);
 						}
 					} else {
@@ -352,7 +352,9 @@ public class Controller extends Thread {
 							} else if (packet.isDiffie()) {
 								handleDiffie(packet);
 							} else {
+								System.out.println("Handling ack?");
 								if (packet.getMessage().equals("ACK")) {
+									System.out.println("Yes!");
 									seqAckTable.registerAckPacket(packet);
 								}
 							}

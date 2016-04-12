@@ -37,7 +37,6 @@ public class RSA {
 		    final Cipher cipher = Cipher.getInstance(ALGORITHM);
 		    cipher.init(Cipher.ENCRYPT_MODE, key);
 		    cipherText = cipher.doFinal(text.getBytes());
-		    System.out.println("Plaintext "+text.getBytes().length +" Cyphertext: "+cipherText.length);
 	    } catch (Exception e) {
 	    	e.printStackTrace();
 	    }
@@ -69,7 +68,6 @@ public class RSA {
 	public static String decrypt(byte[] text, Key key) {
 	    byte[] dectyptedText = null;
 	    try {
-	    	System.out.println("Cyphertext "+text.length);
 		    final Cipher cipher = Cipher.getInstance(ALGORITHM);
 		    cipher.init(Cipher.DECRYPT_MODE, key);
 		    dectyptedText = cipher.doFinal(text);
