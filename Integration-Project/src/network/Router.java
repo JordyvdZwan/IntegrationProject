@@ -267,9 +267,10 @@ public class Router {
 				table.getvalidhops().put(packet.getSource(), true);
 				//TODO: Split at destination, next hop and put these into the forwardingtables
 				byte[] bytes = packet.getMessage().getBytes();
-				byte[] addresses = new byte[bytes.length - packet.getHashPayload()];
+				int length = byteArrayToInt(Arrays.copyOfRange(bytes, 0, 4));
+				byte[] addresses = new byte[bytes.length - length - 4];
 				
-				System.arraycopy(bytes, packet.getHashPayload(), addresses, 0, bytes.length - packet.getHashPayload());
+				System.arraycopy(bytes, length + 4, addresses, 0, bytes.length - length - 4);
 				Integer[] integers = new Integer[addresses.length / 4];
 				
 				for (int i = 0; i < integers.length; i++) {
@@ -293,14 +294,13 @@ public class Router {
 					timeouts.get(packet.getSource()).start();
 				}
 	
-				byte[] nameBytes = new byte[packet.getHashPayload()];
-				System.arraycopy(packet.getMessage().getBytes(), 0, nameBytes, 0, packet.getHashPayload());
+				byte[] nameBytes = new byte[length];
+				System.arraycopy(packet.getMessage().getBytes(), 0, nameBytes, 0, length);
 				String name = new String(nameBytes);
 				if (!name.equals("Anonymous")) {
 					if (addresstable.containsKey(packet.getSource())) {
 						if (addresstable.get(packet.getSource())!= null && !addresstable.get(packet.getSource()).equals("(" + getStringIP(packet.getSource()) + ") " + name)) {
 							controller.removeRecipientToView(getName(packet.getSource()));
-							System.out.println("Is it gone?");
 							addresstable.remove(packet.getSource());
 						}
 					}

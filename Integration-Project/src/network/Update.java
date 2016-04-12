@@ -37,33 +37,37 @@ public class Update extends Thread {
 				}
 			} else {
 				packet = new JRTVPacket(controller.getClientName());
-				packet.setHashPayload(controller.getClientName().getBytes().length);
-				byte[] bytes = new byte[4 * (2 + (2 * controller.getForwardingTable().keySet().size()))];
+				byte[] bytes = new byte[4 * (3 + (2 * controller.getForwardingTable().keySet().size()))];
 				
-				bytes[0] = intToByteArray(controller.getLocalIAddress())[0];
-				bytes[1] = intToByteArray(controller.getLocalIAddress())[1];
-				bytes[2] = intToByteArray(controller.getLocalIAddress())[2];
-				bytes[3] = intToByteArray(controller.getLocalIAddress())[3];
+				bytes[0] = intToByteArray(controller.getClientName().getBytes().length)[0];
+				bytes[1] = intToByteArray(controller.getClientName().getBytes().length)[1];
+				bytes[2] = intToByteArray(controller.getClientName().getBytes().length)[2];
+				bytes[3] = intToByteArray(controller.getClientName().getBytes().length)[3];
 				
-				bytes[4] = intToByteArray(0)[0];
-				bytes[5] = intToByteArray(0)[1];
-				bytes[6] = intToByteArray(0)[2];
-				bytes[7] = intToByteArray(0)[3];
+				bytes[4] = intToByteArray(controller.getLocalIAddress())[0];
+				bytes[5] = intToByteArray(controller.getLocalIAddress())[1];
+				bytes[6] = intToByteArray(controller.getLocalIAddress())[2];
+				bytes[7] = intToByteArray(controller.getLocalIAddress())[3];
+				
+				bytes[8] = intToByteArray(0)[0];
+				bytes[9] = intToByteArray(0)[1];
+				bytes[10] = intToByteArray(0)[2];
+				bytes[11] = intToByteArray(0)[3];
 				
 				int counter = 0;
 				for (Integer integer : controller.getForwardingTable().keySet()) {
 					
-					bytes[(counter * 8) + 8] = intToByteArray(integer)[0];
-					bytes[(counter * 8) + 9] = intToByteArray(integer)[1];
-					bytes[(counter * 8) + 10] = intToByteArray(integer)[2];
-					bytes[(counter * 8) + 11] = intToByteArray(integer)[3];
+					bytes[(counter * 8) + 12] = intToByteArray(integer)[0];
+					bytes[(counter * 8) + 13] = intToByteArray(integer)[1];
+					bytes[(counter * 8) + 14] = intToByteArray(integer)[2];
+					bytes[(counter * 8) + 15] = intToByteArray(integer)[3];
 					
 					Integer cost = controller.getRouter().getNextHopCost(integer) + 1;
 					
-					bytes[(counter * 8) + 12] = intToByteArray(cost)[0];
-					bytes[(counter * 8) + 13] = intToByteArray(cost)[1];
-					bytes[(counter * 8) + 14] = intToByteArray(cost)[2];
-					bytes[(counter * 8) + 15] = intToByteArray(cost)[3];
+					bytes[(counter * 8) + 16] = intToByteArray(cost)[0];
+					bytes[(counter * 8) + 17] = intToByteArray(cost)[1];
+					bytes[(counter * 8) + 18] = intToByteArray(cost)[2];
+					bytes[(counter * 8) + 19] = intToByteArray(cost)[3];
 					
 					counter++;
 				}
