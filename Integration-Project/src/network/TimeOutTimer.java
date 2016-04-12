@@ -73,8 +73,8 @@ public class TimeOutTimer extends Thread {
 						System.out.println("======================== Before retransmission ==============================================");
 						System.out.println(packet.getMessage());
 						System.out.println("=============================================================================================");
+						packet.setBroadcasted(false);
 						table.retransmit(packet, integer);
-						
 					}
 				}
 			}
