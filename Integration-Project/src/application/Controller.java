@@ -345,10 +345,10 @@ public class Controller extends Thread {
 	public void handleMessage(JRTVPacket packet, boolean decrypted) {
 		if (packet.getSource() != localIAddress) {
 			if (packet.getNextHop() == localIAddress && packet.getDestination() != localIAddress && packet.getDestination() != multicastAddress) {
-				retransmit(packet);
+				sendAck(packet);
 			} else {
 				if (packet.getDestination() == localIAddress || packet.getDestination() == multicastAddress) {
-					if (!decrypted && !packet.isAck() && !packet.isUpdate()) {
+					if (!decrypted) {// && !packet.isAck() && !packet.isUpdate()
 						incomingEncryptionPackets.add(packet);
 						if (packet.isNormal()) {
 							sendAck(packet);

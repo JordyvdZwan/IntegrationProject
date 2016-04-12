@@ -33,7 +33,7 @@ public class CreateEncryptedSessionPacket {
 	public JRTVPacket encrypt(JRTVPacket packet, Key privatekey) {
 		byte[] data = packet.getByteMessage();
 		byte[] encrypt = OFB.EnDecrypt(data, diffie.getKey().toByteArray());
-		String sign = new String(RSA.hash(data));
+		String sign = new String(RSA.hash(encrypt));
 		byte[] signed = RSA.encrypt(sign, privatekey);
 		byte[] encrypted = new byte[encrypt.length + signed.length];
 		System.arraycopy(encrypt, 0, encrypted, 0, encrypt.length);
@@ -59,7 +59,7 @@ public class CreateEncryptedSessionPacket {
 		byte[] encrypted = packet.getByteMessage();
 		byte[] encrypt = Arrays.copyOfRange(encrypted, 0, encrypted.length - length);
 		byte[] hash = Arrays.copyOfRange(encrypted, encrypted.length - length, encrypted.length);
-		String sign = new String(RSA.hash(OFB.EnDecrypt(encrypt, diffie.getKey().toByteArray())));
+		String sign = new String(RSA.hash(encrypt));
 		String verify = RSA.decrypt(hash, publickey);
 		if (sign.equals(verify)) {
 			result = new String(OFB.EnDecrypt(encrypt, diffie.getKey().toByteArray()));
