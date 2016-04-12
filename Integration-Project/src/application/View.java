@@ -240,6 +240,7 @@ public class View extends Application {
 	
 	private Map<String, String> conversations = new HashMap<String, String>();
 	private String selectedRecipient = "All";
+	private String lastSelectedRecipient = "All";
 	
 	private List<String> recipients = new ArrayList<String>();
 	private Map<String, Integer> newMessagesAmount = new HashMap<String, Integer>();
@@ -389,20 +390,21 @@ public class View extends Application {
 			conversations.put(selectedRecipient, chatText.getText());
 			chatText.setText(conversations.get(recipient));
 			selectedRecipient = recipient;
+			lastSelectedRecipient = recipient;
 			changeRecipientAmount(recipient, 0);
 		}
 	}
 	
 	public void addMessage(String client, String message, boolean broadcasted) {
 		if (broadcasted) {
-			if (selectedRecipient.equals("All")) {
+			if (lastSelectedRecipient.equals("All")) {
 				chatText.appendText(("\n" + client + ": " + message));
 			} else {
 				conversations.put("Anonymous", conversations.get(client).concat(("\n" + client + ": " + message)));
 				changeRecipientAmount("All", getRecipientValue("All") + 1);
 			}
 		} else {
-			if (selectedRecipient.equals(client)) {
+			if (lastSelectedRecipient.equals(client)) {
 				chatText.appendText(("\n" + client + ": " + message));
 			} else {
 				conversations.put(client, conversations.get(client).concat(("\n" + client + ": " + message)));
