@@ -394,6 +394,7 @@ public class View extends Application {
 			selectedRecipient = recipient;
 			lastSelectedRecipient = recipient;
 			newMessagesAmount.put(recipient, 0);
+			updateRecipient();
 		}
 	}
 	
