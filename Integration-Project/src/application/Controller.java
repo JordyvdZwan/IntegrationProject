@@ -201,7 +201,7 @@ public class Controller extends Thread {
 			seqAckTable.registerSendPacket(packet);
 		}
 		
-		if (packet.getDestination() != multicastAddress && !packet.isDiffie()) {
+		if (packet.getDestination() != multicastAddress && !packet.isDiffie() && !packet.isAck()) {
 			packet.setNextHop(router.getNextHop(packet.getDestination()));
 			outgoingEncryptionPackets.add(packet);
 		} else {
@@ -241,7 +241,7 @@ public class Controller extends Thread {
 	private void decryptMessages() {
 		for (int i = 0; i < incomingEncryptionPackets.size(); i++) {
 			JRTVPacket packet = incomingEncryptionPackets.get(i);
-			if (packet.getDestination() == multicastAddress || packet.isDiffie()) {
+			if (packet.getDestination() == multicastAddress || packet.isDiffie() || packet.isAck()) {
 				byte[] message2 = packet.getByteMessage();
 				byte[] second2 = new byte[packet.getHashPayload()];
 				
@@ -330,6 +330,7 @@ public class Controller extends Thread {
 		p.setSource(localIAddress);
 		p.setDestination(packet.getSource());
 		p.setAcknr(packet.getSeqnr());
+		p.setAck(true);
 //		p.setSeqnr(seqAckTable.getNextSeq(packet.getDestination()));
 
 		if (p.getDestination() != multicastAddress) {
@@ -391,12 +392,11 @@ public class Controller extends Thread {
 								handleAck(packet);
 							} else if (packet.isDiffie()) {
 								handleDiffie(packet);
-							} else {
-								System.out.println("Handling ack?");
-								if (packet.getMessage().contains("ACK")) {
-									System.out.println("Yes!");
-									seqAckTable.registerAckPacket(packet);
-								}
+//							} else {
+//								System.out.println("Handling ack?");
+//								if (packet.getMessage().contains("ACK")) {
+//									System.out.println("Yes!");
+//								}
 							}
 						}
 					}
@@ -435,6 +435,8 @@ public class Controller extends Thread {
 	private void handleAck(JRTVPacket packet) {
 		if (packet.isDiffie()) {
 			router.processDiffie(packet);
+		} else {
+			seqAckTable.registerAckPacket(packet);
 		}
 	}
 	
