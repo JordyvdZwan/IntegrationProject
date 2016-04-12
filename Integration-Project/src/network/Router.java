@@ -5,9 +5,10 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.Key;
 import java.util.Map;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-
+import java.util.List;
 
 import application.Controller;
 import security.CreateEncryptedSessionPacket;
@@ -257,15 +258,22 @@ public class Router {
 					System.arraycopy(addresses, (i * 4), b, 0, 4);
 					integers[i] = byteArrayToInt(b);
 				}
-//				
+				List<Integer> accessableAddresses = new ArrayList<Integer>();
 //				 && packet.getSource() != controller.getLocalIAddress()
 				for (int i = 0; i < integers.length / 2; i++) {
+					accessableAddresses.add(i);
 					if (integers[i * 2] != controller.getLocalIAddress() && integers[i * 2] != controller.multicastAddress && packet.getSource() != controller.getLocalIAddress()) {//TODO CHANGE THIS BACK
 						if (integers[(i * 2) + 1] < MAXINFINITY) {
 							table.addHop(integers[i * 2], packet.getSource(), integers[(i * 2) + 1] + 1);
 						} else {
 							table.removeNextHop(integers[i * 2], packet.getSource());
 						}
+					}
+				}
+				
+				for (Integer address: ) {
+					if (!accessableAddresses.contains(address)) {
+						table.removeNextHop(address, packet.getSource());
 					}
 				}
 				
