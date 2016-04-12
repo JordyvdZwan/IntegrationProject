@@ -29,7 +29,7 @@ public class TimeOutTimer extends Thread {
 		this.packet.setSource(packet.getSource());
 		this.packet.setDestination(packet.getDestination());
 		this.packet.setHashPayload(packet.getHashPayload());
-		this.packet.setNextHop(packet.getNextHop());
+//		this.packet.setNextHop(packet.getNextHop());
 		
 		this.timeout = timeout;
 	}
@@ -52,7 +52,7 @@ public class TimeOutTimer extends Thread {
 		this.packet.setSource(packet.getSource());
 		this.packet.setDestination(packet.getDestination());
 		this.packet.setHashPayload(packet.getHashPayload());
-		this.packet.setNextHop(packet.getNextHop());
+//		this.packet.setNextHop(packet.getNextHop());
 //		System.out.println("++++++++++++++++++++++++++++++++++ timeout constructor +++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 //		System.out.println(this.packet.getMessage());
 //		System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
