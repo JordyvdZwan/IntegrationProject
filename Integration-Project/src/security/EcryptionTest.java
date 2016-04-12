@@ -1,7 +1,6 @@
 package security;
 
 import static org.junit.Assert.*;
-
 import java.math.BigInteger;
 import java.util.Arrays;
 import org.junit.Test;
