@@ -7,7 +7,7 @@ import application.Controller;
 
 public class TimeOutTimer extends Thread {
 	
-	private int timeout = 10000;
+	private int timeout = 1500;
 	private SeqAckTable table;
 	private JRTVPacket packet;
 	
@@ -53,9 +53,9 @@ public class TimeOutTimer extends Thread {
 		this.packet.setDestination(packet.getDestination());
 		this.packet.setHashPayload(packet.getHashPayload());
 		this.packet.setNextHop(packet.getNextHop());
-		System.out.println("++++++++++++++++++++++++++++++++++ timeout constructor +++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-		System.out.println(this.packet.getMessage());
-		System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+//		System.out.println("++++++++++++++++++++++++++++++++++ timeout constructor +++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+//		System.out.println(this.packet.getMessage());
+//		System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 	}
 	
 	public void run() {
@@ -73,9 +73,9 @@ public class TimeOutTimer extends Thread {
 				if (integer != table.getController().getLocalIAddress() && integer != table.getController().multicastAddress) {
 //					System.out.println("Is the packet received? : " + !table.isReceived(integer, packet.getSeqnr()));
 					if (!table.isReceived(integer, packet.getSeqnr())) {
-						System.out.println("++++++++++++++++++++++++++++++++++ before retransmission +++++++++++++++++++++++++++++++++++++++++++++++++++++");
-						System.out.println(this.packet.getMessage());
-						System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+//						System.out.println("++++++++++++++++++++++++++++++++++ before retransmission +++++++++++++++++++++++++++++++++++++++++++++++++++++");
+//						System.out.println(this.packet.getMessage());
+//						System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 //						packet.setBroadcasted(false);
 						
 						JRTVPacket p = new JRTVPacket("");
@@ -102,9 +102,9 @@ public class TimeOutTimer extends Thread {
 			}
 		} else {
 			if (!table.isReceived(packet.getDestination(), packet.getSeqnr()) && table.getController().getForwardingTable().keySet().contains(packet.getDestination())) {
-				System.out.println("++++++++++++++++++++++++++++++++++ before s retransmission +++++++++++++++++++++++++++++++++++++++++++++++++++");
-				System.out.println(this.packet.getMessage());
-				System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+//				System.out.println("++++++++++++++++++++++++++++++++++ before s retransmission +++++++++++++++++++++++++++++++++++++++++++++++++++");
+//				System.out.println(this.packet.getMessage());
+//				System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 				table.retransmit(packet, packet.getDestination());
 			}
 		}
