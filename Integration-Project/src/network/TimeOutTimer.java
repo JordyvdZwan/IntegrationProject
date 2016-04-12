@@ -13,7 +13,23 @@ public class TimeOutTimer extends Thread {
 	
 	public TimeOutTimer(JRTVPacket packet, SeqAckTable table, int timeout) {
 		this.table = table;
-		this.packet = packet;
+		this.packet = new JRTVPacket(packet.getMessage());
+		this.packet.setAck(packet.isAck());
+		this.packet.setSyn(packet.isSyn());
+		this.packet.setUpdate(packet.isUpdate());
+		this.packet.setNormal(packet.isNormal());
+		this.packet.setFin(packet.isFin());
+		this.packet.setBroadcasted(packet.isBroadcasted());
+		this.packet.setRSA(packet.isRSA());
+		this.packet.setDiffie(packet.isDiffie());
+		
+		this.packet.setAcknr(packet.getAcknr());
+		this.packet.setSeqnr(packet.getSeqnr());
+		this.packet.setSource(packet.getSource());
+		this.packet.setDestination(packet.getDestination());
+		this.packet.setHashPayload(packet.getHashPayload());
+		this.packet.setNextHop(packet.getNextHop());
+		
 		this.timeout = timeout;
 	}
 	

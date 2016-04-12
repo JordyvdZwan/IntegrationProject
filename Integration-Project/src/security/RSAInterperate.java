@@ -38,7 +38,7 @@ public class RSAInterperate {
 				in.close();	
 				String print = new String(Base64.decodeBase64(string.substring(2)));
 				return RSA.toPrivateKey(Base64.decodeBase64(string.substring(2)));
-			}d
+			}
 		}
 		s.close();	
 		in.close();
