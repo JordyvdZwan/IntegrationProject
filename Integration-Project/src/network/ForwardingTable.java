@@ -3,7 +3,9 @@ import java.util.Map;
 
 import application.Controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.net.InetAddress;
 
 public class ForwardingTable {
@@ -64,6 +66,16 @@ public class ForwardingTable {
 		}
 	}
 	
+	public List<Integer> getPossibilities(Integer nexthop) {
+		List<Integer> result = new ArrayList<Integer>();
+		for(Integer i: forwardingtable.keySet()) {
+			if(forwardingtable.get(i).containsKey(nexthop)) {
+				result.add(i);
+			}
+		}
+		
+		return result;
+	}
 	
 	public int getNextHopCost(Integer destination) {
 		//Loops through all the paths to the destination and selects the one with the lowest cost
