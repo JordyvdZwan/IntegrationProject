@@ -4,6 +4,8 @@ import java.math.BigInteger;
 import java.security.Key;
 import java.util.Arrays;
 
+import org.apache.commons.codec.binary.Base64;
+
 import network.JRTVPacket;
 
 public class CreateEncryptedSessionPacket {
@@ -32,6 +34,8 @@ public class CreateEncryptedSessionPacket {
 	 */
 	public JRTVPacket encrypt(JRTVPacket packet, Key privatekey) {
 		byte[] data = packet.getByteMessage();
+//		byte[] encodeddata = Base64.encodeBase64(data);
+//		System.out.println(new String(encodeddata));
 		byte[] encrypt = OFB.EnDecrypt(data, diffie.getKey().toByteArray());
 		String sign = new String(RSA.hash(encrypt));
 		byte[] signed = RSA.encrypt(sign, privatekey);
@@ -61,7 +65,7 @@ public class CreateEncryptedSessionPacket {
 		byte[] hash = Arrays.copyOfRange(encrypted, encrypted.length - length, encrypted.length);
 		String sign = new String(RSA.hash(encrypt));
 		String verify = RSA.decrypt(hash, publickey);
-		if (sign.equals(verify)) {
+		if (sign.equals(verify)) {//Base64.decodeBase64(
 			result = new String(OFB.EnDecrypt(encrypt, diffie.getKey().toByteArray()));
 		} else {
 			result = "Data was not verified";

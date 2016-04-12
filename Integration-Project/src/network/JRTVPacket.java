@@ -29,7 +29,7 @@ public class JRTVPacket {
 	private boolean ack = false;
 	private boolean update = false;
 	private boolean normal = false;
-	private boolean fin = false;
+	private boolean file = false;
 	private boolean broadcasted = false;
 	private boolean RSA = false;
 	private boolean diffie = false;
@@ -51,7 +51,7 @@ public class JRTVPacket {
 			res = res.concat("ACK: " + ack + "\n");
 			res = res.concat("UPDATE: " + update + "\n");
 			res = res.concat("NORMAL: " + normal + "\n");
-			res = res.concat("FIN: " + fin + "\n");
+			res = res.concat("FILE: " + file + "\n");
 			res = res.concat("BROADCASTED: " + broadcasted + "\n");
 			res = res.concat("\n");
 			res = res.concat("DATA: \n");
@@ -171,7 +171,6 @@ public class JRTVPacket {
 
 	public void setNextHop(int nextHop) {
 		this.nextHop = nextHop;
-		System.out.println("NExt hop setting to: " + this.nextHop);
 	}
 
 	private void setFlags(byte[] flags) {
@@ -194,7 +193,7 @@ public class JRTVPacket {
 			value -= 16;
 		}
 		if (value >= 8) {
-			fin = true;
+			file = true;
 			value -= 8;
 		}
 		if (value >= 4) {
@@ -226,7 +225,7 @@ public class JRTVPacket {
 		if (normal) {
 			value += 16;
 		}
-		if (fin) {
+		if (file) {
 			value += 8;
 		}
 		if (broadcasted) {
@@ -372,12 +371,12 @@ public class JRTVPacket {
 		this.normal = normal;
 	}
 
-	public boolean isFin() {
-		return fin;
+	public boolean isFile() {
+		return file;
 	}
 
-	public void setFin(boolean fin) {
-		this.fin = fin;
+	public void setFile(boolean file) {
+		this.file = file;
 	}
 	
 	public boolean isBroadcasted() {

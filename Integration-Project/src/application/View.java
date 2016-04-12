@@ -17,6 +17,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
@@ -43,6 +44,7 @@ public class View extends Application {
 	//Initializing all controls on of the program
 	TextArea chatText = new TextArea();
 	Button sendButton = new Button();
+	Button sendFileButton = new Button();
 	TextField inputField = new TextField();
 	Button nameButton = new Button();
 	TextField nameField = new TextField();
@@ -182,12 +184,27 @@ public class View extends Application {
 			    }
 			});
 			
+			sendFileButton.setId("sendButton");
+			sendFileButton.setText("Send File");
+			sendFileButton.setPrefSize( Double.MAX_VALUE, Double.MAX_VALUE );
+			sendFileButton.setDisable(true);
+			sendFileButton.setOnAction(new EventHandler<ActionEvent>() {
+			    @Override 
+			    public void handle(ActionEvent e) {
+		    		File file = (new FileChooser()).showOpenDialog(primaryStage);
+			    	if (file != null) {
+			    		sendFile(file);
+			    	}
+			    }
+			});
+			
 		    
 			//Put all the controls in the pane.
 			root.add(nameField, 0, 0, 2, 1);
 			root.add(nameButton, 1, 0, 1, 1);
 			root.add(chatText, 0, 2, 3, 1);
 			root.add(recipient, 0, 4, 1, 1);
+			root.add(sendFileButton, 1, 4, 1, 1);
 			root.add(inputField, 0, 6, 2, 1);
 			root.add(sendButton, 1, 6, 1, 1);
 			
@@ -216,6 +233,21 @@ public class View extends Application {
 		}
 	}
 	
+	private void sendFile(File file) {
+		if (selectedRecipient == null) {
+			showDialog("You did not select a recipient.\nYou might have lost connection");
+		} else {
+			String dest;
+			
+			if (selectedRecipient.equals("All")) {
+				showDialog("You cannot send a file in a group chat!");
+			} else {
+				dest = selectedRecipient;
+				controller.sendFile(file, dest);
+			}
+		}
+	}
+	
 	byte[] unpack(int bytes) {
 		return new byte[] {
 			(byte)((bytes >>> 24) & 0xff),
@@ -231,6 +263,7 @@ public class View extends Application {
 		recipient.setDisable(false);
 		sendButton.setDisable(false);
 		nameButton.setDisable(false);
+		sendFileButton.setDisable(false);
 		chatText.appendText("\nSYS Connection Ready!");
 		try {
 			chatText.appendText("\nSYS Your IP is: " + InetAddress.getByAddress(unpack(address)).getHostAddress().toString());
@@ -394,7 +427,6 @@ public class View extends Application {
 			selectedRecipient = recipient;
 			lastSelectedRecipient = recipient;
 			newMessagesAmount.put(recipient, 0);
-			updateRecipient();
 		}
 	}
 	

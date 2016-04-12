@@ -19,7 +19,7 @@ public class TimeOutTimer extends Thread {
 		this.packet.setSyn(packet.isSyn());
 		this.packet.setUpdate(packet.isUpdate());
 		this.packet.setNormal(packet.isNormal());
-		this.packet.setFin(packet.isFin());
+		this.packet.setFile(packet.isFile());
 		this.packet.setBroadcasted(packet.isBroadcasted());
 		this.packet.setRSA(packet.isRSA());
 		this.packet.setDiffie(packet.isDiffie());
@@ -42,7 +42,7 @@ public class TimeOutTimer extends Thread {
 		this.packet.setSyn(packet.isSyn());
 		this.packet.setUpdate(packet.isUpdate());
 		this.packet.setNormal(packet.isNormal());
-		this.packet.setFin(packet.isFin());
+		this.packet.setFile(packet.isFile());
 		this.packet.setBroadcasted(packet.isBroadcasted());
 		this.packet.setRSA(packet.isRSA());
 		this.packet.setDiffie(packet.isDiffie());
@@ -84,7 +84,7 @@ public class TimeOutTimer extends Thread {
 						p.setSyn(packet.isSyn());
 						p.setUpdate(packet.isUpdate());
 						p.setNormal(packet.isNormal());
-						p.setFin(packet.isFin());
+						p.setFile(packet.isFile());
 						p.setBroadcasted(packet.isBroadcasted());
 						p.setRSA(packet.isRSA());
 						p.setDiffie(packet.isDiffie());

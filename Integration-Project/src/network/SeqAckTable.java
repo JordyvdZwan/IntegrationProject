@@ -79,25 +79,26 @@ public class SeqAckTable {
 //		System.out.println("In de registerAck is dit de data : \n" + packet.toString());
 		int address = packet.getSource();
 		int seq = packet.getAcknr();
-		System.out.println("Zit deze source in de send list? " + send.containsKey(address));
 		if (send.containsKey(address)) {
-			System.out.println("Zit deze seq in de send list? " + send.get(address).containsKey(seq));
 			if (send.get(address).containsKey(seq)) {
-				System.out.println("Registered ACK: " + Router.getStringIP(address) + " " + seq);
 				send.get(address).put(seq, true);
 			}
 		}
+		controller.getFileManager().handleFileAck(packet.getAcknr());
 	}
 	
 	public void registerSendPacket(JRTVPacket packet) {
 //		System.out.println("REGISTER PACKET:");
+		if (packet.isFile()) {
+			controller.getFileManager().registerSeqNr(packet.getSeqnr(), (new FilePacket(packet.getByteMessage()).getSequenceNumber()));
+		}
 		if (packet.getDestination() == Controller.multicastAddress) {
 			for (Integer integer : controller.getForwardingTable().keySet()) {
 				if (integer != controller.getLocalIAddress() && integer != Controller.multicastAddress) {
 					if (!send.containsKey(integer)) {
 						send.put(integer, new HashMap<Integer, Boolean>());
 					}
-					System.out.println("putting in: " + Router.getStringIP(integer) + " " + packet.getSeqnr());
+//					System.out.println("putting in: " + Router.getStringIP(integer) + " " + packet.getSeqnr());
 					send.get(integer).put(packet.getSeqnr(), false);
 				}
 			}
@@ -106,7 +107,6 @@ public class SeqAckTable {
 				send.put(packet.getDestination(), new HashMap<Integer, Boolean>());
 			}
 			send.get(packet.getDestination()).put(packet.getSeqnr(), false);
-			
 		}
 		if (controller.getForwardingTable().keySet().size() > 0) {
 			TimeOutTimer timeout = new TimeOutTimer(packet, this);
