@@ -16,6 +16,8 @@ import security.RSA;
 
 public class Router {
 	
+	public static final int MAXINFINITY = 5;
+	
 	/**
 	 * main controller needed for basic info and transmitting data.
 	 */
@@ -259,7 +261,11 @@ public class Router {
 //				 && packet.getSource() != controller.getLocalIAddress()
 				for (int i = 0; i < integers.length / 2; i++) {
 					if (integers[i * 2] != controller.getLocalIAddress() && integers[i * 2] != controller.multicastAddress && packet.getSource() != controller.getLocalIAddress()) {//TODO CHANGE THIS BACK
-						table.addHop(integers[i * 2], packet.getSource(), integers[(i * 2) + 1] + 1);
+						if (integers[(i * 2) + 1] < MAXINFINITY) {
+							table.addHop(integers[i * 2], packet.getSource(), integers[(i * 2) + 1]);
+						} else {
+							table.removeNextHop(integers[i * 2], packet.getSource());
+						}
 					}
 				}
 				
