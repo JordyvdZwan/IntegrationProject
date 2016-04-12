@@ -6,6 +6,9 @@ import java.net.MulticastSocket;
 import java.net.SocketException;
 import java.net.InetAddress;
 import java.util.List;
+
+import application.Controller;
+
 import java.util.ArrayList;
 
 
@@ -16,9 +19,10 @@ public class Connection extends Thread {
 	InetAddress paddress;
 	List<DatagramPacket> queuedpackets = new ArrayList<DatagramPacket>();
 	Update update;
+	Controller controller;
 	
-	public Connection(int portnumber, String mcaddress) {
-		
+	public Connection(int portnumber, String mcaddress, Controller controller) {
+		this.controller = controller;
 		try {
 			InetAddress address = InetAddress.getByName(mcaddress);
 			socket = new MulticastSocket(portnumber);

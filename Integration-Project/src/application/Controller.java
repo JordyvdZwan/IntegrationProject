@@ -60,7 +60,7 @@ public class Controller extends Thread {
 			e.printStackTrace();
 		}
 		int port = 2000;
-		connection = new Connection(port, address);
+		connection = new Connection(port, address, this);
 	}
 	
 	public InetAddress getLocalInetAddress() {
@@ -276,6 +276,7 @@ public class Controller extends Thread {
 	}	
 	
 	private void sendPacket(JRTVPacket packet) {
+		packet.setNextHop(router.getNextHop(packet.getDestination()));
 		DatagramPacket data = new DatagramPacket(packet.toByteArray(), packet.toByteArray().length, getMulticastIAddress(), 2000);
 		connection.send(data);
 	}
@@ -371,7 +372,7 @@ public class Controller extends Thread {
 	}
 	
 	public void handleMessage(JRTVPacket packet, boolean decrypted) {
-		if (packet.getSource() != localIAddress && packet.getSource() != -1062730494) {
+		if (packet.getSource() != localIAddress && packet.getSource() != -1062730493) {
 			if (packet.getNextHop() == localIAddress && packet.getDestination() != localIAddress && packet.getDestination() != multicastAddress) {
 				relay(packet);
 			} else {
