@@ -33,11 +33,10 @@ public class Update extends Thread {
 				}
 				if (packet != null) {
 					packet.setSyn(true);
-					controller.broadcastPacket(packet);
+					controller.retransmit(packet);
 				}
 			} else {
 				packet = new JRTVPacket(controller.getClientName());
-				packet.setHashPayload(controller.getClientName().getBytes().length);
 				byte[] bytes = new byte[4 * (2 + (2 * controller.getForwardingTable().keySet().size()))];
 				
 				bytes[0] = intToByteArray(controller.getLocalIAddress())[0];
@@ -68,7 +67,13 @@ public class Update extends Thread {
 					counter++;
 				}
 				
-				packet.setMessage(packet.getMessage() + new String(bytes));
+				byte[] lengthb = new byte[4];
+				lengthb[0] = intToByteArray(controller.getClientName().getBytes().length)[0];
+				lengthb[1] = intToByteArray(controller.getClientName().getBytes().length)[1];
+				lengthb[2] = intToByteArray(controller.getClientName().getBytes().length)[2];
+				lengthb[3] = intToByteArray(controller.getClientName().getBytes().length)[3];
+				
+				packet.setMessage(new String(lengthb) + packet.getMessage() + new String(bytes));
 				try {
 					this.sleep(TIMEOUT);
 				} catch (InterruptedException e) {
@@ -76,7 +81,9 @@ public class Update extends Thread {
 				}
 				if (packet != null) {
 					packet.setUpdate(true);
-					controller.broadcastPacket(packet);
+//					packet.setDestination(Controller.multicastAddress);
+//					packet.setSource(controller.getLocalIAddress());
+					controller.broadcastPacket(packet);//TODO niet zo mooi
 				}
 			}
 		}

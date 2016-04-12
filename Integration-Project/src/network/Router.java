@@ -65,43 +65,79 @@ public class Router {
 			int random = (int) (Math.random() * Integer.MAX_VALUE);
 			int totalLength = length1 + length2 + length3;
 			
-			//Creating the byte array and putting in all data like lengths and keys.
-			byte[] bytes = new byte[4 + totalLength];
+			byte[] randomBytes = new byte[4];
+			byte[] length1Bytes = new byte[4];
+			byte[] length2Bytes = new byte[4];
+			byte[] length3Bytes = new byte[4];
 			
-			byte[] randomBytes = unpack(random);
+//			byte[] randomBytes = new byte[4];
+			
+			//Creating the byte array and putting in all data like lengths and keys.
+			byte[] bytes = new byte[16 + totalLength];
+			
+			randomBytes = intToByteArray(random);
 			bytes[0] = randomBytes[0];
 			bytes[1] = randomBytes[1];
 			bytes[2] = randomBytes[2];
 			bytes[3] = randomBytes[3];
 			
-			byte[] length1Bytes = unpack(random);
+			length1Bytes = intToByteArray(length1);
 			bytes[4] = length1Bytes[0];
 			bytes[5] = length1Bytes[1];
 			bytes[6] = length1Bytes[2];
 			bytes[7] = length1Bytes[3];
 			
-			byte[] length2Bytes = unpack(random);
+			length2Bytes = intToByteArray(length2);
 			bytes[8] = length2Bytes[0];
 			bytes[9] = length2Bytes[1];
 			bytes[10] = length2Bytes[2];
 			bytes[11] = length2Bytes[3];
 			
-			byte[] length3Bytes = unpack(random);
+			length3Bytes = intToByteArray(length3);
 			bytes[12] = length3Bytes[0];
 			bytes[13] = length3Bytes[1];
 			bytes[14] = length3Bytes[2];
 			bytes[15] = length3Bytes[3];
 			
-			System.arraycopy(keys[0], 0, bytes, 16, length1);
-			System.arraycopy(keys[1], 0, bytes, 16 + length1, length2);
-			System.arraycopy(keys[2], 0, bytes, 16 + length1 + length2, length3);
+			byte[] one = keys[0].toByteArray();
+			byte[] two = keys[1].toByteArray();
+			byte[] three = keys[2].toByteArray();
+			
+			System.arraycopy(one, 0, bytes, 16, length1);
+			System.arraycopy(two, 0, bytes, 16 + length1, length2);
+			System.arraycopy(three, 0, bytes, 16 + length1 + length2, length3);
+			
+			this.encryption.put(destination, encryption);
+			this.diffiePacketOutstanding.put(destination, true);
+			this.sendDiffiePacketInt.put(destination, random);
 			
 			//Putting data in new packet and sending it.
-			String message = new String(bytes);
-			JRTVPacket packet = new JRTVPacket(message);
+			JRTVPacket packet = new JRTVPacket("");
+			packet.setByteMessage(bytes);
 			packet.setDiffie(true);
+			
+			
+//			sendDiffieResponse(bytes, packet);
+			packet.setSource(controller.getLocalIAddress());
+			packet.setDestination(destination);
 			controller.sendPacket(destination, packet);
 		}
+	}
+	
+	private static int byteArrayToInt(byte[] b) {
+	    return   b[3] & 0xFF |
+	            (b[2] & 0xFF) << 8 |
+	            (b[1] & 0xFF) << 16 |
+	            (b[0] & 0xFF) << 24;
+	}
+
+	private static byte[] intToByteArray(int a) {
+	    return new byte[] {
+	        (byte) ((a >> 24) & 0xFF),
+	        (byte) ((a >> 16) & 0xFF),   
+	        (byte) ((a >> 8) & 0xFF),   
+	        (byte) (a & 0xFF)
+	    };
 	}
 	
 	/**
@@ -112,54 +148,61 @@ public class Router {
 	public void processDiffie(JRTVPacket packet) {
 		if (packet.isAck()) {
 			//Finish encryption setup.
-			BigInteger i = new BigInteger(packet.getMessage().getBytes());
+			BigInteger i = new BigInteger(packet.getByteMessage());
 			encryption.get(packet.getSource()).keyDiffieHellmanFinal(i);
 		} else {
 			//Send diffie/ack message to the source of the diffie message if the random value is larger than the one send (if send).
-			byte[] bytes = packet.getMessage().getBytes();
-			int random = byteArrayToInt(Arrays.copyOfRange(bytes, 0, 4));
-			if (!diffiePacketOutstanding.get(packet.getSource()) ) { //TODO fix possible bug??
-				//read data and put into variables.
-				int length1 = byteArrayToInt(Arrays.copyOfRange(bytes, 4, 8));
-				int length2 = byteArrayToInt(Arrays.copyOfRange(bytes, 8, 12));
-				int length3 = byteArrayToInt(Arrays.copyOfRange(bytes, 12, 16));
-				
-				BigInteger[] numbers = new BigInteger[3];
-				
-				numbers[0] = new BigInteger(Arrays.copyOfRange(bytes, 16, length1));
-				numbers[1] = new BigInteger(Arrays.copyOfRange(bytes, 16 + length1, length2));
-				numbers[2] = new BigInteger(Arrays.copyOfRange(bytes, 16 + length1 + length2, length3));
-				
-				//Create encryption
-				CreateEncryptedSessionPacket encryption = new CreateEncryptedSessionPacket();
-				BigInteger reply = encryption.keyDiffieHellmanSecond(numbers);
-				this.encryption.put(packet.getSource(), encryption);
-				
-				JRTVPacket p = new JRTVPacket(new String(reply.toByteArray()));
-				p.setAck(true);
-				p.setDiffie(true);
-				controller.sendPacket(packet.getSource(), p);
-			} else if (diffiePacketOutstanding.get(packet.getSource()) && sendDiffiePacketInt.get(packet.getSource()) < random) {
-				//read data and put into variables.
-				int length1 = byteArrayToInt(Arrays.copyOfRange(bytes, 4, 8));
-				int length2 = byteArrayToInt(Arrays.copyOfRange(bytes, 8, 12));
-				int length3 = byteArrayToInt(Arrays.copyOfRange(bytes, 12, 16));
-				
-				BigInteger[] numbers = new BigInteger[3];
-				
-				numbers[0] = new BigInteger(Arrays.copyOfRange(bytes, 16, length1));
-				numbers[1] = new BigInteger(Arrays.copyOfRange(bytes, 16 + length1, length2));
-				numbers[2] = new BigInteger(Arrays.copyOfRange(bytes, 16 + length1 + length2, length3));
-				
-				//Create encryption
-				BigInteger reply = encryption.get(packet.getSource()).keyDiffieHellmanSecond(numbers);
-				
-				JRTVPacket p = new JRTVPacket(new String(reply.toByteArray()));
-				p.setAck(true);
-				p.setDiffie(true);
-				controller.sendPacket(packet.getSource(), p);
+			
+			byte[] bytes = packet.getByteMessage();
+			
+			byte[] randomb = new byte[4];
+			System.arraycopy(bytes, 0, randomb, 0, 4);
+			int random = byteArrayToInt(randomb);
+			
+			if (!(diffiePacketOutstanding.containsKey(packet.getSource()) && diffiePacketOutstanding.get(packet.getSource()))) { //TODO fix possible bug??
+				sendDiffieResponse(bytes, packet);
+			} else if ((diffiePacketOutstanding.containsKey(packet.getSource()) && diffiePacketOutstanding.get(packet.getSource())) && sendDiffiePacketInt.get(packet.getSource()) <= random) {//Changeg the ==
+				sendDiffieResponse(bytes, packet);
 			}
 		}
+	}
+	
+	public void sendDiffieResponse(byte[] bytes, JRTVPacket packet) {
+		byte[] lengthb1 = new byte[4];
+		byte[] lengthb2 = new byte[4];
+		byte[] lengthb3 = new byte[4];
+		
+		System.arraycopy(bytes, 4, lengthb1, 0, 4);
+		System.arraycopy(bytes, 8, lengthb2, 0, 4);
+		System.arraycopy(bytes, 12, lengthb3, 0, 4);
+		
+		int length1 = byteArrayToInt(lengthb1);
+		int length2 = byteArrayToInt(lengthb2);
+		int length3 = byteArrayToInt(lengthb3);
+		BigInteger[] numbers = new BigInteger[3];
+		
+		byte[] number1 = new byte[length1];
+		byte[] number2 = new byte[length2];
+		byte[] number3 = new byte[length3];
+		
+		System.arraycopy(bytes, 16, number1, 0, length1);
+		System.arraycopy(bytes, 16 + length1, number2, 0, length2);
+		System.arraycopy(bytes, 16 + length1 + length2, number3, 0, length3);
+
+		numbers[0] = new BigInteger(number1);
+		numbers[1] = new BigInteger(number2);
+		numbers[2] = new BigInteger(number3);
+		
+		//Create encryption
+		CreateEncryptedSessionPacket encryption = new CreateEncryptedSessionPacket();
+		BigInteger reply = encryption.keyDiffieHellmanSecond(numbers);
+		this.encryption.put(packet.getSource(), encryption);
+		
+		JRTVPacket p = new JRTVPacket("");
+		p.setByteMessage(reply.toByteArray());
+		p.setAck(true);
+		p.setDiffie(true);
+		controller.sendPacket(packet.getSource(), p);
 	}
 	
 	public CreateEncryptedSessionPacket getEncryption(int destination) {
@@ -194,14 +237,15 @@ public class Router {
 	
 	public void processUpdate(JRTVPacket packet) {
 		if (!controller.getSettingUp()) {
-	//		if (packet.getSource() != controller.getLocalIAddress() && packet.getSource() != 0) {
+			if (packet.getSource() != controller.getLocalIAddress() && packet.getSource() != 0) {
 				//Puts true into the list with valid hops
 				table.getvalidhops().put(packet.getSource(), true);
 				//TODO: Split at destination, next hop and put these into the forwardingtables
 				byte[] bytes = packet.getMessage().getBytes();
-				byte[] addresses = new byte[bytes.length - packet.getHashPayload()];
+				int length = byteArrayToInt(Arrays.copyOfRange(bytes, 0, 4));
+				byte[] addresses = new byte[bytes.length - length - 4];
 				
-				System.arraycopy(bytes, packet.getHashPayload(), addresses, 0, bytes.length - packet.getHashPayload());
+				System.arraycopy(bytes, length + 4, addresses, 0, bytes.length - length - 4);
 				Integer[] integers = new Integer[addresses.length / 4];
 				
 				for (int i = 0; i < integers.length; i++) {
@@ -209,9 +253,10 @@ public class Router {
 					System.arraycopy(addresses, (i * 4), b, 0, 4);
 					integers[i] = byteArrayToInt(b);
 				}
-				
+//				
+//				 && packet.getSource() != controller.getLocalIAddress()
 				for (int i = 0; i < integers.length / 2; i++) {
-					if (integers[i * 2] != controller.getLocalIAddress()) {
+					if (integers[i * 2] != controller.getLocalIAddress() && integers[i * 2] != controller.multicastAddress && packet.getSource() != controller.getLocalIAddress()) {//TODO CHANGE THIS BACK
 						table.addHop(integers[i * 2], packet.getSource(), integers[(i * 2) + 1]);
 					}
 				}
@@ -224,14 +269,13 @@ public class Router {
 					timeouts.get(packet.getSource()).start();
 				}
 	
-				byte[] nameBytes = new byte[packet.getHashPayload()];
-				System.arraycopy(packet.getMessage().getBytes(), 0, nameBytes, 0, packet.getHashPayload());
+				byte[] nameBytes = new byte[length];
+				System.arraycopy(packet.getMessage().getBytes(), 4, nameBytes, 0, length);
 				String name = new String(nameBytes);
 				if (!name.equals("Anonymous")) {
 					if (addresstable.containsKey(packet.getSource())) {
 						if (addresstable.get(packet.getSource())!= null && !addresstable.get(packet.getSource()).equals("(" + getStringIP(packet.getSource()) + ") " + name)) {
 							controller.removeRecipientToView(getName(packet.getSource()));
-							System.out.println("Is it gone?");
 							addresstable.remove(packet.getSource());
 						}
 					}
@@ -239,8 +283,11 @@ public class Router {
 					controller.addRecipientToView("(" + getStringIP(packet.getSource()) + ") " + name);
 					//TODO name changing
 				}
-	//		}
+			}
 		}
+		System.out.println("=-------------------------------------------------------------------------------=");
+		System.out.println(table.getTable());
+		System.out.println("=-------------------------------------------------------------------------------=");
 	}
 	
 	public void removeFromTimeout(Integer source) {
@@ -290,13 +337,6 @@ public class Router {
 	//||                                              Util methods:                                                       ||  
 	//======================================================================================================================
 
-	private static int byteArrayToInt(byte[] b) {
-	    return   b[3] & 0xFF |
-	            (b[2] & 0xFF) << 8 |
-	            (b[1] & 0xFF) << 16 |
-	            (b[0] & 0xFF) << 24;
-	}
-	
 	static byte[] unpack(int bytes) {
 		return new byte[] {
 			(byte)((bytes >>> 24) & 0xff),
