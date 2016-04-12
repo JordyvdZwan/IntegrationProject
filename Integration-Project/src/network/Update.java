@@ -52,17 +52,17 @@ public class Update extends Thread {
 				int counter = 0;
 				for (Integer integer : controller.getForwardingTable().keySet()) {
 					
-					bytes[(counter * 8) + 12] = intToByteArray(integer)[0];
-					bytes[(counter * 8) + 13] = intToByteArray(integer)[1];
-					bytes[(counter * 8) + 14] = intToByteArray(integer)[2];
-					bytes[(counter * 8) + 15] = intToByteArray(integer)[3];
+					bytes[(counter * 8) + 8] = intToByteArray(integer)[0];
+					bytes[(counter * 8) + 9] = intToByteArray(integer)[1];
+					bytes[(counter * 8) + 10] = intToByteArray(integer)[2];
+					bytes[(counter * 8) + 11] = intToByteArray(integer)[3];
 					
 					Integer cost = controller.getRouter().getNextHopCost(integer) + 1;
 					
-					bytes[(counter * 8) + 16] = intToByteArray(cost)[0];
-					bytes[(counter * 8) + 17] = intToByteArray(cost)[1];
-					bytes[(counter * 8) + 18] = intToByteArray(cost)[2];
-					bytes[(counter * 8) + 19] = intToByteArray(cost)[3];
+					bytes[(counter * 8) + 12] = intToByteArray(cost)[0];
+					bytes[(counter * 8) + 13] = intToByteArray(cost)[1];
+					bytes[(counter * 8) + 14] = intToByteArray(cost)[2];
+					bytes[(counter * 8) + 15] = intToByteArray(cost)[3];
 					
 					counter++;
 				}
