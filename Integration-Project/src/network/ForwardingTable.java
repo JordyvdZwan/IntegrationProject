@@ -105,9 +105,11 @@ public class ForwardingTable {
 	 * @param nexthop the next hop that should be deleted
 	 */
 	public void removeNextHop(Integer destination, Integer nexthop) {
-		forwardingtable.get(destination).remove(nexthop);
-		if(forwardingtable.get(destination).size() == 0) {
-			forwardingtable.remove(destination);
+		if (forwardingtable.containsKey(destination)) {
+			forwardingtable.get(destination).remove(nexthop);
+			if(forwardingtable.get(destination).size() == 0) {
+				forwardingtable.remove(destination);
+			}
 		}
 	}
 	
