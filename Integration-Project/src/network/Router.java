@@ -271,7 +271,7 @@ public class Router {
 					}
 				}
 				
-				for (Integer address: ) {
+				for (Integer address: table.getPossibilities(packet.getSource())) {
 					if (!accessableAddresses.contains(address)) {
 						table.removeNextHop(address, packet.getSource());
 					}
