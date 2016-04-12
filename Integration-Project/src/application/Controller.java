@@ -230,10 +230,12 @@ public class Controller extends Thread {
 				packet = router.getEncryption(packet.getDestination()).encrypt(packet, RSA.getPrivateKey(localIAddress));//TODO RSA ?
 				outgoingEncryptionPackets.remove(packet);
 				sendPacket(packet);
+				break;
 			} else {
 				if (!router.isSettingUpDiffie(packet.getDestination()) && router.getForwardingTable().getTable().containsKey(packet.getDestination())) {
 					router.setupDiffie(packet.getDestination());
 				}
+				break;
 			}
 		}
 	}
