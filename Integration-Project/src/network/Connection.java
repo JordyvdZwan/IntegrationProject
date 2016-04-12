@@ -57,25 +57,22 @@ public class Connection extends Thread {
 	//Sends a datagrampacket coming from the client
 	public void send(DatagramPacket packet) {
 		try {
-			System.out.println("5");
-
 			JRTVPacket p = new JRTVPacket(packet.getData());
-			System.out.println(p.isDiffie());
-			if (p.isDiffie()) {
+			if (!p.isUpdate()) {
 				
 //				System.out.println("Received packet from " + recv.getAddress() + "with " + recv.getLength() +  " bytes of data");
 //				System.out.println("RECV Message: " + new JRTVPacket(recv.getData()).getMessage());
 //				JRTVPacket p = new JRTVPacket(recv.getData());
+				System.out.println("=================================================================================");
 				System.out.println("seq : " + p.getSeqnr());
 				System.out.println("ack: " + p.getAcknr());
-				System.out.println("DATA : " + p.getMessage());
+//				System.out.println("DATA : " + p.getMessage());
 				System.out.println("Destination : " + Router.getStringIP(p.getDestination()));
-				System.out.println("SOURCE: " + p.getSource());//Router.getStringIP()
+				System.out.println("SOURCE: " + Router.getStringIP(p.getSource()));//
 				System.out.println("NextHop: " + Router.getStringIP(p.getNextHop()));
+				System.out.println("=================================================================================");
 			}
-			System.out.println("6");
 			socket.send(packet);
-			System.out.println("7");
 		} catch (IOException e) {
 			
 			e.printStackTrace();

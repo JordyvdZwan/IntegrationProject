@@ -109,7 +109,6 @@ public class Controller extends Thread {
 				}
 			}
 //		}
-		System.out.println(localIAddress);
 		view.start(localIAddress);
 	}
 	
@@ -215,19 +214,12 @@ public class Controller extends Thread {
 	public void sendEncryptionMessages() {
 		for (int i = 0; i < outgoingEncryptionPackets.size(); i++) {
 			JRTVPacket packet = outgoingEncryptionPackets.get(i);
-//			System.out.println("Inside the encryption messages");
 			if (router.hasEncryptionKey(packet.getDestination())) {
-//				System.out.println("has encryption");
 				packet = router.getEncryption(packet.getDestination()).encrypt(packet, RSA.getPrivateKey(localIAddress));//TODO RSA ?
 				outgoingEncryptionPackets.remove(packet);
 				sendPacket(packet);
 			} else {
-//				System.out.println("has no encryption");
-//				System.out.println("Destination: " + Router.getStringIP(packet.getDestination()));
-//				System.out.println(!router.isSettingUpDiffie(packet.getDestination()));
-//				System.out.println(router.getForwardingTable().getTable().containsKey(packet.getDestination()));
 				if (!router.isSettingUpDiffie(packet.getDestination()) && router.getForwardingTable().getTable().containsKey(packet.getDestination())) {
-//					System.out.println("HI!");
 					router.setupDiffie(packet.getDestination());
 				}
 			}
@@ -248,15 +240,7 @@ public class Controller extends Thread {
 				System.arraycopy(message2, 0, first2, 0, first2.length);
 				System.arraycopy(message2, message2.length - second2.length, second2, 0, second2.length);
 				
-				System.out.println("First: " + first2.length);
-				System.out.println("Second: " + second2.length + " - " + second2.length);
-				
 				String decrypted = RSA.decrypt(second2, RSA.getPublicKey(packet.getSource()));//TODO rsa ok?
-				
-				System.out.println("==============================================================================================");
-				System.out.println("decrypted: " + decrypted);
-				System.out.println("first2: " + new String(RSA.hash(first2)));
-				System.out.println("==============================================================================================");
 				
 				if (decrypted.equals(new String(RSA.hash(first2)))) {
 					packet.setByteMessage(first2);
@@ -336,7 +320,6 @@ public class Controller extends Thread {
 	
 	
 	public void receiveFromView(String client, String message) {
-		System.out.println("FROM VIEW TO: " + client);
 		JRTVPacket packet = new JRTVPacket(message);
 		packet.setNormal(true);
 		sendPacket(client, packet);
@@ -414,7 +397,6 @@ public class Controller extends Thread {
 	}
 	
 	private void handleDiffie(JRTVPacket packet) {
-		System.out.println("Reached handleDiffie");
 		router.processDiffie(packet);
 	}
 	

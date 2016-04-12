@@ -55,7 +55,6 @@ public class Router {
 	 * @param destination Address of the client with whom to set up a secured connection.
 	 */
 	public void setupDiffie(int destination) {
-		System.out.println("1");
 		if (!diffiePacketOutstanding.containsKey(destination) || !diffiePacketOutstanding.get(destination)) {
 			//Creating encryption class and setting values that need to be added to the packet.
 			CreateEncryptedSessionPacket encryption = new CreateEncryptedSessionPacket();
@@ -70,11 +69,6 @@ public class Router {
 			byte[] length1Bytes = new byte[4];
 			byte[] length2Bytes = new byte[4];
 			byte[] length3Bytes = new byte[4];
-			
-			System.out.println(random);
-			System.out.println(length1);
-			System.out.println(length2);
-			System.out.println(length3);
 			
 //			byte[] randomBytes = new byte[4];
 			
@@ -105,11 +99,6 @@ public class Router {
 			bytes[14] = length3Bytes[2];
 			bytes[15] = length3Bytes[3];
 			
-			System.out.println(byteArrayToInt(randomBytes));
-			System.out.println(byteArrayToInt(length1Bytes));
-			System.out.println(byteArrayToInt(length2Bytes));
-			System.out.println(byteArrayToInt(length3Bytes));
-			
 			byte[] one = keys[0].toByteArray();
 			byte[] two = keys[1].toByteArray();
 			byte[] three = keys[2].toByteArray();
@@ -129,7 +118,6 @@ public class Router {
 			
 			
 //			sendDiffieResponse(bytes, packet);
-//			System.out.println("SENDING THE DIFFIE PACKET!!!! MUAUAHAHAHAHAH");
 			packet.setSource(controller.getLocalIAddress());
 			packet.setDestination(destination);
 			controller.sendPacket(destination, packet);
@@ -158,14 +146,11 @@ public class Router {
 	 * @param packet Received packet from a client, which wants to set up a secured connection.
 	 */
 	public void processDiffie(JRTVPacket packet) {
-		System.out.println("Reached proccesDiffie");
 		if (packet.isAck()) {
-			System.out.println("Reached proccesDiffie diffie ack");
 			//Finish encryption setup.
 			BigInteger i = new BigInteger(packet.getByteMessage());
 			encryption.get(packet.getSource()).keyDiffieHellmanFinal(i);
 		} else {
-			System.out.println("Reached proccesDiffie diffie");
 			//Send diffie/ack message to the source of the diffie message if the random value is larger than the one send (if send).
 			
 			byte[] bytes = packet.getByteMessage();
@@ -174,12 +159,9 @@ public class Router {
 			System.arraycopy(bytes, 0, randomb, 0, 4);
 			int random = byteArrayToInt(randomb);
 			
-			System.out.println(random);
-			System.out.println(sendDiffiePacketInt.get(packet.getSource()));
 			if (!(diffiePacketOutstanding.containsKey(packet.getSource()) && diffiePacketOutstanding.get(packet.getSource()))) { //TODO fix possible bug??
 				sendDiffieResponse(bytes, packet);
 			} else if ((diffiePacketOutstanding.containsKey(packet.getSource()) && diffiePacketOutstanding.get(packet.getSource())) && sendDiffiePacketInt.get(packet.getSource()) <= random) {//Changeg the ==
-				System.out.println("Going to send diffie response method");
 				sendDiffieResponse(bytes, packet);
 			}
 		}
@@ -197,13 +179,7 @@ public class Router {
 		int length1 = byteArrayToInt(lengthb1);
 		int length2 = byteArrayToInt(lengthb2);
 		int length3 = byteArrayToInt(lengthb3);
-		System.out.println("2");
 		BigInteger[] numbers = new BigInteger[3];
-		
-
-		System.out.println(length1);
-		System.out.println(length2);
-		System.out.println(length3);
 		
 		byte[] number1 = new byte[length1];
 		byte[] number2 = new byte[length2];
@@ -212,7 +188,7 @@ public class Router {
 		System.arraycopy(bytes, 16, number1, 0, length1);
 		System.arraycopy(bytes, 16 + length1, number2, 0, length2);
 		System.arraycopy(bytes, 16 + length1 + length2, number3, 0, length3);
-		System.out.println("3");
+
 		numbers[0] = new BigInteger(number1);
 		numbers[1] = new BigInteger(number2);
 		numbers[2] = new BigInteger(number3);
@@ -226,7 +202,6 @@ public class Router {
 		p.setByteMessage(reply.toByteArray());
 		p.setAck(true);
 		p.setDiffie(true);
-		System.out.println("Sending");
 		controller.sendPacket(packet.getSource(), p);
 	}
 	
@@ -268,9 +243,6 @@ public class Router {
 				//TODO: Split at destination, next hop and put these into the forwardingtables
 				byte[] bytes = packet.getMessage().getBytes();
 				int length = byteArrayToInt(Arrays.copyOfRange(bytes, 0, 4));
-				System.out.println(packet.getMessage());
-				System.out.println(bytes.length);
-				System.out.println(length);
 				byte[] addresses = new byte[bytes.length - length - 4];
 				
 				System.arraycopy(bytes, length + 4, addresses, 0, bytes.length - length - 4);
@@ -313,7 +285,9 @@ public class Router {
 				}
 			}
 		}
+		System.out.println("=-------------------------------------------------------------------------------=");
 		System.out.println(table.getTable());
+		System.out.println("=-------------------------------------------------------------------------------=");
 	}
 	
 	public void removeFromTimeout(Integer source) {
