@@ -38,6 +38,8 @@ import javafx.scene.text.TextFlow;
 
 public class View extends Application {
 	
+	public static final int MAXINPUTLENGTH = 200;
+	
 	//Initializing all controls on of the program
 	TextArea chatText = new TextArea();
 	Button sendButton = new Button();
@@ -345,6 +347,8 @@ public class View extends Application {
 	private void send() {
 		if (selectedRecipient == null) {
 			showDialog("You did not select a recipient.\nIt might have changed its name");
+		} else if (inputField.getText().length() > MAXINPUTLENGTH) {
+			showDialog("Too many characters");
 		} else {
 			if (!inputField.getText().isEmpty()) {
 				String dest;
