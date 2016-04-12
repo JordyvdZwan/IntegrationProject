@@ -1,5 +1,6 @@
 package network;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.net.InetAddress;
@@ -36,7 +37,8 @@ public class EntryTimeOut extends Thread {
 				e.printStackTrace();
 			}
 		}
-		Set<Integer> test = router.getForwardingTable().getTable().keySet();
+		Set<Integer> test = new HashSet<Integer>();
+		test.addAll(router.getForwardingTable().getTable().keySet());
 		for(Integer i: test) {
 			if(router.getForwardingTable().getTable().get(i).keySet().contains(nexthop)) {
 				router.getForwardingTable().getTable().get(i).remove(nexthop);
