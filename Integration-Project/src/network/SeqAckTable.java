@@ -33,6 +33,9 @@ public class SeqAckTable {
 		if (receivedSeqNrs.containsKey(source)) {
 			found = receivedSeqNrs.get(source).contains(seq);
 		}
+		if (seq == 0) {
+			found = false;
+		}
 		return found;
 	}
 	

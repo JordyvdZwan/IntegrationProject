@@ -328,7 +328,7 @@ public class Controller extends Thread {
 	public void handleMessage(JRTVPacket packet, boolean decrypted) {
 		if (packet.getSource() != localIAddress) {
 			if (packet.getNextHop() == localIAddress && packet.getDestination() != localIAddress && packet.getDestination() != multicastAddress) {
-				sendAck(packet);
+				retransmit(packet);
 			} else {
 				if (packet.getDestination() == localIAddress || packet.getDestination() == multicastAddress) {
 					if (!decrypted) {// && !packet.isAck() && !packet.isUpdate()
@@ -337,6 +337,9 @@ public class Controller extends Thread {
 							sendAck(packet);
 						}
 					} else {
+						System.out.println(packet.toString());
+						System.out.println("Received: " + (!seqAckTable.isReceivedSeqNr(packet.getSource(), packet.getSeqnr())));
+						System.out.println("Is Update: " + packet.isUpdate());
 						if (!seqAckTable.isReceivedSeqNr(packet.getSource(), packet.getSeqnr()) || packet.isUpdate()) {
 							seqAckTable.addReceivedSeqNr(packet.getSource(), packet.getSeqnr());
 							if(packet.isNormal()) {
@@ -353,7 +356,7 @@ public class Controller extends Thread {
 								handleDiffie(packet);
 							} else {
 								System.out.println("Handling ack?");
-								if (packet.getMessage().equals("ACK")) {
+								if (packet.getMessage().contains("ACK")) {
 									System.out.println("Yes!");
 									seqAckTable.registerAckPacket(packet);
 								}
