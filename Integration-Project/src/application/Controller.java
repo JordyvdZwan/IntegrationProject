@@ -225,7 +225,7 @@ public class Controller extends Thread {
 			JRTVPacket packet = outgoingEncryptionPackets.get(i);
 			if (router.hasEncryptionKey(packet.getDestination())) {
 				System.out.println("======================== Before the encryption ==============================================");
-				System.out.println(packet.getMessage());
+				System.out.println(packet.toString());
 				System.out.println("=============================================================================================");
 				packet = router.getEncryption(packet.getDestination()).encrypt(packet, RSA.getPrivateKey(localIAddress));//TODO RSA ?
 				outgoingEncryptionPackets.remove(packet);

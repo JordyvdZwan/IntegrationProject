@@ -149,7 +149,9 @@ public class Router {
 		if (packet.isAck()) {
 			//Finish encryption setup.
 			BigInteger i = new BigInteger(packet.getByteMessage());
-			encryption.get(packet.getSource()).keyDiffieHellmanFinal(i);
+			if (encryption.containsKey(packet.getSource())) {
+				encryption.get(packet.getSource()).keyDiffieHellmanFinal(i);
+			}
 		} else {
 			//Send diffie/ack message to the source of the diffie message if the random value is larger than the one send (if send).
 			
