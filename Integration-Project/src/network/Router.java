@@ -261,7 +261,7 @@ public class Router {
 				List<Integer> accessableAddresses = new ArrayList<Integer>();
 //				 && packet.getSource() != controller.getLocalIAddress()
 				for (int i = 0; i < integers.length / 2; i++) {
-					accessableAddresses.add(i);
+					accessableAddresses.add(integers[i * 2]);
 					if (integers[i * 2] != controller.getLocalIAddress() && integers[i * 2] != controller.multicastAddress && packet.getSource() != controller.getLocalIAddress()) {//TODO CHANGE THIS BACK
 						if (integers[(i * 2) + 1] < MAXINFINITY) {
 							table.addHop(integers[i * 2], packet.getSource(), integers[(i * 2) + 1] + 1);
