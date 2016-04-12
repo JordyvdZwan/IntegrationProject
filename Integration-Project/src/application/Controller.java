@@ -144,7 +144,7 @@ public class Controller extends Thread {
 	public String getInitString() {
 		return initString;
 	}
-	
+//	  && !data.getAddress().toString().contains(".3")
 	public void run() {
 		update = new Update(this);
 		setupIP();
@@ -372,7 +372,7 @@ public class Controller extends Thread {
 	}
 	
 	public void handleMessage(JRTVPacket packet, boolean decrypted) {
-		if (packet.getSource() != localIAddress && packet.getSource() != -1062730493) {
+		if (packet.getSource() != localIAddress) {
 			if (packet.getNextHop() == localIAddress && packet.getDestination() != localIAddress && packet.getDestination() != multicastAddress) {
 				relay(packet);
 			} else {

@@ -197,7 +197,8 @@ public class View extends Application {
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
 			
-			conversations.put("Anonymous", "");
+			newMessagesAmount.put("All", 0);
+			conversations.put("All", "");
 			chatText.appendText("SYS Setting up Connection...");
 			startMedia.play();
 			primaryStage.addEventHandler(WindowEvent.WINDOW_SHOWN, new  EventHandler<WindowEvent>() {
@@ -247,12 +248,12 @@ public class View extends Application {
 	
 	private void updateRecipient() {
 		recipient.getItems().clear();
-		recipient.getItems().add("All");
+		recipient.getItems().add("All" + " (" + newMessagesAmount.get("All") + ")");
 		for (String name : recipients) {
 			if (newMessagesAmount.containsKey(name) && newMessagesAmount.get(name) != 0) {
 				recipient.getItems().add(name + " (" + newMessagesAmount.get(name) + ")");
 			} else {
-				recipient.getItems().add(name);
+				recipient.getItems().add(name + " (" + newMessagesAmount.get(name) + ")");
 			}
 		}
 		for (String item : recipient.getItems()) {
@@ -266,6 +267,7 @@ public class View extends Application {
 		try {
 			if (!recipients.contains(recipient) && !recipient.equals("Anonymous")) {
 				recipients.add(recipient);
+				newMessagesAmount.put(recipient, 0);
 				if (!conversations.containsKey(recipient)) {
 					conversations.put(recipient, "");
 				}
@@ -368,18 +370,18 @@ public class View extends Application {
 		}
 	}
 	
-	private void changeRecipientAmount(String recipient, int amount) {
-		for (String s : this.recipient.getItems()) {
-			if (s.contains(recipient)) {
-				if (amount == 0) {
-					s = recipient;
-				} else {
-					s = recipient + " (" + amount + ")";
-				}
-				break;
-			}
-		}
-	}
+//	private void changeRecipientAmount(String recipient, int amount) {
+//		for (String s : this.recipient.getItems()) {
+//			if (s.contains(recipient)) {
+//				if (amount == 0) {
+//					s = recipient;
+//				} else {
+//					s = recipient + " (" + amount + ")";
+//				}
+//				break;
+//			}
+//		}
+//	}
 	
 	public static void main(String[] args) {
 		launch(args);
@@ -391,7 +393,7 @@ public class View extends Application {
 			chatText.setText(conversations.get(recipient));
 			selectedRecipient = recipient;
 			lastSelectedRecipient = recipient;
-			changeRecipientAmount(recipient, 0);
+			newMessagesAmount.put(recipient, 0);
 		}
 	}
 	
@@ -400,15 +402,15 @@ public class View extends Application {
 			if (lastSelectedRecipient.equals("All")) {
 				chatText.appendText(("\n" + client + ": " + message));
 			} else {
-				conversations.put("Anonymous", conversations.get(client).concat(("\n" + client + ": " + message)));
-				changeRecipientAmount("All", getRecipientValue("All") + 1);
+				conversations.put("All", conversations.get("All").concat(("\n" + client + ": " + message)));
+				newMessagesAmount.put("All", newMessagesAmount.get("All") + 1);
 			}
 		} else {
 			if (lastSelectedRecipient.equals(client)) {
 				chatText.appendText(("\n" + client + ": " + message));
 			} else {
 				conversations.put(client, conversations.get(client).concat(("\n" + client + ": " + message)));
-				changeRecipientAmount(client, getRecipientValue(client) + 1);
+				newMessagesAmount.put(client, newMessagesAmount.get(client) + 1);
 			}
 		}
 		mediaPlayer.play();
