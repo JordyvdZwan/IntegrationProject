@@ -287,7 +287,7 @@ public class Controller extends Thread {
 		packet.setDestination(destination);
 		
 		if (packet.isNormal() || packet.isDiffie()) {
-			System.out.println("========================== Before registering ===============================================");
+			System.out.println("========================== Before registering in retransmit =================================");
 			System.out.println(packet.getMessage());
 			System.out.println("=============================================================================================");
 			seqAckTable.registerSendPacket(packet);
@@ -365,7 +365,7 @@ public class Controller extends Thread {
 	public void handleMessage(JRTVPacket packet, boolean decrypted) {
 		if (packet.getSource() != localIAddress) {
 			if (packet.getNextHop() == localIAddress && packet.getDestination() != localIAddress && packet.getDestination() != multicastAddress) {
-				retransmit(packet);
+//				retransmit(packet);
 			} else {
 				if (packet.getDestination() == localIAddress || packet.getDestination() == multicastAddress) {
 					if (!decrypted) {// && !packet.isAck() && !packet.isUpdate()
