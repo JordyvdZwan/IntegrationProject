@@ -15,7 +15,7 @@ import application.Controller;
 public class FileManager {
 
 	Controller controller;
-	public static final int PACKETSIZE = 1000;
+	public static final int PACKETSIZE = 800;
 	
 	public FileManager(Controller controller) {
 		this.controller = controller;
