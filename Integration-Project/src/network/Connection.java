@@ -48,10 +48,14 @@ public class Connection extends Thread {
 			}
 			
 			JRTVPacket p = new JRTVPacket(recv.getData());
-			if(!p.isDiffie() && !p.isUpdate() && !p.isAck()) {
-//				System.out.println("=================================================================================");
-//				System.out.println("DATA : " + p.toString());
-//				System.out.println("=================================================================================");
+			if (p.isAck()) {
+				System.out.println("To: " + p.getDestination());
+				System.out.println("ACK: " + p.getAcknr());
+				System.out.println("+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+");
+			} else if (p.isNormal()) {
+				System.out.println("To: " + p.getDestination());
+				System.out.println("SEQ: " + p.getSeqnr());
+				System.out.println("+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+");
 			}
 			
 			
@@ -74,11 +78,11 @@ public class Connection extends Thread {
 //				System.out.println("RECV Message: " + new JRTVPacket(recv.getData()).getMessage());==============================================================");
 //				System.out.println("seq : " + p.getSeqnr());
 //				System.out.println("ack: " + p.getAcknr());
-				System.out.println("DATA : " + new FilePacket(p.getByteMessage()).getSequenceNumber());
+//				System.out.println("DATA : " + new FilePacket(p.getByteMessage()).getSequenceNumber());
 //				System.out.println("Destination : " + Router.getStringIP(p.getDestination()));
 //				System.out.println("SOURCE: " + Router.getStringIP(p.getSource()));//
 //				System.out.println("NextHop: " + Router.getStringIP(p.getNextHop()));
-				System.out.println("=========^^^^^^^^^^^^^^^^^^^^^^^^^^^^^send============================================");
+//				System.out.println("=========^^^^^^^^^^^^^^^^^^^^^^^^^^^^^send============================================");
 			}
 			socket.send(packet);
 		} catch (IOException e) {

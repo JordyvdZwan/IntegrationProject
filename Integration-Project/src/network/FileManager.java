@@ -171,14 +171,17 @@ public class FileManager {
 				
 				System.out.println("Bytes length: " + bytes.length);
 				
+				File file = new File(name);
+				
 				try {
-					FileUtils.writeByteArrayToFile(new File(name), bytes);
+					FileUtils.writeByteArrayToFile(file, bytes);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				
 				controller.addMessageToView("New file was downloaded: " + name, packet.getSource());
+				controller.showFile(file, packet.getSource());
 			}
 		}
 	}
