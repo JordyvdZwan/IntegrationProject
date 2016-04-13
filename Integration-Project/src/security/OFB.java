@@ -62,7 +62,9 @@ public class OFB {
 					blocki[j] = message [j + i];
 					j++;
 				}				
-				System.arraycopy(xor(blocki, blocks[i/BLOCKSIZE]), 0, result, i, i + j);
+				System.out.println(blocks[i/BLOCKSIZE].length + "\t\t\t" + blocki.length);
+				
+				System.arraycopy(xor(blocki, blocks[i/BLOCKSIZE]), 0, result, i, result.length - i);
 			}
 		}
 		return result;
