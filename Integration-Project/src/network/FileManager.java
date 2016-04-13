@@ -44,7 +44,6 @@ public class FileManager {
 			if (packetsToBeSend.size() > 0) {
 				JRTVPacket packet = packetsToBeSend.get(0);
 				packetsToBeSend.remove(0);
-				FilePacket fp = new FilePacket(packet.getByteMessage());
 				controller.sendPacket(packet.getDestination(), packet);
 				amount--;
 			} else {
@@ -104,7 +103,6 @@ public class FileManager {
 			filePacket.setData(byteArray);
 			filePacket.setFileNumber(fileNumber);
 			filePacket.setSequenceNumber(counter);
-			System.out.println(counter);
 			filePacket.setTotalAmount(totalAmount);
 			filePackets.add(filePacket);
 			counter++;
@@ -120,6 +118,7 @@ public class FileManager {
 			packet.setFile(true);
 			packet.setDestination(ip);
 			packets.add(packet);
+			System.out.println("seq nr: " + filePacket.getSequenceNumber());
 		}
 		
 		packetsToBeSend.addAll(packets);
@@ -135,6 +134,7 @@ public class FileManager {
 	public void handleFilePacket(JRTVPacket packet) {
 		FilePacket filePacket = new FilePacket(packet.getByteMessage());
 		System.out.println("seq nr: " + filePacket.getSequenceNumber());
+		System.out.println("file nr: " + filePacket.getFileNumber());
 		System.out.println("packet length: " + packet.getPayloadLength());
 		if (!receivedFilePackets.containsKey(packet.getSource())) {
 			receivedFilePackets.put(packet.getSource(), new ArrayList<FilePacket>());

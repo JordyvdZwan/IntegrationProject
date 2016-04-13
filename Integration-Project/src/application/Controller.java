@@ -224,7 +224,7 @@ public class Controller extends Thread {
 //		System.out.println("==========================  Nexthop testing  ===============================================");
 //		System.out.println(packet.getNextHop());
 //		System.out.println("=============================================================================================");
-		
+//		System.out.println(packet);
 		if (packet.getDestination() != multicastAddress && !packet.isDiffie() && !packet.isAck() && !packet.isFile()) {
 			outgoingEncryptionPackets.add(packet);
 		} else {
