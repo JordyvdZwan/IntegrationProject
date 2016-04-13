@@ -146,6 +146,7 @@ public class FileManager {
 			System.out.println("Started to gather all file bytes");
 			List<byte[]> byteList = getFileBytes(packet.getSource(), filePacket.getFileNumber(), filePacket.getTotalAmount());
 			
+			if (!byteList.isEmpty()) {
 			System.out.println("Read Name Byte");
 			byte[] nameBytes = byteList.get(0);
 			byteList.remove(0);
@@ -171,7 +172,7 @@ public class FileManager {
 			}
 			
 			controller.addMessageToView("New file was downloaded: " + name, packet.getSource());
-			
+			}
 		}
 	}
 	
