@@ -408,6 +408,7 @@ public class View extends Application {
 		
 		Stage stage = new Stage();
 		iv1.fitWidthProperty().bind(stage.widthProperty());
+		iv1.fitHeightProperty().bind(stage.heightProperty());
 		Scene scene = new Scene(root,600,600);
 		
 		root.add(iv1, 1, 1);
