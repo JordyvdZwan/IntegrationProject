@@ -224,7 +224,7 @@ public class Controller extends Thread {
 //		System.out.println(packet.getNextHop());
 //		System.out.println("=============================================================================================");
 		
-		if (packet.getDestination() != multicastAddress && !packet.isDiffie() && !packet.isAck()) {
+		if (packet.getDestination() != multicastAddress && !packet.isDiffie() && !packet.isAck() && !packet.isFile()) {
 			outgoingEncryptionPackets.add(packet);
 		} else {
 			//RSA Signing
@@ -265,7 +265,7 @@ public class Controller extends Thread {
 	private void decryptMessages() {
 		for (int i = 0; i < incomingEncryptionPackets.size(); i++) {
 			JRTVPacket packet = incomingEncryptionPackets.get(i);
-			if (packet.getDestination() == multicastAddress || packet.isDiffie() || packet.isAck()) {
+			if (packet.getDestination() == multicastAddress || packet.isDiffie() || packet.isAck() || packet.isFile()) {
 				byte[] message2 = packet.getByteMessage();
 				byte[] second2 = new byte[packet.getHashPayload()];
 				
@@ -319,7 +319,7 @@ public class Controller extends Thread {
 			seqAckTable.registerSendPacket(packet);
 		}
 		
-		if (packet.getDestination() != multicastAddress && !packet.isDiffie()) {
+		if (packet.getDestination() != multicastAddress && !packet.isDiffie() && !packet.isFile()) {
 			packet.setNextHop(router.getNextHop(packet.getDestination()));
 			outgoingEncryptionPackets.add(packet);
 		} else {
