@@ -245,8 +245,10 @@ public class Controller extends Thread {
 	public void sendEncryptionMessages() {
 		for (int i = 0; i < outgoingEncryptionPackets.size(); i++) {
 			JRTVPacket packet = outgoingEncryptionPackets.get(i);
+			System.out.println("======================== Before the encryption ==============================================");
 			if (router.hasEncryptionKey(packet.getDestination())) {
-//				System.out.println("======================== Before the encryption ==============================================");
+				
+				System.out.println("======================== Before the encryption ==============================================");
 //				System.out.println(packet.getMessage());
 //				System.out.println("=============================================================================================");
 				packet = router.getEncryption(packet.getDestination()).encrypt(packet, RSA.getPrivateKey(localIAddress));//TODO RSA ?
@@ -462,7 +464,7 @@ public class Controller extends Thread {
 		if (name.contains(".png") || name.contains(".jpg") || name.contains(".gif") || name.contains(".JPG") || name.contains(".jpeg")) {
 			Image image;
 			System.out.println(file.getName());
-			image = new Image(file.getName(), true);
+			image = new Image("file:" + file.getName(), true);
 			System.out.println("NAME: " + name);
 			view.addImage(image, router.getName(source));
 		}
