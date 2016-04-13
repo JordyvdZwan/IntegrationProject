@@ -314,7 +314,7 @@ public class Controller extends Thread {
 //			System.out.println("========================== Before registering in retransmit =================================");
 //			System.out.println(packet.getMessage());
 //			System.out.println("=============================================================================================");
-			packet.setSeqnr(seqAckTable.getNextSeq(packet.getDestination()));
+//			packet.setSeqnr(seqAckTable.getNextSeq(packet.getDestination()));
 			seqAckTable.registerSendPacket(packet);
 		}
 		
