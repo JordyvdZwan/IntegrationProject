@@ -402,7 +402,7 @@ public class Controller extends Thread {
 	}
 	
 	public void handleMessage(JRTVPacket packet, boolean decrypted) {
-//		if (packet.getSource() != localIAddress) {
+		if (packet.getSource() != localIAddress) {
 			if (packet.getNextHop() == localIAddress && packet.getDestination() != localIAddress && packet.getDestination() != multicastAddress) {
 				relay(packet);
 			} else {
@@ -440,7 +440,7 @@ public class Controller extends Thread {
 					}
 				}
 			}
-//		}
+		}
 	}
 	
 	public void addRecipientToView(String recipient) {

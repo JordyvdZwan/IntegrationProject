@@ -242,7 +242,7 @@ public class Router {
 	
 	public void processUpdate(JRTVPacket packet) {
 		if (!controller.getSettingUp()) {
-//			if (packet.getSource() != controller.getLocalIAddress() && packet.getSource() != 0) {
+			if (packet.getSource() != controller.getLocalIAddress() && packet.getSource() != 0) {
 				//Puts true into the list with valid hops
 				table.getvalidhops().put(packet.getSource(), true);
 				//TODO: Split at destination, next hop and put these into the forwardingtables
@@ -259,12 +259,9 @@ public class Router {
 					integers[i] = byteArrayToInt(b);
 				}
 				List<Integer> accessableAddresses = new ArrayList<Integer>();
-//				 && packet.getSource() != controller.getLocalIAddress()
 				for (int i = 0; i < integers.length / 2; i++) {
 					accessableAddresses.add(integers[i * 2]);
-//					&& packet.getSource() != controller.getLocalIAddress()
-//							integers[i * 2] != controller.getLocalIAddress() && 
-					if (integers[i * 2] != controller.multicastAddress) {//TODO CHANGE THIS BACK
+					if (integers[i * 2] != controller.getLocalIAddress() && integers[i * 2] != controller.multicastAddress && packet.getSource() != controller.getLocalIAddress()) {//TODO CHANGE THIS BACK
 						if (integers[(i * 2) + 1] < MAXINFINITY) {
 							table.addHop(integers[i * 2], packet.getSource(), integers[(i * 2) + 1] + 0);
 						} else {
@@ -301,7 +298,7 @@ public class Router {
 					controller.addRecipientToView("(" + getStringIP(packet.getSource()) + ") " + name);
 					//TODO name changing
 				}
-//			}
+			}
 		}
 //		System.out.println("=-------------------------------------------------------------------------------=");
 //		System.out.println(table.getTable());

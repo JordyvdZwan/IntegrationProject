@@ -46,9 +46,9 @@ public class Connection extends Thread {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			
-
-
+			System.out.println("=================================================================================");
+			System.out.println("DATA : " + new JRTVPacket(recv.getData()).getMessage());
+			System.out.println("=================================================================================");
 			
 			
 			
