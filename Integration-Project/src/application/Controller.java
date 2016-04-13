@@ -462,7 +462,7 @@ public class Controller extends Thread {
 		if (name.contains(".png") || name.contains(".jpg") || name.contains(".gif") || name.contains(".JPG") || name.contains(".jpeg")) {
 			Image image;
 			System.out.println(file.getName());
-			image = new Image(file.getName(), 600, 600, false, false);
+			image = new Image(file.getName(), true);
 			System.out.println("NAME: " + name);
 			view.addImage(image, router.getName(source));
 		}
