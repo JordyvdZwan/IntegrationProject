@@ -46,9 +46,14 @@ public class Connection extends Thread {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			System.out.println("=================================================================================");
-			System.out.println("DATA : " + new JRTVPacket(recv.getData()).getMessage());
-			System.out.println("=================================================================================");
+			
+			JRTVPacket p = new JRTVPacket(recv.getData());
+			if(!p.isDiffie() && !p.isUpdate() && !p.isAck()) {
+				System.out.println("=================================================================================");
+				System.out.println("DATA : " + p.toString());
+				System.out.println("=================================================================================");
+			}
+			
 			
 			
 			

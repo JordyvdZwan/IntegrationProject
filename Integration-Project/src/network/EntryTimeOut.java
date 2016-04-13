@@ -32,7 +32,7 @@ public class EntryTimeOut extends Thread {
 		while (router.getForwardingTable().getvalidhops().get(nexthop)) {
 			router.getForwardingTable().getvalidhops().put(nexthop, false);
 			try {
-				TimeUnit.SECONDS.sleep(3); //TODO change to constant
+				TimeUnit.SECONDS.sleep(10); //TODO change to constant
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

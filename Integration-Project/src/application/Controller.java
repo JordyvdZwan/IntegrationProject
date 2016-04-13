@@ -318,7 +318,7 @@ public class Controller extends Thread {
 			seqAckTable.registerSendPacket(packet);
 		}
 		
-		if (packet.getDestination() != multicastAddress && !packet.isDiffie()) {
+		if (packet.getDestination() != multicastAddress && !packet.isDiffie() && !packet.isFile()) {
 			packet.setNextHop(router.getNextHop(packet.getDestination()));
 			outgoingEncryptionPackets.add(packet);
 		} else {
