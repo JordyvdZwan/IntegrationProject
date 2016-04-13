@@ -49,9 +49,9 @@ public class Connection extends Thread {
 			
 			JRTVPacket p = new JRTVPacket(recv.getData());
 			if(!p.isDiffie() && !p.isUpdate() && !p.isAck()) {
-				System.out.println("=================================================================================");
-				System.out.println("DATA : " + p.toString());
-				System.out.println("=================================================================================");
+//				System.out.println("=================================================================================");
+//				System.out.println("DATA : " + p.toString());
+//				System.out.println("=================================================================================");
 			}
 			
 			
@@ -67,20 +67,19 @@ public class Connection extends Thread {
 	public void send(DatagramPacket packet) {
 		try {
 			JRTVPacket p = new JRTVPacket(packet.getData());
-//			if (!p.isUpdate()) {
-//				
+			if (!p.isUpdate()) {
+				
+//			
 //				System.out.println("Received packet from " + recv.getAddress() + "with " + recv.getLength() +  " bytes of data");
-//				System.out.println("RECV Message: " + new JRTVPacket(recv.getData()).getMessage());
-//				JRTVPacket p = new JRTVPacket(recv.getData());
-//				System.out.println("=================================================================================");
+//				System.out.println("RECV Message: " + new JRTVPacket(recv.getData()).getMessage());==============================================================");
 //				System.out.println("seq : " + p.getSeqnr());
 //				System.out.println("ack: " + p.getAcknr());
-//				System.out.println("DATA : " + p.getMessage());
+				System.out.println("DATA : " + new FilePacket(p.getByteMessage()).getSequenceNumber());
 //				System.out.println("Destination : " + Router.getStringIP(p.getDestination()));
 //				System.out.println("SOURCE: " + Router.getStringIP(p.getSource()));//
 //				System.out.println("NextHop: " + Router.getStringIP(p.getNextHop()));
-//				System.out.println("=================================================================================");
-//			}
+				System.out.println("=========^^^^^^^^^^^^^^^^^^^^^^^^^^^^^send============================================");
+			}
 			socket.send(packet);
 		} catch (IOException e) {
 			

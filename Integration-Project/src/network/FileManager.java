@@ -114,11 +114,17 @@ public class FileManager {
 		int ip = client;
 		
 		for (FilePacket filePacket : filePackets) {
-			JRTVPacket packet = new JRTVPacket(new String(filePacket.getBytes()));
+			JRTVPacket packet = new JRTVPacket("");
+			packet.setByteMessage(filePacket.getBytes());
 			packet.setFile(true);
 			packet.setDestination(ip);
 			packets.add(packet);
 			System.out.println("seq nr: " + filePacket.getSequenceNumber());
+		}
+		
+		for(JRTVPacket p: packets) {
+			FilePacket f = new FilePacket(p.getByteMessage());
+			System.out.println("Dit is het sequence nummer: " + f.getSequenceNumber());
 		}
 		
 		packetsToBeSend.addAll(packets);
