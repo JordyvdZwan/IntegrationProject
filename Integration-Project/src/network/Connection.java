@@ -49,9 +49,9 @@ public class Connection extends Thread {
 			
 			JRTVPacket p = new JRTVPacket(recv.getData());
 			if(!p.isDiffie() && !p.isUpdate() && !p.isAck()) {
-				System.out.println("=================================================================================");
-				System.out.println("DATA : " + p.toString());
-				System.out.println("=================================================================================");
+//				System.out.println("=================================================================================");
+//				System.out.println("DATA : " + p.toString());
+//				System.out.println("=================================================================================");
 			}
 			
 			
