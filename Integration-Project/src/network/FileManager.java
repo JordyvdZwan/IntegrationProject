@@ -147,31 +147,32 @@ public class FileManager {
 			List<byte[]> byteList = getFileBytes(packet.getSource(), filePacket.getFileNumber(), filePacket.getTotalAmount());
 			
 			if (!byteList.isEmpty()) {
-			System.out.println("Read Name Byte");
-			byte[] nameBytes = byteList.get(0);
-			byteList.remove(0);
-			String name = new String(nameBytes);
-			
-			System.out.println("Started creating one big bytearray");
-			byte[] bytes = new byte[0];
-			byte[] temp;
-			for (byte[] array : byteList) {
-				temp = new byte[bytes.length + array.length];
-				System.arraycopy(bytes, 0, temp, 0, bytes.length);
-				System.arraycopy(array, 0, temp, bytes.length, array.length);
-				bytes = temp;
-			}
-			
-			System.out.println("Bytes length: " + bytes.length);
-			
-			try {
-				FileUtils.writeByteArrayToFile(new File(name), bytes);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			controller.addMessageToView("New file was downloaded: " + name, packet.getSource());
+				System.out.println("Read Name Byte");
+				byte[] nameBytes = byteList.get(0);
+				byteList.remove(0);
+				String name = new String(nameBytes);
+				
+				System.out.println("Started creating one big bytearray");
+				byte[] bytes = new byte[0];
+				byte[] temp;
+				for (int i = 0; i < byteList.size(); i++) {
+					byte[] array = byteList.get(i);
+					temp = new byte[bytes.length + array.length];
+					System.arraycopy(bytes, 0, temp, 0, bytes.length);
+					System.arraycopy(array, 0, temp, bytes.length, array.length);
+					bytes = temp;
+				}
+				
+				System.out.println("Bytes length: " + bytes.length);
+				
+				try {
+					FileUtils.writeByteArrayToFile(new File(name), bytes);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				controller.addMessageToView("New file was downloaded: " + name, packet.getSource());
 			}
 		}
 	}
