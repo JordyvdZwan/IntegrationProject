@@ -43,9 +43,11 @@ public class FileManager {
 		while (amount > 0) {
 			if (packetsToBeSend.size() > 0) {
 				JRTVPacket packet = packetsToBeSend.get(0);
-				packetsToBeSend.remove(0);
-				controller.sendPacket(packet.getDestination(), packet);
-				amount--;
+				if (controller.getRouter().getForwardingTable().getTable().containsKey(packet.getDestination())) {
+					packetsToBeSend.remove(0);
+					controller.sendPacket(packet.getDestination(), packet);
+					amount--;
+				}
 			} else {
 				break;
 			}

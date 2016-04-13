@@ -275,11 +275,9 @@ public class View extends Application {
 	
 	public void start(int address) {
 		nameField.setDisable(false);
-		inputField.setDisable(false);
-		recipient.setDisable(false);
-		sendButton.setDisable(false);
+		
 		nameButton.setDisable(false);
-		sendFileButton.setDisable(false);
+		
 		chatText.appendText("\nSYS Connection Ready!");
 		try {
 			chatText.appendText("\nSYS Your IP is: " + InetAddress.getByAddress(unpack(address)).getHostAddress().toString());
@@ -361,6 +359,10 @@ public class View extends Application {
 			root.getChildren().remove(nameField);
 			root.getChildren().remove(chatText);
 			root.add(chatText, 0, 0, 3, 3);
+			inputField.setDisable(false);
+			recipient.setDisable(false);
+			sendButton.setDisable(false);
+			sendFileButton.setDisable(false);
 		}
 	}
 	
