@@ -224,7 +224,7 @@ public class Controller extends Thread {
 //		System.out.println(packet.getNextHop());
 //		System.out.println("=============================================================================================");
 		
-		if (packet.getDestination() != multicastAddress && !packet.isDiffie() && !packet.isAck() && !packet.isFile()) {
+		if (packet.getDestination() != multicastAddress && !packet.isDiffie() && !packet.isAck()) {
 			outgoingEncryptionPackets.add(packet);
 		} else {
 			//RSA Signing
@@ -265,7 +265,7 @@ public class Controller extends Thread {
 	private void decryptMessages() {
 		for (int i = 0; i < incomingEncryptionPackets.size(); i++) {
 			JRTVPacket packet = incomingEncryptionPackets.get(i);
-			if (packet.getDestination() == multicastAddress || packet.isDiffie() || packet.isAck() || packet.isFile()) {
+			if (packet.getDestination() == multicastAddress || packet.isDiffie() || packet.isAck()) {
 				byte[] message2 = packet.getByteMessage();
 				byte[] second2 = new byte[packet.getHashPayload()];
 				
@@ -319,7 +319,7 @@ public class Controller extends Thread {
 			seqAckTable.registerSendPacket(packet);
 		}
 		
-		if (packet.getDestination() != multicastAddress && !packet.isDiffie() && !packet.isFile()) {
+		if (packet.getDestination() != multicastAddress && !packet.isDiffie()) {
 			packet.setNextHop(router.getNextHop(packet.getDestination()));
 			outgoingEncryptionPackets.add(packet);
 		} else {
@@ -459,9 +459,10 @@ public class Controller extends Thread {
 	
 	public void showFile(File file, int source) {
 		String name = file.getName();
-		if (name.contains(".png") || name.contains(".jpg") || name.contains(".gif")) {
+		if (name.contains(".png") || name.contains(".jpg") || name.contains(".gif") || name.contains(".JPG") || name.contains(".jpeg")) {
 			Image image;
-			image = new Image("file:" + file.getName(), true);
+			System.out.println(file.getName());
+			image = new Image(file.getName(), 600, 600, false, false);
 			System.out.println("NAME: " + name);
 			view.addImage(image, router.getName(source));
 		}

@@ -411,7 +411,7 @@ public class View extends Application {
 		Scene scene = new Scene(root,600,600);
 		
 		root.add(iv1, 1, 1);
-		
+		stage.getIcons().add(new Image("file:icon.png"));
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		stage.setScene(scene);
 		stage.show();
