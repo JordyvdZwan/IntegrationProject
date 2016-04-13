@@ -75,6 +75,7 @@ public class Controller extends Thread {
 		boolean found = false;
 		Enumeration<NetworkInterface> interfaces;
 		try {
+			System.out.println("starting cycling over networks" );
 			interfaces = NetworkInterface.getNetworkInterfaces();
 			
 			while (interfaces.hasMoreElements()) {
@@ -93,11 +94,13 @@ public class Controller extends Thread {
 			e.printStackTrace();
 		}
 		if (!found) {
+			System.out.println("starting sending random streing" );
 			initString = randomString();
 			while (settingUp) {
 				DatagramPacket data;
 				if((data = connection.getFirstInQueue()) != null) {
 					JRTVPacket p = new JRTVPacket(data.getData());
+					System.out.println("data: " + p.getMessage() );
 					if (new JRTVPacket(data.getData()).getMessage().equals(initString)) {
 						InetAddress add = data.getAddress(); 
 						String address = add.toString();
