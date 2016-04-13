@@ -26,6 +26,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.control.ComboBox;
@@ -45,6 +46,7 @@ public class View extends Application {
 	TextArea chatText = new TextArea();
 	Button sendButton = new Button();
 	Button sendFileButton = new Button();
+	Button showFileButton = new Button();
 	TextField inputField = new TextField();
 	Button nameButton = new Button();
 	TextField nameField = new TextField();
@@ -74,10 +76,12 @@ public class View extends Application {
 			primaryStage.getIcons().add(new Image("file:icon.png"));
 			
 			ColumnConstraints coll1 = new ColumnConstraints();
-			coll1.setPercentWidth(80);
+			coll1.setPercentWidth(50);
+			ColumnConstraints coll2 = new ColumnConstraints();
+			coll2.setPercentWidth(40);
 			ColumnConstraints coll3 = new ColumnConstraints();
-			coll3.setPercentWidth(20);
-			root.getColumnConstraints().addAll(coll1, coll3);
+			coll3.setPercentWidth(40);
+			root.getColumnConstraints().addAll(coll1, coll2, coll3);
 			
 			
 			RowConstraints row6 = new RowConstraints();
@@ -198,18 +202,30 @@ public class View extends Application {
 			    }
 			});
 			
+			showFileButton.setId("sendButton");
+			showFileButton.setText("Show File");
+			showFileButton.setPrefSize( Double.MAX_VALUE, Double.MAX_VALUE );
+			showFileButton.setDisable(true);
+			showFileButton.setOnAction(new EventHandler<ActionEvent>() {
+			    @Override 
+			    public void handle(ActionEvent e) {
+			    	showImage();
+			    }
+			});
+			
 		    
 			//Put all the controls in the pane.
-			root.add(nameField, 0, 0, 2, 1);
-			root.add(nameButton, 1, 0, 1, 1);
-			root.add(chatText, 0, 2, 3, 1);
+			root.add(nameField, 0, 0, 3, 1);
+			root.add(nameButton, 2, 0, 1, 1);
+			root.add(chatText, 0, 2, 4, 1);
 			root.add(recipient, 0, 4, 1, 1);
-			root.add(sendFileButton, 1, 4, 1, 1);
-			root.add(inputField, 0, 6, 2, 1);
-			root.add(sendButton, 1, 6, 1, 1);
+			root.add(showFileButton, 1, 4, 1, 1);
+			root.add(sendFileButton, 2, 4, 1, 1);
+			root.add(inputField, 0, 6, 3, 1);
+			root.add(sendButton, 2, 6, 1, 1);
 			
 			primaryStage.setTitle("Chat Client (dev-Version 1.0)");
-			Scene scene = new Scene(root,600,800);
+			Scene scene = new Scene(root,800,900);
 			
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
@@ -356,6 +372,49 @@ public class View extends Application {
 		dialog.show();
 	}
 	
+	Map<String, List<Image>> images = new HashMap<String, List<Image>>();
+	
+	public void addImage(Image image, String destination) {
+		if (!images.containsKey(destination)) {
+			images.put(destination, new ArrayList<Image>());
+		}
+		images.get(destination).add(image);
+		if (images.containsKey(selectedRecipient) && !images.get(selectedRecipient).isEmpty()) {
+			showFileButton.setDisable(false);
+		} else {
+			showFileButton.setDisable(true);
+		}
+	}
+	
+	private void showImage() {
+		if (images.containsKey(selectedRecipient) && !images.get(selectedRecipient).isEmpty()) {
+			showImage(images.get(selectedRecipient).get(0));
+			images.get(selectedRecipient).remove(0);
+			if (images.containsKey(selectedRecipient) && !images.get(selectedRecipient).isEmpty()) {
+				showFileButton.setDisable(false);
+			} else {
+				showFileButton.setDisable(true);
+			}
+		}
+	}
+	
+	private void showImage(Image image) {
+		ImageView iv1 = new ImageView();
+		iv1.setImage(image);
+		
+		GridPane root = new GridPane();
+		
+		Stage stage = new Stage();
+		iv1.fitWidthProperty().bind(stage.widthProperty());
+		Scene scene = new Scene(root,600,600);
+		
+		root.add(iv1, 1, 1);
+		
+		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		stage.setScene(scene);
+		stage.show();
+	}
+	
 	public void error(String message) {
 		showDialog("ERROR: " + message);
 	}
@@ -427,6 +486,11 @@ public class View extends Application {
 			selectedRecipient = recipient;
 			lastSelectedRecipient = recipient;
 			newMessagesAmount.put(recipient, 0);
+			if (images.containsKey(selectedRecipient) && !images.get(selectedRecipient).isEmpty()) {
+				showFileButton.setDisable(false);
+			} else {
+				showFileButton.setDisable(true);
+			}
 		}
 	}
 	

@@ -18,6 +18,7 @@ import java.util.Set;
 
 import org.apache.commons.codec.binary.Base64;
 
+import javafx.scene.image.Image;
 import network.Connection;
 import network.FileManager;
 import network.JRTVPacket;
@@ -454,6 +455,16 @@ public class Controller extends Thread {
 	
 	public void addMessageToView(String message, int client) {
 		view.addMessage(router.getName(client), message, false);
+	}
+	
+	public void showFile(File file, int source) {
+		String name = file.getName();
+		if (name.contains(".png") || name.contains(".jpg") || name.contains(".gif")) {
+			Image image;
+			image = new Image("file:" + file.getName(), true);
+			System.out.println("NAME: " + name);
+			view.addImage(image, router.getName(source));
+		}
 	}
 	
 	public void handleNormal(JRTVPacket packet) {
