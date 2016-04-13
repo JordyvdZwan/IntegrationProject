@@ -94,13 +94,11 @@ public class Controller extends Thread {
 			e.printStackTrace();
 		}
 		if (!found) {
-			System.out.println("starting sending random streing" );
 			initString = randomString();
 			while (settingUp) {
 				DatagramPacket data;
 				if((data = connection.getFirstInQueue()) != null) {
 					JRTVPacket p = new JRTVPacket(data.getData());
-					System.out.println("data: " + p.getMessage() );
 					if (new JRTVPacket(data.getData()).getMessage().equals(initString)) {
 						InetAddress add = data.getAddress(); 
 						String address = add.toString();
@@ -224,7 +222,7 @@ public class Controller extends Thread {
 //		System.out.println("==========================  Nexthop testing  ===============================================");
 //		System.out.println(packet.getNextHop());
 //		System.out.println("=============================================================================================");
-//		System.out.println(packet);
+		
 		if (packet.getDestination() != multicastAddress && !packet.isDiffie() && !packet.isAck() && !packet.isFile()) {
 			outgoingEncryptionPackets.add(packet);
 		} else {
