@@ -73,9 +73,9 @@ public class TimeOutTimer extends Thread {
 				if (integer != table.getController().getLocalIAddress() && integer != table.getController().multicastAddress) {
 //					System.out.println("Is the packet received? : " + !table.isReceived(integer, packet.getSeqnr()));
 					if (!table.isReceived(integer, packet.getSeqnr())) {
-//						System.out.println("++++++++++++++++++++++++++++++++++ before retransmission +++++++++++++++++++++++++++++++++++++++++++++++++++++");
-//						System.out.println(this.packet.getMessage());
-//						System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+						System.out.println("++++++++++++++++++++++++++++++++++ before retransmission +++++++++++++++++++++++++++++++++++++++++++++++++++++");
+						System.out.println(this.packet.getMessage());
+						System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 //						packet.setBroadcasted(false);
 						
 						JRTVPacket p = new JRTVPacket("");
