@@ -72,11 +72,12 @@ public class SeqAckTable {
 //	}
 	
 	public void retransmit(JRTVPacket packet, int destination) {
+//		System.out.println("Retransmitting");
 		controller.retransmit(packet, destination);
 	}
 	
 	public void registerAckPacket(JRTVPacket packet) {
-		System.out.println("In de registerAck ackNr: \n" + packet.getAcknr());
+//		System.out.println("In de registerAck ackNr: \n" + packet.getAcknr());
 		int address = packet.getSource();
 		int seq = packet.getAcknr();
 		if (send.containsKey(address)) {
@@ -98,7 +99,7 @@ public class SeqAckTable {
 					if (!send.containsKey(integer)) {
 						send.put(integer, new HashMap<Integer, Boolean>());
 					}
-					System.out.println("putting in: " + Router.getStringIP(integer) + " " + packet.getSeqnr());
+//					System.out.println("putting in: " + Router.getStringIP(integer) + " " + packet.getSeqnr());
 					send.get(integer).put(packet.getSeqnr(), false);
 				}
 			}

@@ -108,7 +108,7 @@ public class ForwardingTable {
 		if (forwardingtable.containsKey(destination)) {
 			forwardingtable.get(destination).put(nexthop, cost);
 		} else {
-			router.setupDiffie(destination);
+//			router.setupDiffie(destination);
 			forwardingtable.put(destination, new HashMap<Integer, Integer>());
 			addHop(destination, nexthop, cost);
 		}

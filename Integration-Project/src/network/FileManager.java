@@ -121,7 +121,7 @@ public class FileManager {
 			packet.setFile(true);
 			packet.setDestination(ip);
 			packets.add(packet);
-			System.out.println("seq nr: " + filePacket.getSequenceNumber());
+//			System.out.println("seq nr: " + filePacket.getSequenceNumber());
 		}
 		
 		for(JRTVPacket p: packets) {
@@ -141,9 +141,9 @@ public class FileManager {
 	
 	public void handleFilePacket(JRTVPacket packet) {
 		FilePacket filePacket = new FilePacket(packet.getByteMessage());
-		System.out.println("seq nr: " + filePacket.getSequenceNumber());
-		System.out.println("file nr: " + filePacket.getFileNumber());
-		System.out.println("packet length: " + packet.getPayloadLength());
+//		System.out.println("seq nr: " + filePacket.getSequenceNumber());
+//		System.out.println("file nr: " + filePacket.getFileNumber());
+//		System.out.println("packet length: " + packet.getPayloadLength());
 		if (!receivedFilePackets.containsKey(packet.getSource())) {
 			receivedFilePackets.put(packet.getSource(), new ArrayList<FilePacket>());
 		}
