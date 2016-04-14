@@ -60,7 +60,6 @@ public class RSA {
 			m.update(input, 0, input.length);
 			bi = new BigInteger(1, m.digest());
 		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return bi.mod(new BigInteger("1975846582458")).toString().getBytes();
@@ -116,18 +115,13 @@ public class RSA {
 			
 			key =  RSAInterperate.rsaInterperatePrivateKey(number, file);
 		} catch (NumberFormatException e) {
-			//TODO error
+			e.printStackTrace();
 		} catch (IOException e) {
-			//TODO error
+			e.printStackTrace();
 		}
 		return key;
 	}
 	
-//	public static byte[] toBytes() {
-//		return PUBLICKEY.getEncoded();
-//	}
-	
-	//TODO
 	public static Key toPublicKey(byte[] bytes) { 
 		Key key = null;
 		try {

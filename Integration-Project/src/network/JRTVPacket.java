@@ -32,6 +32,9 @@ public class JRTVPacket {
 	private boolean rsa = false;
 	private boolean diffie = false;
 	
+	//======================================================================================================================
+	//||                                                  Constructor/conversions                                          ||  
+	//======================================================================================================================	
 
 	public String toString() {
 		String res = "";
@@ -54,17 +57,6 @@ public class JRTVPacket {
 		res = res.concat("\n");
 		res = res.concat("DATA: \n");
 		res = res.concat(new String(message));
-		res = res.concat("\n");
-		res = res.concat("Bytes\n");
-//			for (int i = 0; i < HEADERLENGTH + payloadLength; i++) {
-//				Integer j = (int) this.toByteArray()[i];
-//				res = res.concat(i + ": " + j.toString());
-//				res = res.concat("\n");
-//				if ((i + 1) % 8 == 0) {
-//					res = res.concat("----------------------\n");
-//				}
-//			}
-		
 		return res;
 	}
 	
@@ -264,6 +256,10 @@ public class JRTVPacket {
 	        (byte) (a & 0xFF)
 	    };
 	}
+	
+	//======================================================================================================================
+	//||                                                  getters/setters                                                 ||  
+	//======================================================================================================================
 	
 	public boolean isRSA() {
 		return rsa;

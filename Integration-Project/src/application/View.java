@@ -41,19 +41,30 @@ public class View extends Application {
 	
 	public static final int MAXINPUTLENGTH = 200;
 	
-	//Initializing all controls on of the program
+	//======================================================================================================================
+	//||                                             Displayable controls                                                 ||  
+	//======================================================================================================================
+
 	TextArea chatText = new TextArea();
+	TextField inputField = new TextField();
+	TextField nameField = new TextField();
 	Button sendButton = new Button();
 	Button sendFileButton = new Button();
 	Button showFileButton = new Button();
-	TextField inputField = new TextField();
 	Button nameButton = new Button();
-	TextField nameField = new TextField();
 	ComboBox<String> recipient = new ComboBox<String>();
 	GridPane root = new GridPane();
 	View view = this;
 	
+	//======================================================================================================================
+	//||                                                  Variables                                                       ||  
+	//======================================================================================================================
+	
 	Controller controller;
+	
+	//======================================================================================================================
+	//||                                             Initializing methods                                                 ||  
+	//======================================================================================================================
 	
 	String path = "Notification.mp3";
 	Media media = new Media(new File(path).toURI().toString());
@@ -63,10 +74,13 @@ public class View extends Application {
 	Media media2 = new Media(new File(path2).toURI().toString());
 	MediaPlayer startMedia = new MediaPlayer(media2);
 		
-	public void resetMedia() {
-		Media medium = new Media(new File(path).toURI().toString());
-		mediaPlayer = new MediaPlayer(medium);
+	public static void main(String[] args) {
+		launch(args);
 	}
+	
+	//======================================================================================================================
+	//||                                             Initializing methods                                                 ||  
+	//======================================================================================================================
 	
 	@Override
 	public void start(Stage primaryStage) {
@@ -239,19 +253,9 @@ public class View extends Application {
 		primaryStage.show();
 	}
 	
-	private void sendFile(File file) {
-		if (selectedRecipient == null) {
-			showDialog("You did not select a recipient.\nYou might have lost connection");
-		} else {
-			String dest;
-			
-			if (selectedRecipient.equals("All")) {
-				showDialog("You cannot send a file in a group chat!");
-			} else {
-				dest = selectedRecipient;
-				controller.sendFile(file, dest);
-			}
-		}
+	private void resetMedia() {
+		Media medium = new Media(new File(path).toURI().toString());
+		mediaPlayer = new MediaPlayer(medium);
 	}
 	
 	byte[] unpack(int bytes) {
@@ -277,12 +281,16 @@ public class View extends Application {
 		}
 	}
 	
+	//======================================================================================================================
+	//||                                            GUI data displaying methods:                                          ||  
+	//======================================================================================================================
+	
 	private Map<String, String> conversations = new HashMap<String, String>();
 	private String selectedRecipient = "All";
 	private String lastSelectedRecipient = "All";
-	
 	private List<String> recipients = new ArrayList<String>();
 	private Map<String, Integer> newMessagesAmount = new HashMap<String, Integer>();
+	private Map<String, List<Image>> images = new HashMap<String, List<Image>>();
 	
 	private void updateRecipient() {
 		recipient.getItems().clear();
@@ -336,36 +344,9 @@ public class View extends Application {
 			selectedRecipient = null;
 			recipients.add("All");
 		} catch (IllegalStateException e) {
-			//TODO actualy do nothing...
+			e.printStackTrace();
 		}
 	}
-	
-	private void setName() {
-		if (nameField.getText().contains("(")) {
-			error("Cant use the sign: '(' ");
-		} else {
-			controller.setClientName(nameField.getText());
-			showDialog("Your name is set to: " + nameField.getText());
-			root.getChildren().remove(nameButton);
-			root.getChildren().remove(nameField);
-			root.getChildren().remove(chatText);
-			root.add(chatText, 0, 0, 3, 3);
-			inputField.setDisable(false);
-			recipient.setDisable(false);
-			sendButton.setDisable(false);
-			sendFileButton.setDisable(false);
-		}
-	}
-	
-	private void showDialog(String message) {
-		Stage dialog = new Stage();
-		dialog.initStyle(StageStyle.UTILITY);
-		Scene sc = new Scene(new Group(new Text(25, 25, message)), 260, 80);
-		dialog.setScene(sc);
-		dialog.show();
-	}
-	
-	Map<String, List<Image>> images = new HashMap<String, List<Image>>();
 	
 	public void addImage(Image image, String destination) {
 		if (!images.containsKey(destination)) {
@@ -391,28 +372,7 @@ public class View extends Application {
 		}
 	}
 	
-	private void showImage(Image image) {
-		ImageView iv1 = new ImageView();
-		iv1.setImage(image);
-		
-		GridPane rooot = new GridPane();
-		
-		Stage stage = new Stage();
-		iv1.fitWidthProperty().bind(stage.widthProperty());
-		Scene scene = new Scene(rooot, 600, 600);
-		
-		rooot.add(iv1, 1, 1);
-		
-		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-		stage.setScene(scene);
-		stage.show();
-	}
-	
-	public void error(String message) {
-		showDialog("ERROR: " + message);
-	}
-	
-	public String getRecipientValue() {
+	private String getRecipientValue() {
 		if (recipient.getValue() != null) {
 			return recipient.getValue().split(Pattern.quote(" ("))[0];
 		} else {
@@ -420,7 +380,7 @@ public class View extends Application {
 		}
 	}
 	
-	public int getRecipientValue(String receiver) {
+	private int getRecipientValue(String receiver) {
 		for (String s : this.recipient.getItems()) {
 			if (s.contains(receiver)) {
 				if (s.split(Pattern.quote(" (")).length > 1) {
@@ -432,47 +392,7 @@ public class View extends Application {
 		return 0;
 	}
 	
-	private void send() {
-		if (selectedRecipient == null) {
-			showDialog("You did not select a recipient.\nIt might have changed its name");
-		} else if (inputField.getText().length() > MAXINPUTLENGTH) {
-			showDialog("Too many characters");
-		} else {
-			if (!inputField.getText().isEmpty()) {
-				String dest;
-				
-				if (selectedRecipient.equals("All")) {
-					dest = "Anonymous";
-				} else {
-					dest = selectedRecipient;
-				}
-				
-				chatText.appendText("\n" + "You: " + inputField.getText());
-    			controller.receiveFromView(dest, inputField.getText());
-    			inputField.requestFocus();
-    			inputField.clear();
-			}
-		}
-	}
-	
-//	private void changeRecipientAmount(String recipient, int amount) {
-//		for (String s : this.recipient.getItems()) {
-//			if (s.contains(recipient)) {
-//				if (amount == 0) {
-//					s = recipient;
-//				} else {
-//					s = recipient + " (" + amount + ")";
-//				}
-//				break;
-//			}
-//		}
-//	}
-	
-	public static void main(String[] args) {
-		launch(args);
-	}
-	
-	public void updateText(String receiver) {
+	private void updateText(String receiver) {
 		if (receiver != null) {
 			conversations.put(selectedRecipient, chatText.getText());
 			chatText.setText(conversations.get(receiver));
@@ -507,5 +427,97 @@ public class View extends Application {
 		}
 		mediaPlayer.play();
 		resetMedia();
+	}
+	
+	//======================================================================================================================
+	//||                                            GUI popup/new window methods:                                         ||  
+	//======================================================================================================================
+	
+	private void showImage(Image image) {
+		ImageView iv1 = new ImageView();
+		iv1.setImage(image);
+		
+		GridPane rooot = new GridPane();
+		
+		Stage stage = new Stage();
+		iv1.fitWidthProperty().bind(stage.widthProperty());
+		Scene scene = new Scene(rooot, 600, 600);
+		
+		rooot.add(iv1, 1, 1);
+		
+		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		stage.setScene(scene);
+		stage.show();
+	}
+	
+	private void showDialog(String message) {
+		Stage dialog = new Stage();
+		dialog.initStyle(StageStyle.UTILITY);
+		Scene sc = new Scene(new Group(new Text(25, 25, message)), 260, 80);
+		dialog.setScene(sc);
+		dialog.show();
+	}
+	
+	public void error(String message) {
+		showDialog("ERROR: " + message);
+	}
+	
+	//======================================================================================================================
+	//||                                       GUI data relay to controller methods:                                      ||  
+	//======================================================================================================================
+	
+	private void send() {
+		if (selectedRecipient == null) {
+			showDialog("You did not select a recipient.\nIt might have changed its name");
+		} else if (inputField.getText().length() > MAXINPUTLENGTH) {
+			showDialog("Too many characters");
+		} else {
+			if (!inputField.getText().isEmpty()) {
+				String dest;
+				
+				if (selectedRecipient.equals("All")) {
+					dest = "Anonymous";
+				} else {
+					dest = selectedRecipient;
+				}
+				
+				chatText.appendText("\n" + "You: " + inputField.getText());
+    			controller.receiveFromView(dest, inputField.getText());
+    			inputField.requestFocus();
+    			inputField.clear();
+			}
+		}
+	}
+	
+	private void setName() {
+		if (nameField.getText().contains("(")) {
+			error("Cant use the sign: '(' ");
+		} else {
+			controller.setClientName(nameField.getText());
+			showDialog("Your name is set to: " + nameField.getText());
+			root.getChildren().remove(nameButton);
+			root.getChildren().remove(nameField);
+			root.getChildren().remove(chatText);
+			root.add(chatText, 0, 0, 3, 3);
+			inputField.setDisable(false);
+			recipient.setDisable(false);
+			sendButton.setDisable(false);
+			sendFileButton.setDisable(false);
+		}
+	}
+	
+	private void sendFile(File file) {
+		if (selectedRecipient == null) {
+			showDialog("You did not select a recipient.\nYou might have lost connection");
+		} else {
+			String dest;
+			
+			if (selectedRecipient.equals("All")) {
+				showDialog("You cannot send a file in a group chat!");
+			} else {
+				dest = selectedRecipient;
+				controller.sendFile(file, dest);
+			}
+		}
 	}
 }

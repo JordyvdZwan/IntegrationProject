@@ -12,21 +12,21 @@ public class SeqAckTable {
 	
 	Controller controller;
 	public static final int TIMEOUT = 1000;
+	Map<Integer, Integer> seqNrs = new HashMap<Integer, Integer>();
+	Map<Integer, Map<Integer, Boolean>> send = new HashMap<Integer, Map<Integer, Boolean>>();
+	Map<Integer, List<Integer>> receivedSeqNrs = new HashMap<Integer, List<Integer>>();
+	
+	//======================================================================================================================
+	//||                                               Constructor:                                                       ||  
+	//======================================================================================================================
 	
 	public SeqAckTable(Controller controller) {
 		this.controller = controller;
 	}
 	
-	Map<Integer, Integer> seqNrs = new HashMap<Integer, Integer>();
-	Map<Integer, Map<Integer, Boolean>> send = new HashMap<Integer, Map<Integer, Boolean>>();
-	Map<Integer, List<Integer>> receivedSeqNrs = new HashMap<Integer, List<Integer>>();
-	
-	public void addReceivedSeqNr(Integer source, Integer seq) {
-		if (!receivedSeqNrs.containsKey(source)) {
-			receivedSeqNrs.put(source, new ArrayList<Integer>());
-		}
-		receivedSeqNrs.get(source).add(seq);
-	}
+	//======================================================================================================================
+	//||                                              checking methods:                                                   ||  
+	//======================================================================================================================
 	
 	public boolean isReceivedSeqNr(Integer source, Integer seq) {
 		boolean found = false;
@@ -52,27 +52,27 @@ public class SeqAckTable {
 	
 	public Boolean isReceived(Integer address, Integer seq) {
 		Boolean res = false;
-//		System.out.println("Zit hij in de send ? : " + send.containsKey(address));
 		if (send.containsKey(address)) {
-//			System.out.println("Zit de seq in de keyset? " + send.get(address).containsKey(seq));
 			if (send.get(address).containsKey(seq)) {
-//				System.out.println("Wat is deze value dan? " + send.get(address).get(seq));
 				res = send.get(address).get(seq);
 			}
 		}
 		return res;
 	}
 	
-//	public void removeReceived(Integer address, Integer seq) {
-//		if (send.containsKey(address)) {
-//			if (send.get(address).containsKey(seq)) {
-//				send.get(address).remove(seq);
-//			}
-//		}
-//	}
-	
 	public void retransmit(JRTVPacket packet, int destination) {
 		controller.retransmit(packet, destination);
+	}
+	
+	//======================================================================================================================
+	//||                                           registering methods:                                                   ||  
+	//======================================================================================================================
+	
+	public void addReceivedSeqNr(Integer source, Integer seq) {
+		if (!receivedSeqNrs.containsKey(source)) {
+			receivedSeqNrs.put(source, new ArrayList<Integer>());
+		}
+		receivedSeqNrs.get(source).add(seq);
 	}
 	
 	public void registerAckPacket(JRTVPacket packet) {
@@ -88,7 +88,6 @@ public class SeqAckTable {
 	}
 	
 	public void registerSendPacket(JRTVPacket packet) {
-//		System.out.println("REGISTER PACKET:");
 		if (packet.isFile()) {
 			controller.getFileManager().registerSeqNr(packet.getSeqnr(),
 									new FilePacket(packet.getByteMessage()).getSequenceNumber());
@@ -117,6 +116,10 @@ public class SeqAckTable {
 			timeout.start();
 		}
 	}
+	
+	//======================================================================================================================
+	//||                                               get/set methods:                                                   ||  
+	//======================================================================================================================
 	
 	public Controller getController() {
 		return controller;

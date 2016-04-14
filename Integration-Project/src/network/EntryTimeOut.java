@@ -9,6 +9,7 @@ public class EntryTimeOut extends Thread {
 	Router router;
 	Integer nexthop;
 	boolean  receivednewroute = false;
+	public static final int TimeoutSeconds = 5;
 	
 	/**
 	 * Creates a new instance of the EntryTimeOut class.
@@ -27,13 +28,10 @@ public class EntryTimeOut extends Thread {
 	 * If the hop is still false, all it's entries will be deleted from the forwardingtable.
 	 */
 	public void run() {
-		//Checks if the specified hop is still a valid hop, 
-		//puts false, waits 3 seconds, if still false:
-		// remove all entries in the forwardingtable that contain this next hop as next hop. 
 		while (router.getForwardingTable().getvalidhops().get(nexthop)) {
 			router.getForwardingTable().getvalidhops().put(nexthop, false);
 			try {
-				TimeUnit.SECONDS.sleep(5); //TODO change to constant
+				TimeUnit.SECONDS.sleep(TimeoutSeconds);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

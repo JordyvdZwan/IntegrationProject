@@ -28,7 +28,7 @@ public class TimeOutTimer extends Thread {
 		this.packet.setSource(packet.getSource());
 		this.packet.setDestination(packet.getDestination());
 		this.packet.setHashPayload(packet.getHashPayload());
-//		this.packet.setNextHop(packet.getNextHop());
+		this.packet.setNextHop(packet.getNextHop());
 		
 		this.timeout = timeout;
 	}
@@ -51,10 +51,7 @@ public class TimeOutTimer extends Thread {
 		this.packet.setSource(packet.getSource());
 		this.packet.setDestination(packet.getDestination());
 		this.packet.setHashPayload(packet.getHashPayload());
-//		this.packet.setNextHop(packet.getNextHop());
-//		System.out.println("++++++++++++++++++++++++++++++++++ timeout constructor +++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-//		System.out.println(this.packet.getMessage());
-//		System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+		this.packet.setNextHop(packet.getNextHop());
 	}
 	
 	public void run() {
@@ -63,21 +60,12 @@ public class TimeOutTimer extends Thread {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-//		System.out.println("Is the destination the multicast address? : " + (packet.getDestination() == Controller.multicastAddress));
 		if (packet.getDestination() == Controller.multicastAddress) {
-//			System.out.println("Forwarding table keys : " + table.getController().getForwardingTable().keySet().toString() );
 			Set<Integer> i = table.getController().getForwardingTable().keySet();
 			for (Integer integer : i) {
-//				System.out.println("Is it a valid address?" + (integer != table.getController().getLocalIAddress() && integer != table.getController().multicastAddress));
 				if (integer != table.getController().getLocalIAddress() 
-									&& integer != table.getController().multicastAddress) {
-//					System.out.println("Is the packet received? : " + !table.isReceived(integer, packet.getSeqnr()));
+									&& integer != Controller.multicastAddress) {
 					if (!table.isReceived(integer, packet.getSeqnr())) {
-						System.out.println("++++++++++++++++++++++++++++++++++ before retransmission +++++++++++++++++++++++++++++++++++++++++++++++++++++");
-						System.out.println(this.packet.getMessage());
-						System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-//						packet.setBroadcasted(false);
-						
 						JRTVPacket p = new JRTVPacket("");
 						p.setByteMessage(packet.getByteMessage());
 						p.setAck(packet.isAck());
@@ -104,13 +92,9 @@ public class TimeOutTimer extends Thread {
 			if (!table.isReceived(packet.getDestination(), packet.getSeqnr()) 
 					  && table.getController()
 					  		.getForwardingTable().keySet().contains(packet.getDestination())) {
-//				System.out.println("++++++++++++++++++++++++++++++++++ before s retransmission +++++++++++++++++++++++++++++++++++++++++++++++++++");
-//				System.out.println(this.packet.getMessage());
-//				System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 				table.retransmit(packet, packet.getDestination());
 			}
 		}
-//		table.removeReceived(packet.getDestination(), packet.getSeqnr());
 		this.interrupt();
 	}
 	

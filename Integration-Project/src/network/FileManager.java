@@ -16,17 +16,22 @@ public class FileManager {
 	Controller controller;
 	public static final int PACKETSIZE = 800;
 	
+	//======================================================================================================================
+	//||                                                  Constructor                                                     ||  
+	//======================================================================================================================
+	
 	public FileManager(Controller controller) {
 		this.controller = controller;
 	}
+	
+	//======================================================================================================================
+	//||                                             File sending methods:                                                ||  
+	//======================================================================================================================
 	
 	List<JRTVPacket> packetsToBeSend = new ArrayList<JRTVPacket>();
 	List<Integer> knownSeqNumbers = new ArrayList<Integer>();
 	
 	public void handleFileAck(Integer acknr) {
-//		System.out.println("Acknr that gets checked: " + acknr);
-//		System.out.println("List: ");
-//		System.out.println(knownSeqNumbers);
 		if (knownSeqNumbers.contains(acknr)) {
 			knownSeqNumbers.remove(acknr);
 			sendPackets(1);
@@ -34,7 +39,6 @@ public class FileManager {
 	}
 	
 	public void registerSeqNr(int seqNr, int fileNr) {
-//		System.out.println("Seqnr that gets added: " + seqNr);
 		knownSeqNumbers.add(seqNr);
 	}
 	
@@ -56,17 +60,12 @@ public class FileManager {
 	}
 	
 	public void sendFile(File file, int client) {
-		System.out.println("Reading File and converting to bytes");
 		byte[] fileBytes = new byte[0];
 		try {
 			fileBytes = FileUtils.readFileToByteArray(file);
-//			fileBytes = Files.readAllBytes(file.toPath());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println("fileBytes Length: " + fileBytes.length);
-		System.out.println("Breaking file up into parts");
 		List<byte[]> fileParts = new ArrayList<byte[]>();
 		
 		boolean busy = true;
@@ -85,8 +84,7 @@ public class FileManager {
 				}
 			}
 		}
-		System.out.println("fileParts Length: " + fileParts.size());
-		System.out.println("putting bytes in filePackets");
+		
 		List<FilePacket> filePackets = new ArrayList<FilePacket>();
 		
 		int fileNumber = (int) (Math.random() * Integer.MAX_VALUE);
@@ -110,7 +108,6 @@ public class FileManager {
 			filePackets.add(filePacket);
 			counter++;
 		}
-		System.out.println("putting filePackets in JRTVPackets");
 		
 		List<JRTVPacket> packets = new ArrayList<JRTVPacket>();
 		
@@ -122,53 +119,37 @@ public class FileManager {
 			packet.setFile(true);
 			packet.setDestination(ip);
 			packets.add(packet);
-			System.out.println("seq nr: " + filePacket.getSequenceNumber());
-		}
-		
-		for (JRTVPacket p: packets) {
-			FilePacket f = new FilePacket(p.getByteMessage());
-			System.out.println("Dit is het sequence nummer: " + f.getSequenceNumber());
 		}
 		
 		packetsToBeSend.addAll(packets);
-		System.out.println("Packets Length: " + packets.size());
-		System.out.println("Sending first ten (or so) packets");
-		System.out.println("PacketsToBeSend Length: " + packetsToBeSend.size());
 		sendPackets(10);
-		System.out.println("Done initializing file Stream.");
 	}
+	
+	//======================================================================================================================
+	//||                                           File receiving methods:                                                ||  
+	//======================================================================================================================
 	
 	Map<Integer, List<FilePacket>> receivedFilePackets = new HashMap<Integer, List<FilePacket>>();
 	
 	public void handleFilePacket(JRTVPacket packet) {
 		FilePacket filePacket = new FilePacket(packet.getByteMessage());
-		System.out.println("seq nr: " + filePacket.getSequenceNumber());
-		System.out.println("file nr: " + filePacket.getFileNumber());
-		System.out.println("packet length: " + packet.getPayloadLength());
 		if (!receivedFilePackets.containsKey(packet.getSource())) {
 			receivedFilePackets.put(packet.getSource(), new ArrayList<FilePacket>());
 		}
 		receivedFilePackets.get(packet.getSource()).add(filePacket);
 		
-		System.out.println("Complete? " + 
-					 isComplete(filePacket.getFileNumber(), 
-									filePacket.getTotalAmount(), 
-											packet.getSource()));
 		if (isComplete(filePacket.getFileNumber(), 
 							filePacket.getTotalAmount(), 
 									packet.getSource())) {
-			System.out.println("Started to gather all file bytes");
 			List<byte[]> byteList = getFileBytes(packet.getSource(), 
 												filePacket.getFileNumber(), 
 													filePacket.getTotalAmount());
 			
 			if (!byteList.isEmpty()) {
-				System.out.println("Read Name Byte");
 				byte[] nameBytes = byteList.get(0);
 				byteList.remove(0);
 				String name = new String(nameBytes);
 				
-				System.out.println("Started creating one big bytearray");
 				byte[] bytes = new byte[0];
 				byte[] temp;
 				for (int i = 0; i < byteList.size(); i++) {
@@ -179,14 +160,11 @@ public class FileManager {
 					bytes = temp;
 				}
 				
-				System.out.println("Bytes length: " + bytes.length);
-				
 				File file = new File(name);
 				
 				try {
 					FileUtils.writeByteArrayToFile(file, bytes);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				

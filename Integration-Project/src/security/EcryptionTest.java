@@ -43,9 +43,6 @@ public class EcryptionTest {
 						RSA.getPrivateKey(-1062730494)), 
 								RSA.getPublicKey(-1062730494)).equals(tekst));
 		assertEquals(RSA.getPublicKey(-1062730494), RSA.getPublicKey(-1062730494));
-
-//		System.out.println(RSA.toKey(RSA.toBytes()) + "     " + RSA.getPublicKey(-1062730494));
-//		assertTrue(RSA.toKey(RSA.toBytes()).equals(RSA.getPublicKey(-1062730494)));
 	}
 
 	@Test
@@ -55,7 +52,6 @@ public class EcryptionTest {
 		String verify = RSA.decrypt(signed, RSA.getPublicKey(-1062730494));
 		
 		assertEquals(sign, verify);
-		//assertTrue(RSA2.verify(tekst, sign.getBytes(), RSA2.getPublicKey()));
 	}
 
 }

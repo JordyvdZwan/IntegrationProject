@@ -77,8 +77,6 @@ public class Router {
 			byte[] length2Bytes = new byte[4];
 			byte[] length3Bytes = new byte[4];
 			
-//			byte[] randomBytes = new byte[4];
-			
 			//Creating the byte array and putting in all data like lengths and keys.
 			byte[] bytes = new byte[16 + totalLength];
 			
@@ -123,8 +121,6 @@ public class Router {
 			packet.setByteMessage(bytes);
 			packet.setDiffie(true);
 			
-			
-//			sendDiffieResponse(bytes, packet);
 			packet.setSource(controller.getLocalIAddress());
 			packet.setDestination(destination);
 			controller.sendPacket(destination, packet);
@@ -171,7 +167,7 @@ public class Router {
 			int random = byteArrayToInt(randomb);
 			
 			if (!(diffiePacketOutstanding.containsKey(packet.getSource())
-								&& diffiePacketOutstanding.get(packet.getSource()))) { //TODO fix possible bug??
+								&& diffiePacketOutstanding.get(packet.getSource()))) {
 				sendDiffieResponse(bytes, packet);
 			} else if ((diffiePacketOutstanding.containsKey(packet.getSource()) 
 								&& diffiePacketOutstanding.get(packet.getSource())) 
@@ -254,7 +250,6 @@ public class Router {
 			if (packet.getSource() != controller.getLocalIAddress() && packet.getSource() != 0) {
 				//Puts true into the list with valid hops
 				table.getvalidhops().put(packet.getSource(), true);
-				//TODO: Split at destination, next hop and put these into the forwardingtables
 				byte[] bytes = packet.getMessage().getBytes();
 				int length = byteArrayToInt(Arrays.copyOfRange(bytes, 0, 4));
 				byte[] addresses = new byte[bytes.length - length - 4];
@@ -271,11 +266,11 @@ public class Router {
 				for (int i = 0; i < integers.length / 2; i++) {
 					accessableAddresses.add(integers[i * 2]);
 					if (integers[i * 2] != controller.getLocalIAddress()
-								 && integers[i * 2] != controller.multicastAddress 
-										&& packet.getSource() != controller.getLocalIAddress()) {//TODO CHANGE THIS BACK
+								 && integers[i * 2] != Controller.multicastAddress 
+										&& packet.getSource() != controller.getLocalIAddress()) {
 						if (integers[(i * 2) + 1] < MAXINFINITY) {
 							table.addHop(integers[i * 2], 
-										 packet.getSource(), integers[(i * 2) + 1] + 0);
+										 packet.getSource(), integers[(i * 2) + 1] + 1);
 						} else {
 							table.removeNextHop(integers[i * 2], packet.getSource());
 						}
@@ -312,14 +307,9 @@ public class Router {
 										"(" + getStringIP(packet.getSource()) + ") " + name);
 					controller.addRecipientToView(
 										"(" + getStringIP(packet.getSource()) + ") " + name);
-					//TODO name changing
 				}
 			}
 		}
-//		System.out.println("=-------------------------------------------------------------------------------=");
-//		System.out.println(table.getTable());
-//		System.out.println(addresstable);
-//		System.out.println("=-------------------------------------------------------------------------------=");
 	}
 	
 	public void removeFromTimeout(Integer source) {
@@ -356,7 +346,7 @@ public class Router {
 	
 	public String getName(int address) {
 		if (!addresstable.containsKey(address)) {
-			return "Anonymous"; //TODO
+			return "Anonymous";
 		}
 		return addresstable.get(address);
 	}
@@ -382,7 +372,6 @@ public class Router {
 		try {
 			return InetAddress.getByAddress(unpack(address)).getHostAddress().toString();
 		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
 			return null;
 		}
 	}

@@ -31,8 +31,6 @@ public class CreateEncryptedSessionPacket {
 	 */
 	public JRTVPacket encrypt(JRTVPacket packet, Key privatekey) {
 		byte[] data = packet.getByteMessage();
-//		byte[] encodeddata = Base64.encodeBase64(data);
-//		System.out.println(new String(encodeddata));
 		byte[] encrypt = OFB.enDecrypt(data, diffie.getKey().toByteArray());
 		String sign = new String(RSA.hash(encrypt));
 		byte[] signed = RSA.encrypt(sign, privatekey);
