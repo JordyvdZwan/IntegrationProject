@@ -66,6 +66,11 @@ public class ForwardingTable {
 		}
 	}
 	
+	/**
+	 * Returns a list of destinations given a next hop.
+	 * @param nexthop ip of the next hop.
+	 * @return list of destinations this hop can reach.
+	 */
 	public synchronized List<Integer> getPossibilities(Integer nexthop) {
 		List<Integer> result = new ArrayList<Integer>();
 		for (Integer i: forwardingtable.keySet()) {
@@ -77,6 +82,11 @@ public class ForwardingTable {
 		return result;
 	}
 	
+	/**
+	 * Returns the lowest hop cost to a certain destination.
+	 * @param destination destination ip you want to reach.
+	 * @return the lowest hop cost to the destination.
+	 */
 	public synchronized int getNextHopCost(Integer destination) {
 		//Loops through all the paths to the destination and selects the one with the lowest cost
 		int resultcost = 100;
@@ -89,7 +99,6 @@ public class ForwardingTable {
 		}
 		return resultcost;
 	}
-	
 	
 	/**
 	 * Puts a possible next hop into the forwardingtable at the right place.

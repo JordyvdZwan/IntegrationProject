@@ -19,17 +19,6 @@ public class DiffieHellman {
 		p = new BigInteger(LENGTH / 2, 100, r);
 	}
 	
-//	/**
-//	 * Constructor to receive a session.
-//	 * @param g
-//	 * @param p
-//	 * @param A Received form other party
-//	 */
-//	public DiffieHellman(BigInteger g, BigInteger p, BigInteger a) {
-//		SecureRandom r = new SecureRandom();
-//		a = new BigInteger(LENGTH / 2, 100, r);
-//	}
-	
 	/**
 	 * Generate the first round of variables.
 	 * @param k own generated key 	- Received number

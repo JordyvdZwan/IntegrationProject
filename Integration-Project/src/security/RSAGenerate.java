@@ -11,6 +11,10 @@ public class RSAGenerate {
 	
 	public static final String ALGORITHM = "RSA";	
 	
+	/**
+	 * This method Creates RSA Public and private keys
+	 * @param amount the amount of keys you want.
+	 */
 	public static void rsaGenerateKeys(int amount) {
 		try {
 			File publickeys = new File("publickeys.txt");

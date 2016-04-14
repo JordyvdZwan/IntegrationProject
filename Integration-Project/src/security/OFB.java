@@ -16,7 +16,12 @@ public class OFB {
 							+ "3475098740958613240985613208746098236"
 							+ "508736409182364099283464869320").toByteArray();
 
-	
+	/**
+	 * This method encrypts and decrypts a certain message.
+	 * @param message to be encrypted data.
+	 * @param key Key with which to encrypt.
+	 * @return Encrypted message.
+	 */
 	public static byte[] enDecrypt(byte[] message, byte[] key) {
 		/**
 		 * OFB

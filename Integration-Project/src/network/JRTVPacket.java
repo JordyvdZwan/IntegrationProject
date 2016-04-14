@@ -65,6 +65,10 @@ public class JRTVPacket {
 		this.payloadLength = message.getBytes().length;
 	}
 	
+	/**
+	 * Constructs a JRTVPacket given a byte array.
+	 * @param bytes byte array which represents a JRTVPacket.
+	 */
 	public JRTVPacket(byte[] bytes) {
 		byte[] header = new byte[HEADERLENGTH];
 		System.arraycopy(bytes, 0, header, 0, HEADERLENGTH);
@@ -115,6 +119,9 @@ public class JRTVPacket {
 		this.nextHop = byteArrayToInt(nexthop);
 	}
 	
+	/**
+	 * @return this packet in form of a byte array.
+	 */
 	public byte[] toByteArray() {
 		byte[] result = new byte[HEADERLENGTH + message.length];
 		
@@ -164,15 +171,12 @@ public class JRTVPacket {
 		System.arraycopy(message, 0, result, HEADERLENGTH, message.length);
 		return result;
 	}
-	
-	public int getNextHop() {
-		return nextHop;
-	}
 
-	public void setNextHop(int nextHop) {
-		this.nextHop = nextHop;
-	}
 
+	/**
+	 * Sets the flags given a byte.
+	 * @param flags byte containing the flags.
+	 */
 	private void setFlags(byte[] flags) {
 		Byte b = flags[0];
 		int value = b.intValue();
@@ -210,6 +214,9 @@ public class JRTVPacket {
 		}
 	}
 	
+	/**
+	 * Returns a byte corresponding to the flags set in this class.
+	 */
 	private byte getByteFlags() {
 		int value = 0;
 		byte b = 0;
@@ -241,6 +248,9 @@ public class JRTVPacket {
 		return b;
 	}
 	
+	/**
+	 * returns a int given a byte array.
+	 */
 	private static int byteArrayToInt(byte[] b) {
 	    return   b[3] & 0xFF |
 	            (b[2] & 0xFF) << 8 |
@@ -248,6 +258,9 @@ public class JRTVPacket {
 	            (b[0] & 0xFF) << 24;
 	}
 
+	/**
+	 * returns a byte array given a int.
+	 */
 	private static byte[] intToByteArray(int a) {
 	    return new byte[] {
 	        (byte) ((a >> 24) & 0xFF),
@@ -281,6 +294,9 @@ public class JRTVPacket {
 		return new String(message);
 	}
 
+	/**
+	 * Sets the message and the payloadlength.
+	 */
 	public void setMessage(String message) {
 		this.message = message.getBytes();
 		this.payloadLength = message.getBytes().length;
@@ -290,9 +306,12 @@ public class JRTVPacket {
 		return message;
 	}
 	
-	public void setByteMessage(byte[] bericht) {
-		this.message = bericht;
-		this.payloadLength = bericht.length;
+	/**
+	 * Sets the message and the payloadlength.
+	 */
+	public void setByteMessage(byte[] message) {
+		this.message = message;
+		this.payloadLength = message.length;
 	}
 
 	public Byte getFlags() {
@@ -397,5 +416,14 @@ public class JRTVPacket {
 
 	public void setPayloadLength(int payloadLength) {
 		this.payloadLength = payloadLength;
+	}
+	
+	
+	public int getNextHop() {
+		return nextHop;
+	}
+
+	public void setNextHop(int nextHop) {
+		this.nextHop = nextHop;
 	}
 }

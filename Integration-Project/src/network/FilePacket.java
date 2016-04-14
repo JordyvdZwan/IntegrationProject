@@ -16,6 +16,10 @@ public class FilePacket {
 	public FilePacket() {
 	}
 	
+	/**
+	 * Creates a file packet given a byte array.
+	 * @param bytes byte array that needs to be converted to a filePacket.
+	 */
 	public FilePacket(byte[] bytes) {
 		sequenceNumber = byteArrayToInt(Arrays.copyOfRange(bytes, 0, 4));
 		totalAmount = byteArrayToInt(Arrays.copyOfRange(bytes, 4, 8));
@@ -23,6 +27,10 @@ public class FilePacket {
 		data = Arrays.copyOfRange(bytes, 12, bytes.length);
 	}
 	
+	/**
+	 * Returns the packet in form of a byte array.
+	 * @return file packet in form of a byte array.
+	 */
 	public byte[] getBytes() {
 		byte[] result = new byte[12 + data.length];
 		
@@ -49,6 +57,9 @@ public class FilePacket {
 		return result;
 	}
 	
+	/**
+	 * Converts a Byte Array into a int.
+	 */
 	private static int byteArrayToInt(byte[] b) {
 	    return   b[3] & 0xFF |
 	            (b[2] & 0xFF) << 8 |
@@ -56,6 +67,9 @@ public class FilePacket {
 	            (b[0] & 0xFF) << 24;
 	}
 
+	/**
+	 * Converts a int into a byte array.
+	 */
 	private static byte[] intToByteArray(int a) {
 	    return new byte[] {
 	        (byte) ((a >> 24) & 0xFF),

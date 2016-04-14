@@ -6,10 +6,15 @@ public class Update extends Thread {
 	
 	Controller controller;
 	public static final long TIMEOUT = 1200;
+	
 	public Update(Controller controller) {
 		this.controller = controller;
 	}
 	
+	/**
+	 * This method Keeps sending your client name and forwarding table to the multicast address.
+	 * It is also used for sending the initialisation string in the beginning of the program.
+	 */
 	public void run() {
 		this.setName("Updater");
 		while (true) {

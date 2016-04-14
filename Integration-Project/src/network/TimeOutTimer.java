@@ -54,6 +54,9 @@ public class TimeOutTimer extends Thread {
 		this.packet.setNextHop(packet.getNextHop());
 	}
 	
+	/**
+	 * This method first waits a certain amount of time and then checks if it needs to retransmit the packet.
+	 */
 	public void run() {
 		try {
 			sleep(timeout);

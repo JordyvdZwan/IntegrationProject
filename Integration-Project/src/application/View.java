@@ -45,21 +45,66 @@ public class View extends Application {
 	//||                                             Displayable controls                                                 ||  
 	//======================================================================================================================
 
+	/**
+	 * Area that displays all the text corresponding to the selected recipient.
+	 */
 	TextArea chatText = new TextArea();
+	
+	/**
+	 * field in which you can write your message.
+	 */
 	TextField inputField = new TextField();
+	
+	/**
+	 * field used for entering in your name.
+	 */
 	TextField nameField = new TextField();
+	
+	/**
+	 * button used for sending a message typed in the inputField
+	 */
 	Button sendButton = new Button();
+	
+	/**
+	 * Button which opens an explorer window and sends the file you have selected.
+	 */
 	Button sendFileButton = new Button();
+	
+	/**
+	 * Button which will enable if a displayable file has been received.
+	 * It will then open a new window with the image if clicked on.
+	 */
 	Button showFileButton = new Button();
+	
+	/**
+	 * Button which will set the text written in the nameField as your name and send it to the controller.
+	 */
 	Button nameButton = new Button();
+	
+	/**
+	 * Combobox in which you can select to who you want to send your messages
+	 * It will also display the amount of new messages if you open the combobox
+	 * This is only updated at opening the menu.
+	 */
 	ComboBox<String> recipient = new ComboBox<String>();
+	
+	/**
+	 * The parent of all controls.
+	 */
 	GridPane root = new GridPane();
+	
+	/**
+	 * Variable used for accessing the view in a event handler where this did not work.
+	 */
 	View view = this;
 	
 	//======================================================================================================================
 	//||                                                  Variables                                                       ||  
 	//======================================================================================================================
 	
+	/**
+	 * Controller which controls all of the logic of the gui.
+	 */
 	Controller controller;
 	
 	//======================================================================================================================
@@ -253,11 +298,19 @@ public class View extends Application {
 		primaryStage.show();
 	}
 	
+	/**
+	 * Resets the media to be able to play again.
+	 */
 	private void resetMedia() {
 		Media medium = new Media(new File(path).toURI().toString());
 		mediaPlayer = new MediaPlayer(medium);
 	}
 	
+	/**
+	 * returns a bytearray given an integer.
+	 * @param bytes integer to be converted to bytes.
+	 * @return bytearray corresponing to the integer given.
+	 */
 	byte[] unpack(int bytes) {
 		return new byte[] {
 			(byte) ((bytes >>> 24) & 0xff),
@@ -267,6 +320,10 @@ public class View extends Application {
 		};
 	}
 	
+	/**
+	 * Enables controlls after the controller has initialized.
+	 * @param address ip address of local computer to be displayed.
+	 */
 	public void start(int address) {
 		nameField.setDisable(false);
 		
@@ -285,13 +342,39 @@ public class View extends Application {
 	//||                                            GUI data displaying methods:                                          ||  
 	//======================================================================================================================
 	
+	/**
+	 * Map which maps the source Name to a string which is the conversation.
+	 */
 	private Map<String, String> conversations = new HashMap<String, String>();
+	
+	/**
+	 * recipient seleced at this time.
+	 */
 	private String selectedRecipient = "All";
+	
+	/**
+	 * recipient last selected.
+	 */
 	private String lastSelectedRecipient = "All";
+	
+	/**
+	 * list of recipients reachable used for displaying the items in the combobox.
+	 */
 	private List<String> recipients = new ArrayList<String>();
+	
+	/**
+	 * Maps names of sources to the amount of new messages.
+	 */
 	private Map<String, Integer> newMessagesAmount = new HashMap<String, Integer>();
+	
+	/**
+	 * Maps names of sources to Images they are able to view using the show file button.
+	 */
 	private Map<String, List<Image>> images = new HashMap<String, List<Image>>();
 	
+	/**
+	 * Updates the recipient combobox used when opening.
+	 */
 	private void updateRecipient() {
 		recipient.getItems().clear();
 		recipient.getItems().add("All" + " (" + newMessagesAmount.get("All") + ")");
@@ -309,6 +392,10 @@ public class View extends Application {
 		}
 	}
 	
+	/**
+	 * Adds a recipient to the list of available recipients.
+	 * @param receiver recipient to be added.
+	 */
 	public void addRecipient(String receiver) {
 		try {
 			if (!recipients.contains(receiver) && !receiver.equals("Anonymous")) {
@@ -323,6 +410,10 @@ public class View extends Application {
 		}
 	}
 	
+	/**
+	 * Removes a recipient from the list of available recipients.
+	 * @param receiver recipient to be removed.
+	 */
 	public void removeRecipient(String receiver) {
 		if (receiver != null) {
 			try {
@@ -333,26 +424,21 @@ public class View extends Application {
 					}
 				}
 			} catch (IllegalStateException e) {
-				System.out.println("Zeikerds...");
+				e.printStackTrace();
 			}
 		}
 	}
 	
-	public void removeAllRecipient() {
-		try {
-			recipients.clear();
-			selectedRecipient = null;
-			recipients.add("All");
-		} catch (IllegalStateException e) {
-			e.printStackTrace();
+	/**
+	 * Adds an image to the to be displayed images map.
+	 * @param image Image to be added to the list.
+	 * @param source Source of the person who send it.
+	 */
+	public void addImage(Image image, String source) {
+		if (!images.containsKey(source)) {
+			images.put(source, new ArrayList<Image>());
 		}
-	}
-	
-	public void addImage(Image image, String destination) {
-		if (!images.containsKey(destination)) {
-			images.put(destination, new ArrayList<Image>());
-		}
-		images.get(destination).add(image);
+		images.get(source).add(image);
 		if (images.containsKey(selectedRecipient) && !images.get(selectedRecipient).isEmpty()) {
 			showFileButton.setDisable(false);
 		} else {
@@ -360,6 +446,9 @@ public class View extends Application {
 		}
 	}
 	
+	/**
+	 * Shows an image and enables/disables the show file button as neccesary.
+	 */
 	private void showImage() {
 		if (images.containsKey(selectedRecipient) && !images.get(selectedRecipient).isEmpty()) {
 			showImage(images.get(selectedRecipient).get(0));
@@ -372,6 +461,10 @@ public class View extends Application {
 		}
 	}
 	
+	/**
+	 * This method determines the current recipient that is selected without the new message counter.
+	 * @return currently selected recipient.
+	 */
 	private String getRecipientValue() {
 		if (recipient.getValue() != null) {
 			return recipient.getValue().split(Pattern.quote(" ("))[0];
@@ -380,18 +473,10 @@ public class View extends Application {
 		}
 	}
 	
-	private int getRecipientValue(String receiver) {
-		for (String s : this.recipient.getItems()) {
-			if (s.contains(receiver)) {
-				if (s.split(Pattern.quote(" (")).length > 1) {
-					return Integer.parseInt(s.split(Pattern.quote(" ("))[1].replace(")", ""));
-				}
-				break;
-			}
-		}
-		return 0;
-	}
-	
+	/**
+	 * Updates the chat text and displays the chat conversationt coresponding to the receiver.
+	 * @param receiver client you will be sending to and which chat conversation you will see.
+	 */
 	private void updateText(String receiver) {
 		if (receiver != null) {
 			conversations.put(selectedRecipient, chatText.getText());
@@ -407,6 +492,12 @@ public class View extends Application {
 		}
 	}
 	
+	/**
+	 * Adds a message to the chat and plays a sound and updates the new message counter if source not selected recipient.
+	 * @param client client who send the message.
+	 * @param message Message that is received.
+	 * @param broadcasted boolean telling if the message was broadcasted or a private message.
+	 */
 	public void addMessage(String client, String message, boolean broadcasted) {
 		if (broadcasted) {
 			if (lastSelectedRecipient.equals("All")) {
@@ -433,6 +524,10 @@ public class View extends Application {
 	//||                                            GUI popup/new window methods:                                         ||  
 	//======================================================================================================================
 	
+	/**
+	 * Shows a new window with the image that has been received first by the person.
+	 * @param image image that has been received
+	 */
 	private void showImage(Image image) {
 		ImageView iv1 = new ImageView();
 		iv1.setImage(image);
@@ -450,6 +545,10 @@ public class View extends Application {
 		stage.show();
 	}
 	
+	/**
+	 * Displays a diaglog with a certain message.
+	 * @param message message that it send.
+	 */
 	private void showDialog(String message) {
 		Stage dialog = new Stage();
 		dialog.initStyle(StageStyle.UTILITY);
@@ -458,6 +557,10 @@ public class View extends Application {
 		dialog.show();
 	}
 	
+	/**
+	 * Displays a new dialog with the string error: and a message.
+	 * @param message message to be displayed.
+	 */
 	public void error(String message) {
 		showDialog("ERROR: " + message);
 	}
@@ -466,6 +569,9 @@ public class View extends Application {
 	//||                                       GUI data relay to controller methods:                                      ||  
 	//======================================================================================================================
 	
+	/**
+	 * This method takes the string in the inputField and sends it to the controller to be send to the selected recipient.
+	 */
 	private void send() {
 		if (selectedRecipient == null) {
 			showDialog("You did not select a recipient.\nIt might have changed its name");
@@ -489,6 +595,9 @@ public class View extends Application {
 		}
 	}
 	
+	/**
+	 * This method takes the string in the nameField and passes it to the controller to set is as the clientname.
+	 */
 	private void setName() {
 		if (nameField.getText().contains("(")) {
 			error("Cant use the sign: '(' ");
@@ -506,6 +615,10 @@ public class View extends Application {
 		}
 	}
 	
+	/**
+	 * Passes a file on to the controller to tbe send to the selected recipient.
+	 * @param file
+	 */
 	private void sendFile(File file) {
 		if (selectedRecipient == null) {
 			showDialog("You did not select a recipient.\nYou might have lost connection");

@@ -18,6 +18,10 @@ public class Connection extends Thread {
 	Update update;
 	Controller controller;
 	
+	/**
+	 * Sets up the Socket.
+	 * @param portnumber portnumber used for the socket.
+	 */
 	public Connection(int portnumber, String mcaddress, Controller controller) {
 		this.controller = controller;
 		try {
@@ -31,7 +35,9 @@ public class Connection extends Thread {
 		this.start();
 	}
 	
-	//Tries to receive a new datagram, if it gets one, put it in the queue.
+	/**
+	 * Tries to receive a new datagram, if it gets one, put it in the queue.
+	 */
 	public void run() {
 		while (true) {
 			byte[] buffer = new byte[1000];
@@ -49,17 +55,23 @@ public class Connection extends Thread {
 
 	}
 	
-	//Sends a datagrampacket coming from the client
+	/**
+	 * Sends a datagrampacket coming from the client
+	 * @param packet Packet to be send
+	 */
 	public void send(DatagramPacket packet) {
 		try {
 			socket.send(packet);
 		} catch (IOException e) {
-			
 			e.printStackTrace();
 		}
 		
 	}
 	
+	/**
+	 * Returns the first received packet.
+	 * @return first received packet
+	 */
 	public DatagramPacket getFirstInQueue() {
 		DatagramPacket selectedpacket = null;
 		if (!queuedpackets.isEmpty()) {

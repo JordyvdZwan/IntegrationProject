@@ -10,6 +10,14 @@ import org.apache.commons.codec.binary.Base64;
 
 public class RSAInterperate {
 	
+	/**
+	 * This method returns a public key given a file name and number of the key.
+	 * @param number which public key to get from the file.
+	 * @param file in which file to read the data
+	 * @return Public key
+	 * @throws NumberFormatException
+	 * @throws IOException
+	 */
 	public static Key rsaInterperatePublicKey(int number, String file) 
 												throws NumberFormatException, IOException {
 		BufferedReader in = new BufferedReader(new FileReader(file));
@@ -27,6 +35,14 @@ public class RSAInterperate {
 		return null;
 	}
 	
+	/**
+	 * This method returns a private key given a file name and number of the key.
+	 * @param number which private key to get from the file.
+	 * @param file in which file to read the data.
+	 * @return public key
+	 * @throws NumberFormatException
+	 * @throws IOException
+	 */
 	public static Key rsaInterperatePrivateKey(int number, String file)
 												throws NumberFormatException, IOException {
 		BufferedReader in = new BufferedReader(new FileReader(file));

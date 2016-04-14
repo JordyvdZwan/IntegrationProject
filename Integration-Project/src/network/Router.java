@@ -127,6 +127,9 @@ public class Router {
 		}
 	}
 	
+	/**
+	 * This method returns an int given a byte array.
+	 */
 	private static int byteArrayToInt(byte[] b) {
 	    return   b[3] & 0xFF |
 	            (b[2] & 0xFF) << 8 |
@@ -134,6 +137,9 @@ public class Router {
 	            (b[0] & 0xFF) << 24;
 	}
 
+	/**
+	 * This method returns a byte array given a int.
+	 */
 	private static byte[] intToByteArray(int a) {
 	    return new byte[] {
 	        (byte) ((a >> 24) & 0xFF),
@@ -177,6 +183,9 @@ public class Router {
 		}
 	}
 	
+	/**
+	 * This Method responds on a received diffie packet.
+	 */
 	public void sendDiffieResponse(byte[] bytes, JRTVPacket packet) {
 		byte[] lengthb1 = new byte[4];
 		byte[] lengthb2 = new byte[4];
@@ -215,6 +224,11 @@ public class Router {
 		controller.sendPacket(packet.getSource(), p);
 	}
 	
+	/**
+	 * Returns the corresponding encryption class given a destination.
+	 * @param destination ip of the client whos encryption you want.
+	 * @return encryption file.
+	 */
 	public CreateEncryptedSessionPacket getEncryption(int destination) {
 		if (hasEncryptionKey(destination)) {
 			return encryption.get(destination);
@@ -223,10 +237,20 @@ public class Router {
 		}
 	}
 	
+	/**
+	 * returns wheter or not this client has an encryption for this person.
+	 * @param destination ip of client from who you want to know wheter you have the encryption.
+	 * @return true if you have the encryption otherwise false.
+	 */
 	public boolean hasEncryptionKey(int destination) {
 		return encryption.containsKey(destination) && encryption.get(destination).hasKey();
 	}
 	
+	/**
+	 * Checks wether you have send an diffie packet.
+	 * @param destination ip address of the client for which you are checking
+	 * @return true if you have a packet outstanding.
+	 */
 	public boolean isSettingUpDiffie(int destination) {
 		if (diffiePacketOutstanding.containsKey(destination)) {
 			return diffiePacketOutstanding.get(destination);
@@ -240,11 +264,27 @@ public class Router {
 	//||                                           Routing methods:                                                       ||  
 	//======================================================================================================================
 		
-	
+	/**
+	 * Table filled with ip addresses and a name.
+	 */
 	private Map<Integer, String> addresstable = new HashMap<Integer, String>();
+	
+	/**
+	 * The forwarding table of this router.
+	 */
 	private ForwardingTable table = new ForwardingTable(this);
+	
+	/**
+	 * All the entry timeouts.
+	 */
 	private Map<Integer, EntryTimeOut> timeouts = new HashMap<Integer, EntryTimeOut>();
 	
+	/**
+	 * This method will add the routing table to its own.
+	 * Also start a entry timeout for the entries it enters.
+	 * It also adds the name to the addresstable.
+	 * @param packet packet to process.
+	 */
 	public void processUpdate(JRTVPacket packet) {
 		if (!controller.getSettingUp()) {
 			if (packet.getSource() != controller.getLocalIAddress() && packet.getSource() != 0) {
@@ -312,6 +352,10 @@ public class Router {
 		}
 	}
 	
+	/**
+	 * Removes all info of a person if connection was lost.
+	 * @param source person of which to delete the info.
+	 */
 	public void removeFromTimeout(Integer source) {
 		timeouts.remove(source);
 		controller.removeRecipientToView(getName(source));
@@ -321,6 +365,11 @@ public class Router {
 		addresstable.remove(source);
 	}
 	
+	/**
+	 * returns a ip address given a name.
+	 * @param client name of a client.
+	 * @return ip address of the corresponding client.
+	 */
 	public Integer getIP(String client) {
 		Integer result = null;
 		if (client.equals("Anonymous")) {
@@ -336,23 +385,32 @@ public class Router {
 		return result;
 	}
 	
+	/**
+	 * Returns the next hop corresponding to the given destination ip.
+	 * @param destination destination ip address.
+	 * @return next hop to reach this destination.
+	 */
 	public int getNextHop(Integer destination) {
 		return table.getNextHop(destination);
 	}
 	
+	/**
+	 * Returns the next hop cost corresponding to the given destination ip.
+	 * @param destination destination ip address.
+	 * @return next hop cost to reach this destination.
+	 */
 	public int getNextHopCost(Integer destination) {
 		return table.getNextHopCost(destination);
 	}
 	
+	/**
+	 * If available returns a name given a integer ip address
+	 */
 	public String getName(int address) {
 		if (!addresstable.containsKey(address)) {
 			return "Anonymous";
 		}
 		return addresstable.get(address);
-	}
-	
-	public int getIntIP(String client) {
-		return getIP(client);
 	}
 	
 	//======================================================================================================================
@@ -368,6 +426,11 @@ public class Router {
 		};
 	}
 	
+	/**
+	 * Returns a String ip address given a integer representation.
+	 * @param address ip as an integer
+	 * @return IP as an String in form 0.0.0.0.
+	 */
 	public static String getStringIP(int address) {
 		try {
 			return InetAddress.getByAddress(unpack(address)).getHostAddress().toString();

@@ -14,6 +14,10 @@ import application.Controller;
 public class FileManager {
 
 	Controller controller;
+	
+	/**
+	 * Maximum amount of bytes of data in the file packets.
+	 */
 	public static final int PACKETSIZE = 800;
 	
 	//======================================================================================================================
@@ -28,9 +32,21 @@ public class FileManager {
 	//||                                             File sending methods:                                                ||  
 	//======================================================================================================================
 	
+	/**
+	 * JRTVPackets that need to be send out.
+	 */
 	List<JRTVPacket> packetsToBeSend = new ArrayList<JRTVPacket>();
+	
+	/**
+	 * Known sequence numbers to be connected to a file packet.
+	 * If such a sequence number is received it will send a new packet.
+	 */
 	List<Integer> knownSeqNumbers = new ArrayList<Integer>();
 	
+	/**
+	 * this method checks if the given ack is connected to a file packet and if so sends a new packet.
+	 * @param acknr acknr to be checked.
+	 */
 	public void handleFileAck(Integer acknr) {
 		if (knownSeqNumbers.contains(acknr)) {
 			knownSeqNumbers.remove(acknr);
@@ -38,10 +54,18 @@ public class FileManager {
 		}
 	}
 	
+	/**
+	 * Puts the sequence number in the map to signal when this packet is acked you can send a new packet.
+	 * @param seqNr seq number to be registered
+	 */
 	public void registerSeqNr(int seqNr, int fileNr) {
 		knownSeqNumbers.add(seqNr);
 	}
 	
+	/**
+	 * Send an amount of packets on the front of the to be send packets list.
+	 * @param amount to be send amount.
+	 */
 	private void sendPackets(int amount) {
 		int counter = amount;
 		while (counter > 0) {
@@ -59,6 +83,13 @@ public class FileManager {
 		}
 	}
 	
+	/**
+	 * This method will convert a file to a byte array and split it.
+	 * Then it will put it into filePacktets.
+	 * And those filepackets will be put in a JRTVPacket ready for being send.
+	 * @param file file to be send.
+	 * @param client destination.
+	 */
 	public void sendFile(File file, int client) {
 		byte[] fileBytes = new byte[0];
 		try {
@@ -129,8 +160,16 @@ public class FileManager {
 	//||                                           File receiving methods:                                                ||  
 	//======================================================================================================================
 	
+	/**
+	 * Map with all file parts.
+	 */
 	Map<Integer, List<FilePacket>> receivedFilePackets = new HashMap<Integer, List<FilePacket>>();
 	
+	/**
+	 * Add the previous filepacket to the list and check if you have all the parts of that file.
+	 * if you have all the parts you will put the file together and write it to the disk.
+	 * @param packet received JRTVPacket containing the FilePacket.
+	 */
 	public void handleFilePacket(JRTVPacket packet) {
 		FilePacket filePacket = new FilePacket(packet.getByteMessage());
 		if (!receivedFilePackets.containsKey(packet.getSource())) {
@@ -174,6 +213,13 @@ public class FileManager {
 		}
 	}
 	
+	/**
+	 * This method checks if a given file is complete and ready for being put together.
+	 * @param fileNumber Number of the file that is received.
+	 * @param maxAmount Amount of file packets this file has.
+	 * @param source Sourc address of client.
+	 * @return true if all parts are present otherwise false.
+	 */
 	private boolean isComplete(Integer fileNumber, Integer maxAmount, Integer source) {
 		for (int i = 1; i <= maxAmount; i++) {
 			if (!receivedFilePart(source, fileNumber, i)) {
@@ -183,6 +229,13 @@ public class FileManager {
 		return true;
 	}
 	
+	/**
+	 * This Method looks if it can find a certain file part.
+	 * @param source source ip of the sender.
+	 * @param fileNumber filenumber of the file that needs to be checked.
+	 * @param seqNr sequence number of the part you want to check.
+	 * @return true if the file part is present.
+	 */
 	private boolean receivedFilePart(int source, int fileNumber, int seqNr) {
 		for (FilePacket filePacket : receivedFilePackets.get(source)) {
 			if (filePacket.fileNumber == fileNumber && filePacket.sequenceNumber == seqNr) {
@@ -192,6 +245,13 @@ public class FileManager {
 		return false;
 	}
 	
+	/**
+	 * This method returns the entire file in form of a list with byte arrays.
+	 * @param source source ip of the sender.
+	 * @param fileNumber filenumber of the wanted file.
+	 * @param maxAmount amount of packets that belong to this file.
+	 * @return a list with bytearrays containing the file.
+	 */
 	private List<byte[]> getFileBytes(int source, int fileNumber, int maxAmount) {
 		List<byte[]> res = new ArrayList<byte[]>();
 		for (int i = 1; i <= maxAmount; i++) {
@@ -200,6 +260,13 @@ public class FileManager {
 		return res;
 	}
 	
+	/**
+	 * This method returns a single byte array.
+	 * @param source ip of the sender.
+	 * @param fileNumber file numer of the file you want.
+	 * @param seqNr sequence number of the file part you want.
+	 * @return byte array that corresponds to the criteria.
+	 */
 	private byte[] getByteArray(int source, int fileNumber, int seqNr) {
 		for (FilePacket filePacket : receivedFilePackets.get(source)) {
 			if (filePacket.fileNumber == fileNumber && filePacket.sequenceNumber == seqNr) {

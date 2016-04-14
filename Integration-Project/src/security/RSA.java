@@ -89,7 +89,11 @@ public class RSA {
 	    return new String(dectyptedText);
 	}
 
-	
+	/**
+	 * Gets a private key of a source.
+	 * @param source ip of the client which key you want.
+	 * @return Public key of the client.
+	 */
 	public static Key getPublicKey(int source) {
 		Key key = null;
 		try {
@@ -105,6 +109,11 @@ public class RSA {
 		return key;
 	}
 	
+	/**
+	 * Gets a private key of a source (Normaly not done like this but satisfactory for this project)
+	 * @param source ip of the client which key you want.
+	 * @return Private key of the client.
+	 */
 	public static Key getPrivateKey(int ip) {
 		Key key = null;
 		try {
@@ -122,6 +131,11 @@ public class RSA {
 		return key;
 	}
 	
+	/**
+	 * given bytes it constructs a public key.
+	 * @param bytes the to be converted bytes.
+	 * @return the Public key.
+	 */
 	public static Key toPublicKey(byte[] bytes) { 
 		Key key = null;
 		try {
@@ -132,6 +146,11 @@ public class RSA {
 		return key;
 	}
 	
+	/**
+	 * given bytes it constructs a private key.
+	 * @param bytes the to be converted bytes.
+	 * @return the Private key.
+	 */
 	public static Key toPrivateKey(byte[] bytes) { 
 		Key key = null;
 		try {

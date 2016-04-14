@@ -19,12 +19,18 @@ public class EcryptionTest {
 	DiffieHellman d = new DiffieHellman();
 	DiffieHellman h = new DiffieHellman();
 	
+	/**
+	 * This tests whether the OFB encnryption works.
+	 */
 	@Test
 	public void testOFBEnDecrypt() {
 		byte[] encrypt = OFB.enDecrypt(text, key);
 		assertTrue(Arrays.equals(OFB.enDecrypt(encrypt, key), text));
 	}
 	
+	/**
+	 * This tests whether the diffie Hellman exchange works.
+	 */
 	@Test
 	public void testDiffie() {
 		BigInteger a = d.generate(d.geta(), d.getg(), d.getp());
@@ -34,6 +40,9 @@ public class EcryptionTest {
 		assertEquals(keyd, keyh);
 	}
 	
+	/**
+	 * This tests whether the RSA signing and encrypting works.
+	 */
 	@Test
 	public void testRSA() {
 		assertTrue(RSA.decrypt(RSA.encrypt(tekst, 
@@ -45,6 +54,9 @@ public class EcryptionTest {
 		assertEquals(RSA.getPublicKey(-1062730494), RSA.getPublicKey(-1062730494));
 	}
 
+	/**
+	 * This tests whether the RSA signing works using hashing.
+	 */
 	@Test
 	public void testRSASigning() {
 		String sign = new String(RSA.hash(tekst.getBytes()));
