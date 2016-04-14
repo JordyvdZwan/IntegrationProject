@@ -1,10 +1,5 @@
 package network;
 
-import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.concurrent.TimeUnit;
-
 import application.Controller;
 
 public class Update extends Thread {
@@ -13,21 +8,18 @@ public class Update extends Thread {
 	public static final long TIMEOUT = 1200;
 	public Update(Controller controller) {
 		this.controller = controller;
-		this.setDaemon(true);
-		this.start();
-		
 	}
 	
 	public void run() {
 		this.setName("Updater");
-		while(true) {
+		while (true) {
 			JRTVPacket packet = null;
 			if (controller.getSettingUp()) {
 				if (controller.getInitString() != null) {
 					packet = new JRTVPacket(controller.getInitString());
 				}
 				try {
-					this.sleep(TIMEOUT / 3);
+					sleep(TIMEOUT / 3);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -37,7 +29,8 @@ public class Update extends Thread {
 				}
 			} else {
 				packet = new JRTVPacket(controller.getClientName());
-				byte[] bytes = new byte[4 * (2 + (2 * controller.getForwardingTable().keySet().size()))];
+				byte[] bytes = new byte[4 * (2 + 
+											(2 * controller.getForwardingTable().keySet().size()))];
 				
 				bytes[0] = intToByteArray(controller.getLocalIAddress())[0];
 				bytes[1] = intToByteArray(controller.getLocalIAddress())[1];
@@ -75,7 +68,7 @@ public class Update extends Thread {
 				
 				packet.setMessage(new String(lengthb) + packet.getMessage() + new String(bytes));
 				try {
-					this.sleep(TIMEOUT);
+					sleep(TIMEOUT);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -83,7 +76,7 @@ public class Update extends Thread {
 					packet.setUpdate(true);
 //					packet.setDestination(Controller.multicastAddress);
 //					packet.setSource(controller.getLocalIAddress());
-					controller.broadcastPacket(packet);//TODO niet zo mooi
+					controller.broadcastPacket(packet); //TODO niet zo mooi
 				}
 			}
 		}

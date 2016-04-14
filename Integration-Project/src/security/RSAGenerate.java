@@ -11,7 +11,7 @@ public class RSAGenerate {
 	
 	public static final String ALGORITHM = "RSA";	
 	
-	public static void RSAGenerateKeys(int amount) {
+	public static void rsaGenerateKeys(int amount) {
 		try {
 			File publickeys = new File("publickeys.txt");
 			PrintWriter printerpublic = new PrintWriter(publickeys);
@@ -19,15 +19,16 @@ public class RSAGenerate {
 				try {
 					KeyPairGenerator kpg = KeyPairGenerator.getInstance(ALGORITHM);
 					KeyPair kp = kpg.generateKeyPair();
-					Key PublicKey = kp.getPublic();
-					Key PrivateKey = kp.getPrivate();
-					
-					System.out.println((i + 1) + " " + new String(Base64.encodeBase64(PublicKey.getEncoded())));
-					printerpublic.println((i + 1) + " " + new String(Base64.encodeBase64(PublicKey.getEncoded())));				
+					Key publicKey = kp.getPublic();
+					Key privateKey = kp.getPrivate();
+
+					printerpublic.println((i + 1) + " " + 
+							  new String(Base64.encodeBase64(publicKey.getEncoded())));				
 					
 					File privatekey = new File("privatekey" + (i + 1) + ".txt");
 					PrintWriter printerprivate = new PrintWriter(privatekey);				
-					printerprivate.write((i + 1) + " " + new String(Base64.encodeBase64(PrivateKey.getEncoded())));
+					printerprivate.write((i + 1) + " " + 
+							  new String(Base64.encodeBase64(privateKey.getEncoded())));
 					
 					printerprivate.flush();
 					printerpublic.flush();
@@ -35,15 +36,15 @@ public class RSAGenerate {
 					printerprivate.close();
 				} catch (NoSuchAlgorithmException e) {
 					e.printStackTrace();
-				} finally {
-				}
+				} 
 			}
+			printerpublic.close();
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
 		}
 	}
 	
 	public static void main(String[] args) {
-		RSAGenerateKeys(4);
+		rsaGenerateKeys(4);
 	}
 }

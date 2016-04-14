@@ -2,7 +2,6 @@ package network;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,13 +39,15 @@ public class FileManager {
 	}
 	
 	private void sendPackets(int amount) {
-		while (amount > 0) {
+		int counter = amount;
+		while (counter > 0) {
 			if (packetsToBeSend.size() > 0) {
 				JRTVPacket packet = packetsToBeSend.get(0);
-				if (controller.getRouter().getForwardingTable().getTable().containsKey(packet.getDestination())) {
+				if (controller.getRouter().getForwardingTable()
+									.getTable().containsKey(packet.getDestination())) {
 					packetsToBeSend.remove(0);
 					controller.sendPacket(packet.getDestination(), packet);
-					amount--;
+					counter--;
 				}
 			} else {
 				break;
@@ -124,7 +125,7 @@ public class FileManager {
 			System.out.println("seq nr: " + filePacket.getSequenceNumber());
 		}
 		
-		for(JRTVPacket p: packets) {
+		for (JRTVPacket p: packets) {
 			FilePacket f = new FilePacket(p.getByteMessage());
 			System.out.println("Dit is het sequence nummer: " + f.getSequenceNumber());
 		}
@@ -149,10 +150,17 @@ public class FileManager {
 		}
 		receivedFilePackets.get(packet.getSource()).add(filePacket);
 		
-		System.out.println("Complete? " + isComplete(filePacket.getFileNumber(), filePacket.getTotalAmount(), packet.getSource()));
-		if (isComplete(filePacket.getFileNumber(), filePacket.getTotalAmount(), packet.getSource())) {
+		System.out.println("Complete? " + 
+					 isComplete(filePacket.getFileNumber(), 
+									filePacket.getTotalAmount(), 
+											packet.getSource()));
+		if (isComplete(filePacket.getFileNumber(), 
+							filePacket.getTotalAmount(), 
+									packet.getSource())) {
 			System.out.println("Started to gather all file bytes");
-			List<byte[]> byteList = getFileBytes(packet.getSource(), filePacket.getFileNumber(), filePacket.getTotalAmount());
+			List<byte[]> byteList = getFileBytes(packet.getSource(), 
+												filePacket.getFileNumber(), 
+													filePacket.getTotalAmount());
 			
 			if (!byteList.isEmpty()) {
 				System.out.println("Read Name Byte");

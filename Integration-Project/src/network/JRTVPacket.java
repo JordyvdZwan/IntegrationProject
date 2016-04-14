@@ -1,7 +1,5 @@
 package network;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 public class JRTVPacket {
 
@@ -31,33 +29,33 @@ public class JRTVPacket {
 	private boolean normal = false;
 	private boolean file = false;
 	private boolean broadcasted = false;
-	private boolean RSA = false;
+	private boolean rsa = false;
 	private boolean diffie = false;
 	
 
 	public String toString() {
 		String res = "";
-			res = res.concat("Addressing data:\n");
-			res = res.concat("Sequence number: " + seqnr + "\n");
-			res = res.concat("Acknowledgement number: " + acknr + "\n");
-			res = res.concat("Source Address: " + Router.getStringIP(source) + "\n");
-			res = res.concat("Destination Address: " + Router.getStringIP(destination) + "\n");
-			res = res.concat("Hash Payload Length: " + hashPayload + "\n");
-			res = res.concat("Payload Length: " + payloadLength + "\n");
-			res = res.concat("nextHop: " + Router.getStringIP(nextHop) + "\n");
-			res = res.concat("\n");
-			res = res.concat("Flaggs:\n");
-			res = res.concat("SYN: " + syn + "\n");
-			res = res.concat("ACK: " + ack + "\n");
-			res = res.concat("UPDATE: " + update + "\n");
-			res = res.concat("NORMAL: " + normal + "\n");
-			res = res.concat("FILE: " + file + "\n");
-			res = res.concat("BROADCASTED: " + broadcasted + "\n");
-			res = res.concat("\n");
-			res = res.concat("DATA: \n");
-			res = res.concat(new String(message));
-			res = res.concat("\n");
-			res = res.concat("Bytes\n");
+		res = res.concat("Addressing data:\n");
+		res = res.concat("Sequence number: " + seqnr + "\n");
+		res = res.concat("Acknowledgement number: " + acknr + "\n");
+		res = res.concat("Source Address: " + Router.getStringIP(source) + "\n");
+		res = res.concat("Destination Address: " + Router.getStringIP(destination) + "\n");
+		res = res.concat("Hash Payload Length: " + hashPayload + "\n");
+		res = res.concat("Payload Length: " + payloadLength + "\n");
+		res = res.concat("nextHop: " + Router.getStringIP(nextHop) + "\n");
+		res = res.concat("\n");
+		res = res.concat("Flaggs:\n");
+		res = res.concat("SYN: " + syn + "\n");
+		res = res.concat("ACK: " + ack + "\n");
+		res = res.concat("UPDATE: " + update + "\n");
+		res = res.concat("NORMAL: " + normal + "\n");
+		res = res.concat("FILE: " + file + "\n");
+		res = res.concat("BROADCASTED: " + broadcasted + "\n");
+		res = res.concat("\n");
+		res = res.concat("DATA: \n");
+		res = res.concat(new String(message));
+		res = res.concat("\n");
+		res = res.concat("Bytes\n");
 //			for (int i = 0; i < HEADERLENGTH + payloadLength; i++) {
 //				Integer j = (int) this.toByteArray()[i];
 //				res = res.concat(i + ": " + j.toString());
@@ -79,40 +77,50 @@ public class JRTVPacket {
 		byte[] header = new byte[HEADERLENGTH];
 		System.arraycopy(bytes, 0, header, 0, HEADERLENGTH);
 		
-		byte[] source = new byte[SOURCELENGTH];
-		System.arraycopy(bytes, 0, source, 0, SOURCELENGTH);
-		this.source = byteArrayToInt(source);
+		byte[] sender = new byte[SOURCELENGTH];
+		System.arraycopy(bytes, 0, sender, 0, SOURCELENGTH);
+		this.source = byteArrayToInt(sender);
 		
-		byte[] destination = new byte[DESTINATIONLENGTH];
-		System.arraycopy(bytes, SOURCELENGTH, destination, 0, DESTINATIONLENGTH);
-		this.destination = byteArrayToInt(destination);
+		byte[] receiver = new byte[DESTINATIONLENGTH];
+		System.arraycopy(bytes, SOURCELENGTH, receiver, 0, DESTINATIONLENGTH);
+		this.destination = byteArrayToInt(receiver);
 		
 		byte[] seq = new byte[SEQLENGTH];
 		System.arraycopy(bytes, SOURCELENGTH + DESTINATIONLENGTH, seq, 0, SEQLENGTH);
 		this.seqnr = byteArrayToInt(seq);
 		
-		byte[] ack = new byte[ACKLENGTH];
-		System.arraycopy(bytes, SOURCELENGTH + DESTINATIONLENGTH + SEQLENGTH , ack, 0, ACKLENGTH);
-		this.acknr = byteArrayToInt(ack);
+		byte[] acknowledgement = new byte[ACKLENGTH];
+		System.arraycopy(bytes, SOURCELENGTH + DESTINATIONLENGTH + SEQLENGTH, 
+														acknowledgement, 0, ACKLENGTH);
+		this.acknr = byteArrayToInt(acknowledgement);
 		
-		byte[] hashPayload = new byte[HASHPAYLOADLENGTH + 1];
-		System.arraycopy(bytes, SOURCELENGTH + DESTINATIONLENGTH + SEQLENGTH + ACKLENGTH, hashPayload, 1, HASHPAYLOADLENGTH);
-		this.hashPayload = byteArrayToInt(hashPayload);
+		byte[] hashpayload = new byte[HASHPAYLOADLENGTH + 1];
+		System.arraycopy(bytes, SOURCELENGTH + DESTINATIONLENGTH + SEQLENGTH + ACKLENGTH,
+																hashpayload, 1, HASHPAYLOADLENGTH);
+		this.hashPayload = byteArrayToInt(hashpayload);
 		
-		byte[] flags = new byte[FLAGSLENGTH];
-		System.arraycopy(bytes, SOURCELENGTH + DESTINATIONLENGTH + SEQLENGTH + ACKLENGTH + HASHPAYLOADLENGTH, flags, 0, FLAGSLENGTH);
-		setFlags(flags);
+		byte[] flgs = new byte[FLAGSLENGTH];
+		System.arraycopy(bytes,
+					 SOURCELENGTH + DESTINATIONLENGTH + SEQLENGTH + ACKLENGTH + HASHPAYLOADLENGTH,
+																			flgs, 0, FLAGSLENGTH);
+		setFlags(flgs);
 		
-		byte[] payloadLength = new byte[PAYLOADLENGTH];
-		System.arraycopy(bytes, SOURCELENGTH + DESTINATIONLENGTH + SEQLENGTH + ACKLENGTH + HASHPAYLOADLENGTH + FLAGSLENGTH, payloadLength, 0, PAYLOADLENGTH);
-		this.payloadLength = byteArrayToInt(payloadLength);
+		byte[] payloadlength = new byte[PAYLOADLENGTH];
+		System.arraycopy(bytes, 
+					 SOURCELENGTH + DESTINATIONLENGTH + SEQLENGTH
+					 						+ ACKLENGTH + HASHPAYLOADLENGTH + FLAGSLENGTH,
+					 											payloadlength, 0, PAYLOADLENGTH);
+		this.payloadLength = byteArrayToInt(payloadlength);
 		
 		message = new byte[this.payloadLength];
 		System.arraycopy(bytes, HEADERLENGTH, message, 0, this.payloadLength);
 		//
-		byte[] nextHop = new byte[NEXTHOPLENGTH];
-		System.arraycopy(bytes, SOURCELENGTH + DESTINATIONLENGTH + SEQLENGTH + ACKLENGTH + HASHPAYLOADLENGTH + FLAGSLENGTH + PAYLOADLENGTH, nextHop, 0, NEXTHOPLENGTH);
-		this.nextHop = byteArrayToInt(nextHop);
+		byte[] nexthop = new byte[NEXTHOPLENGTH];
+		System.arraycopy(bytes, 
+					 SOURCELENGTH + DESTINATIONLENGTH + SEQLENGTH + ACKLENGTH 
+					 			+ HASHPAYLOADLENGTH + FLAGSLENGTH + PAYLOADLENGTH, 
+					 												nexthop, 0, NEXTHOPLENGTH);
+		this.nextHop = byteArrayToInt(nexthop);
 	}
 	
 	public byte[] toByteArray() {
@@ -136,11 +144,11 @@ public class JRTVPacket {
 		result[10] = seq[2];
 		result[11] = seq[3];
 		
-		byte[] ack = intToByteArray(acknr);
-		result[12] = ack[0];
-		result[13] = ack[1];
-		result[14] = ack[2];
-		result[15] = ack[3];
+		byte[] acknowledgement = intToByteArray(acknr);
+		result[12] = acknowledgement[0];
+		result[13] = acknowledgement[1];
+		result[14] = acknowledgement[2];
+		result[15] = acknowledgement[3];
 		
 		byte[] hpayload = intToByteArray(hashPayload);
 		result[16] = hpayload[1];
@@ -149,17 +157,17 @@ public class JRTVPacket {
 		
 		result[19] = getByteFlags();
 		
-		byte[] payloadLength = intToByteArray(this.payloadLength);
-		result[20] = payloadLength[0];
-		result[21] = payloadLength[1];
-		result[22] = payloadLength[2];
-		result[23] = payloadLength[3];
+		byte[] payloadlength = intToByteArray(this.payloadLength);
+		result[20] = payloadlength[0];
+		result[21] = payloadlength[1];
+		result[22] = payloadlength[2];
+		result[23] = payloadlength[3];
 		
-		byte[] nextHop = intToByteArray(this.nextHop);
-		result[24] = nextHop[0];
-		result[25] = nextHop[1];
-		result[26] = nextHop[2];
-		result[27] = nextHop[3];
+		byte[] nexthop = intToByteArray(this.nextHop);
+		result[24] = nexthop[0];
+		result[25] = nexthop[1];
+		result[26] = nexthop[2];
+		result[27] = nexthop[3];
 		
 		System.arraycopy(message, 0, result, HEADERLENGTH, message.length);
 		return result;
@@ -201,7 +209,7 @@ public class JRTVPacket {
 			value -= 4;
 		}
 		if (value >= 2) {
-			RSA = true;
+			rsa = true;
 			value -= 2;
 		}
 		if (value >= 1) {
@@ -231,7 +239,7 @@ public class JRTVPacket {
 		if (broadcasted) {
 			value += 4;
 		}
-		if (RSA) {
+		if (rsa) {
 			value += 2;
 		}
 		if (diffie) {
@@ -258,11 +266,11 @@ public class JRTVPacket {
 	}
 	
 	public boolean isRSA() {
-		return RSA;
+		return rsa;
 	}
 
 	public void setRSA(boolean rSA) {
-		RSA = rSA;
+		rsa = rSA;
 	}
 
 	public boolean isDiffie() {
@@ -286,9 +294,9 @@ public class JRTVPacket {
 		return message;
 	}
 	
-	public void setByteMessage(byte[] message) {
-		this.message = message;
-		this.payloadLength = message.length;
+	public void setByteMessage(byte[] bericht) {
+		this.message = bericht;
+		this.payloadLength = bericht.length;
 	}
 
 	public Byte getFlags() {

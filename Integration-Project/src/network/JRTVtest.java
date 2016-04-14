@@ -10,12 +10,8 @@ public class JRTVtest {
 
 	@Before
 	public void setup() {
-		
-		byte[] bytes = {00000000, 00000000, 00000000, 00000000, 00000000, 00000000, 00000000, 00000000, 
-				00000000, 00000000, 00000000, 00000000, 00000000, 00000000, 00000000, 00000000, 
-				00000000, 00000000, 00000000, 00000000, 00000000};
 		packet = new JRTVPacket("Hello");
-		packet.setAcknr(500);
+	 	packet.setAcknr(500);
 		packet.setSeqnr(300);
 	}
 	

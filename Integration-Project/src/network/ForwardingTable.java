@@ -6,15 +6,15 @@ import application.Controller;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.net.InetAddress;
 
 public class ForwardingTable {
 	
 	/**
-	 * Map<Destination, Map<Nexthop, cost>>
+	 * Map<Destination, Map<Nexthop, cost>>.
 	 * stores all the destinations with the possible next hops
 	 */
-	Map<Integer, Map<Integer, Integer>> forwardingtable = new HashMap<Integer, Map<Integer, Integer>>();
+	Map<Integer, Map<Integer, Integer>> forwardingtable 
+									= new HashMap<Integer, Map<Integer, Integer>>();
 	
 	/**
 	 * Stores all the nexthops that are a valid option (i.e. sent an update recently).
@@ -24,7 +24,7 @@ public class ForwardingTable {
 	
 	
 	/**
-	 * Creates a new instance of forwardingtable
+	 * Creates a new instance of forwardingtable.
 	 * @param router the router class to which this forwardingtable is connected
 	 */
 	public ForwardingTable(Router router) {
@@ -32,7 +32,7 @@ public class ForwardingTable {
 	}
 	
 	/**
-	 * gives the forwardingtable
+	 * gives the forwardingtable.
 	 * @return the forwardingtable
 	 */
 	public synchronized Map<Integer, Map<Integer, Integer>> getTable() {
@@ -40,7 +40,8 @@ public class ForwardingTable {
 	}
 	
 	/**
-	 * Loops through all the possible nexthops to a destination, and determines the one with the least hops
+	 * Loops through all the possible nexthops to a destination
+	 * and determines the one with the least hops.
 	 * 
 	 * @param destination the destination to which should be routed
 	 * @return result the next hop with the least cost, to which the packet should be routed
@@ -53,12 +54,12 @@ public class ForwardingTable {
 		if (destination == Controller.multicastAddress) {
 			return Controller.multicastAddress;
 		} else {
-			if(forwardingtable.containsKey(destination)) {
+			if (forwardingtable.containsKey(destination)) {
 				Map<Integer, Integer> possibilities = forwardingtable.get(destination);
 //				System.out.println("Contains: " + destination);
 //				System.out.println("Amount of possibilities: " + possibilities.keySet().size());
-				for(Integer e: possibilities.keySet()) {
-					if(possibilities.get(e) <= resultcost) {
+				for (Integer e: possibilities.keySet()) {
+					if (possibilities.get(e) <= resultcost) {
 //						System.out.println("Contains: " + e + " With cost: " + possibilities.get(e));
 						result = e;
 						resultcost = possibilities.get(e);
@@ -72,8 +73,8 @@ public class ForwardingTable {
 	
 	public synchronized List<Integer> getPossibilities(Integer nexthop) {
 		List<Integer> result = new ArrayList<Integer>();
-		for(Integer i: forwardingtable.keySet()) {
-			if(forwardingtable.get(i).containsKey(nexthop)) {
+		for (Integer i: forwardingtable.keySet()) {
+			if (forwardingtable.get(i).containsKey(nexthop)) {
 				result.add(i);
 			}
 		}
@@ -83,13 +84,13 @@ public class ForwardingTable {
 	
 	public synchronized int getNextHopCost(Integer destination) {
 		//Loops through all the paths to the destination and selects the one with the lowest cost
-		Integer result = 100;
+//		Integer result = 100;
 		int resultcost = 100;
 		Map<Integer, Integer> possibilities = forwardingtable.get(destination);
 		
-		for(Integer e: possibilities.keySet()) {
-			if(possibilities.get(e) <= resultcost) {
-				result = e;
+		for (Integer e: possibilities.keySet()) {
+			if (possibilities.get(e) <= resultcost) {
+//				result = e;
 				resultcost = possibilities.get(e);
 			}
 		}
@@ -98,7 +99,7 @@ public class ForwardingTable {
 	
 	
 	/**
-	 * Puts a possible next hop into the forwardingtable at the right place
+	 * Puts a possible next hop into the forwardingtable at the right place.
 	 * 
 	 * @param destination the destination to which a packet can be sent
 	 * @param nexthop a possible next hop to this destination
@@ -115,7 +116,7 @@ public class ForwardingTable {
 	}
 	
 	/**
-	 * deletes a next hop to a destination from the forwardingtable
+	 * deletes a next hop to a destination from the forwardingtable.
 	 * 
 	 * @param destination the destination from which the next hop should be removed
 	 * @param nexthop the next hop that should be deleted
@@ -123,7 +124,7 @@ public class ForwardingTable {
 	public synchronized void removeNextHop(Integer destination, Integer nexthop) {
 		if (forwardingtable.containsKey(destination)) {
 			forwardingtable.get(destination).remove(nexthop);
-			if(forwardingtable.get(destination).size() == 0) {
+			if (forwardingtable.get(destination).size() == 0) {
 				forwardingtable.remove(destination);
 			}
 		}

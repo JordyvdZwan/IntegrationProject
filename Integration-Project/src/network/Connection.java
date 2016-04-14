@@ -3,7 +3,6 @@ package network;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.MulticastSocket;
-import java.net.SocketException;
 import java.net.InetAddress;
 import java.util.List;
 
@@ -27,7 +26,7 @@ public class Connection extends Thread {
 			InetAddress address = InetAddress.getByName(mcaddress);
 			socket = new MulticastSocket(portnumber);
 			socket.joinGroup(address);
-		} catch(IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		this.setDaemon(true);
@@ -37,7 +36,7 @@ public class Connection extends Thread {
 	//Tries to receive a new datagram, if it gets one, put it in the queue.
 	//TODO must stop if the rest of the program stops...
 	public void run() {
-		while(true) {
+		while (true) {
 			byte[] buffer = new byte[1000];
 			DatagramPacket recv = new DatagramPacket(buffer, buffer.length);
 			
@@ -51,11 +50,11 @@ public class Connection extends Thread {
 			if (p.isAck()) {
 				System.out.println("To: " + p.getDestination());
 				System.out.println("ACK: " + p.getAcknr());
-				System.out.println("+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+");
+				System.out.println("+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+");
 			} else if (p.isNormal()) {
 				System.out.println("To: " + p.getDestination());
 				System.out.println("SEQ: " + p.getSeqnr());
-				System.out.println("+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+");
+				System.out.println("+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+");
 			}
 			
 			
@@ -70,9 +69,9 @@ public class Connection extends Thread {
 	//Sends a datagrampacket coming from the client
 	public void send(DatagramPacket packet) {
 		try {
-			JRTVPacket p = new JRTVPacket(packet.getData());
-			if (!p.isUpdate()) {
-				
+//			JRTVPacket p = new JRTVPacket(packet.getData());
+//			if (!p.isUpdate()) {
+//				
 //			
 //				System.out.println("Received packet from " + recv.getAddress() + "with " + recv.getLength() +  " bytes of data");
 //				System.out.println("RECV Message: " + new JRTVPacket(recv.getData()).getMessage());==============================================================");
@@ -83,7 +82,7 @@ public class Connection extends Thread {
 //				System.out.println("SOURCE: " + Router.getStringIP(p.getSource()));//
 //				System.out.println("NextHop: " + Router.getStringIP(p.getNextHop()));
 //				System.out.println("=========^^^^^^^^^^^^^^^^^^^^^^^^^^^^^send============================================");
-			}
+//			}
 			socket.send(packet);
 		} catch (IOException e) {
 			

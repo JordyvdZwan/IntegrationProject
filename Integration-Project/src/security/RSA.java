@@ -7,25 +7,28 @@ import java.security.spec.EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import javax.crypto.Cipher;
 
-import org.apache.commons.codec.binary.Base64;
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 
 import network.Router;
 
 public class RSA {
 	
 	/**
-	 * Defining all finals
+	 * Defining all finals.
 	 * PublicKey
 	 * PrivateKey
 	 * 
 	 */
 	//READER FIXEN
-	public static final String ALGORITHM = "RSA";	
+	public static final String ALGORITHM = "RSA";
+	public static final int CORRECTION = 48;
 	
 	/**
-	 * Using native Java methods to encrypt the given text
+	 * Using native Java methods to encrypt the given text.
 	 * using RSA
 	 * @param text to sign/encrypt
 	 * @param key either private (for signing) or public (for encryption)
@@ -33,14 +36,19 @@ public class RSA {
 	 */
 	public static byte[] encrypt(String text, Key key) {
 	    byte[] cipherText = null;
-	    try {
-		    final Cipher cipher = Cipher.getInstance(ALGORITHM);
-		    cipher.init(Cipher.ENCRYPT_MODE, key);
-		    cipherText = cipher.doFinal(text.getBytes());
-	    } catch (Exception e) {
-	    	e.printStackTrace();
-	    }
-	return cipherText;
+	    Cipher cipher;
+		try {
+			cipher = Cipher.getInstance(ALGORITHM);
+			cipher.init(Cipher.ENCRYPT_MODE, key);
+			cipherText = cipher.doFinal(text.getBytes());
+		} catch (NoSuchAlgorithmException | 
+						NoSuchPaddingException | 
+						InvalidKeyException | 
+						IllegalBlockSizeException | 
+						BadPaddingException e) {
+			e.printStackTrace();
+		}
+		return cipherText;
 	}
 	
 	
@@ -50,7 +58,7 @@ public class RSA {
 		try {
 			m = MessageDigest.getInstance("MD5");
 			m.update(input, 0, input.length);
-			bi = new BigInteger(1,m.digest());
+			bi = new BigInteger(1, m.digest());
 		} catch (NoSuchAlgorithmException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -59,7 +67,7 @@ public class RSA {
 	}
 	  
 	/**
-	 * Using native Java methods to decrypt the given text
+	 * Using native Java methods to decrypt the given text.
 	 * using RSA
 	 * @param text to verify/decrypt
 	 * @param key either public (for verifying) or private (for decryption)
@@ -67,13 +75,18 @@ public class RSA {
 	 */
 	public static String decrypt(byte[] text, Key key) {
 	    byte[] dectyptedText = null;
-	    try {
-		    final Cipher cipher = Cipher.getInstance(ALGORITHM);
+		Cipher cipher;
+		try {
+			cipher = Cipher.getInstance(ALGORITHM);
 		    cipher.init(Cipher.DECRYPT_MODE, key);
 		    dectyptedText = cipher.doFinal(text);
-	    } catch (Exception ex) {
-	    	ex.printStackTrace();
-	    }
+		} catch (NoSuchAlgorithmException | 
+				NoSuchPaddingException | 
+				InvalidKeyException | 
+				IllegalBlockSizeException | 
+				BadPaddingException e) {
+			e.printStackTrace();
+		}
 	    return new String(dectyptedText);
 	}
 
@@ -81,15 +94,14 @@ public class RSA {
 	public static Key getPublicKey(int source) {
 		Key key = null;
 		try {
-			//System.out.println("Length: " + PUBLICKEY.toString().getBytes().length + "    " + PUBLICKEY.toString()); 
 			String file = "publickeys.txt";
-			int number = Router.getStringIP(source).charAt(Router.getStringIP(source).length() - 1) - 48;
+			int number
+			    = Router.getStringIP(source).charAt(
+			    			  Router.getStringIP(source).length() - 1) - CORRECTION;
 			
-			key = RSAInterperate.RSAInterperatePublicKey(number, file);
-		} catch (NumberFormatException e) {
-			//TODO error
-		} catch (IOException e) {
-			//TODO error
+			key = RSAInterperate.rsaInterperatePublicKey(number, file);
+		} catch (NumberFormatException | IOException e) {
+			e.printStackTrace();
 		}
 		return key;
 	}
@@ -98,10 +110,11 @@ public class RSA {
 		Key key = null;
 		try {
 			String file;
-			int number = Router.getStringIP(ip).charAt(Router.getStringIP(ip).length() - 1) - 48;
+			int number = Router.getStringIP(ip).charAt(
+							  Router.getStringIP(ip).length() - 1) - CORRECTION;
 			file = "privatekey" + number + ".txt";
 			
-			key =  RSAInterperate.RSAInterperatePrivateKey(number, file);
+			key =  RSAInterperate.rsaInterperatePrivateKey(number, file);
 		} catch (NumberFormatException e) {
 			//TODO error
 		} catch (IOException e) {

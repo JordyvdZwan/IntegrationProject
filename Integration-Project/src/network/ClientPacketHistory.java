@@ -9,7 +9,12 @@ public class ClientPacketHistory {
 	int destination;
 	int source;
 	
-	public ClientPacketHistory(int seq, int ack, int length, int destination, int source, boolean broadcasted) {
+	public ClientPacketHistory(int seq, 
+								int ack, 
+									int length, 
+										int destination, 
+											int source, 
+												boolean broadcasted) {
 		this.seq = seq;
 		this.ack = ack;
 		this.length = length;

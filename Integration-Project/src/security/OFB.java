@@ -5,26 +5,37 @@ import java.math.BigInteger;
 public class OFB {
 
 	private static final int BLOCKSIZE = 63;
-	private static final byte[] Oj =
-					new BigInteger("2983491237019287350983127509183275489273049832704918237409823170149873210498127304987123094872301948712039487012398470123980217464283746981982734691238756932814756934817165982735689473659827346598732496598723465983475692384795634876592873465983475079823475098740958613240985613208746098236508736409182364099283464869320").toByteArray();
+	private static final byte[] OJ =
+					new BigInteger("2983491237019287350983127509183"
+							+ "275489273049832704918237409823170149"
+							+ "8732104981273049871230948723019487120"
+							+ "3948701239847012398021746428374698198"
+							+ "2734691238756932814756934817165982735"
+							+ "6894736598273465987324965987234659834"
+							+ "7569238479563487659287346598347507982"
+							+ "3475098740958613240985613208746098236"
+							+ "508736409182364099283464869320").toByteArray();
 
 	
-	public static byte[] EnDecrypt(byte[] message, byte[] key) {
+	public static byte[] enDecrypt(byte[] message, byte[] key) {
 		/**
 		 * OFB
 		 */
-		int m = message.length; 				//Length of the message to encrypt.
-		byte[] result = new byte[m];			//Encrypted message in the form of a byte array
-		byte[][] blocks = new byte[(m/BLOCKSIZE) + 1][BLOCKSIZE];	//Array of the blocks used to encrypt.
+		//Length of the message to encrypt.
+		int m = message.length; 				
+		//Encrypted message in the form of a byte array
+		byte[] result = new byte[m];			
+		//Array of the blocks used to encrypt.
+		byte[][] blocks = new byte[(m / BLOCKSIZE) + 1][BLOCKSIZE];	
 				
 		/*
 		 * Create the blocks which are used to encrypt the message
 		 */
 		for (int i = 0; i < blocks.length; i++) {
 			if (i == 0) {
-				blocks[0] = xor(Oj, key);
+				blocks[0] = xor(OJ, key);
 			} else {
-				blocks[i] = xor(blocks[i-1], key);
+				blocks[i] = xor(blocks[i - 1], key);
 			}
 		}
 		
@@ -44,14 +55,14 @@ public class OFB {
 //		System.out.print("\n");
 		
 		
-		for(int i = 0; i < m; i += BLOCKSIZE) {
+		for (int i = 0; i < m; i += BLOCKSIZE) {
 			byte[] blocki = new byte[BLOCKSIZE];
 			/*
 			 * Normal case, BLOCKSIZE is smaller then the still to be encrypted message
 			 */
 			if ((message.length - i) / BLOCKSIZE >= 1.00) {
 				System.arraycopy(message, i, blocki, 0, BLOCKSIZE);
-				System.arraycopy(xor(blocki, blocks[i/BLOCKSIZE]), 0, result, i, BLOCKSIZE);
+				System.arraycopy(xor(blocki, blocks[i / BLOCKSIZE]), 0, result, i, BLOCKSIZE);
 			} else {
 				/*
 				 * Case in which the BLOCKSIZE is bigger then the still to be done message
@@ -62,9 +73,10 @@ public class OFB {
 					blocki[j] = message [j + i];
 					j++;
 				}				
-				System.out.println(blocks[i/BLOCKSIZE].length + "\t\t\t" + blocki.length);
+				System.out.println(blocks[i / BLOCKSIZE].length + "\t\t\t" + blocki.length);
 				
-				System.arraycopy(xor(blocki, blocks[i/BLOCKSIZE]), 0, result, i, result.length - i);
+				System.arraycopy(xor(blocki, blocks[i / BLOCKSIZE]),
+															0, result, i, result.length - i);
 			}
 		}
 		return result;
@@ -89,56 +101,16 @@ public class OFB {
 	 */
 	private static byte[] xor(byte[] a, byte[] b) {
 		int length;
-		if (a.length < b.length){
+		if (a.length < b.length) {
 			length = a.length;
 		} else {
 			length = b.length;
 		}
 		byte[] result = new byte[length];
 		for (int i = 0; i < length; i++) {
-			result[i] = (byte)((int)a[i] ^ (int)b[i]);
+			result[i] = (byte) ((int) a[i] ^ (int) b[i]);
 		}
 		return result;
 	}
 }
 	
-	
-//	
-//	
-//	
-//	
-//	
-//	
-//	
-//	
-//	
-//	/*
-//	 * MAIN to test some stuff
-//	 */
-//	public static void main(String[] args) {
-//		OFB hoi = new OFB();
-//		hoi.setKey(new byte[]{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0});
-//		
-//		System.out.println("Encrypt: \n{1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1}");
-//		byte[] result = hoi.EnDecrypt(new byte[]{1,1,1,0,1,1,1,0,0,0,0,0});
-//		System.out.print("{" );
-//		for (int i = 0; i < result.length; i++) {
-//			if (i != 0) {
-//				System.out.print(", ");
-//			}
-//		System.out.print(result[i]);
-//		}
-//		System.out.print("}\n");
-//	
-//		System.out.println("Decrypt:");
-//		byte[] retur = hoi.EnDecrypt(result);
-//		System.out.print("{" );
-//		for (int i = 0; i < retur.length; i++) {
-//			if (i != 0) {
-//				System.out.print(", ");
-//			}
-//		System.out.print(retur[i]);
-//		}
-//		System.out.print("}");
-//	}
-//}

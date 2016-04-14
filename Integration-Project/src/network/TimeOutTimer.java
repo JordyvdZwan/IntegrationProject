@@ -1,6 +1,5 @@
 package network;
 
-import java.util.HashMap;
 import java.util.Set;
 
 import application.Controller;
@@ -60,7 +59,7 @@ public class TimeOutTimer extends Thread {
 	
 	public void run() {
 		try {
-			this.sleep(timeout);
+			sleep(timeout);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -70,7 +69,8 @@ public class TimeOutTimer extends Thread {
 			Set<Integer> i = table.getController().getForwardingTable().keySet();
 			for (Integer integer : i) {
 //				System.out.println("Is it a valid address?" + (integer != table.getController().getLocalIAddress() && integer != table.getController().multicastAddress));
-				if (integer != table.getController().getLocalIAddress() && integer != table.getController().multicastAddress) {
+				if (integer != table.getController().getLocalIAddress() 
+									&& integer != table.getController().multicastAddress) {
 //					System.out.println("Is the packet received? : " + !table.isReceived(integer, packet.getSeqnr()));
 					if (!table.isReceived(integer, packet.getSeqnr())) {
 						System.out.println("++++++++++++++++++++++++++++++++++ before retransmission +++++++++++++++++++++++++++++++++++++++++++++++++++++");
@@ -101,7 +101,9 @@ public class TimeOutTimer extends Thread {
 				}
 			}
 		} else {
-			if (!table.isReceived(packet.getDestination(), packet.getSeqnr()) && table.getController().getForwardingTable().keySet().contains(packet.getDestination())) {
+			if (!table.isReceived(packet.getDestination(), packet.getSeqnr()) 
+					  && table.getController()
+					  		.getForwardingTable().keySet().contains(packet.getDestination())) {
 //				System.out.println("++++++++++++++++++++++++++++++++++ before s retransmission +++++++++++++++++++++++++++++++++++++++++++++++++++");
 //				System.out.println(this.packet.getMessage());
 //				System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");

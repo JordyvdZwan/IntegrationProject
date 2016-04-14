@@ -3,7 +3,6 @@ package network;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.security.Key;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,7 +11,6 @@ import java.util.List;
 
 import application.Controller;
 import security.CreateEncryptedSessionPacket;
-import security.RSA;
 
 
 public class Router {
@@ -25,7 +23,8 @@ public class Router {
 	private Controller controller;
 
 	/**
-	 * Class constructor which will store the given controller for acquiring data and transmitting data.
+	 * Class constructor which will store the given controller 
+	 * for acquiring data and transmitting data.
 	 * @param controller main controller which will be stored.
 	 */
 	public Router(Controller controller) {
@@ -39,10 +38,12 @@ public class Router {
 	/**
 	 * Map which maps addresses of clients to their corresponding encryption classes.
 	 */
-	private Map<Integer, CreateEncryptedSessionPacket> encryption = new HashMap<Integer, CreateEncryptedSessionPacket>();
+	private Map<Integer, CreateEncryptedSessionPacket> encryption 
+								= new HashMap<Integer, CreateEncryptedSessionPacket>();
 	
 	/**
-	 * Map which maps addresses to a boolean value which tells if a diffie packet has been send to a person.
+	 * Map which maps addresses to a boolean value which tells 
+	 * if a diffie packet has been send to a person.
 	 */
 	private Map<Integer, Boolean> diffiePacketOutstanding = new HashMap<Integer, Boolean>();
 	
@@ -52,16 +53,19 @@ public class Router {
 	private Map<Integer, Integer> sendDiffiePacketInt = new HashMap<Integer, Integer>();
 	
 	/**
-	 * This method creates and sends a diffie packet with the generated values from the CreateEncryptedSessionPacket class for setting up a secured connection.
+	 * This method creates and sends a diffie packet with the generated values 
+	 * from the CreateEncryptedSessionPacket class for setting up a secured connection.
 	 * It will send out the packet and add the encryption to the encryption map.
-	 * It also sets the diffiePacketOutstanding to true and the sendDiffiePacketint to the correct value.
+	 * It also sets the diffiePacketOutstanding to true 
+	 * and the sendDiffiePacketint to the correct value.
 	 * @param destination Address of the client with whom to set up a secured connection.
 	 */
 	public void setupDiffie(int destination) {
-		if (!diffiePacketOutstanding.containsKey(destination) || !diffiePacketOutstanding.get(destination)) {
+		if (!diffiePacketOutstanding.containsKey(destination) 
+										|| !diffiePacketOutstanding.get(destination)) {
 			//Creating encryption class and setting values that need to be added to the packet.
-			CreateEncryptedSessionPacket encryption = new CreateEncryptedSessionPacket();
-			BigInteger[] keys = encryption.keyDiffieHellmanFirst();
+			CreateEncryptedSessionPacket encryptie = new CreateEncryptedSessionPacket();
+			BigInteger[] keys = encryptie.keyDiffieHellmanFirst();
 			int length1 = keys[0].toByteArray().length;
 			int length2 = keys[1].toByteArray().length;
 			int length3 = keys[2].toByteArray().length;
@@ -110,7 +114,7 @@ public class Router {
 			System.arraycopy(two, 0, bytes, 16 + length1, length2);
 			System.arraycopy(three, 0, bytes, 16 + length1 + length2, length3);
 			
-			this.encryption.put(destination, encryption);
+			this.encryption.put(destination, encryptie);
 			this.diffiePacketOutstanding.put(destination, true);
 			this.sendDiffiePacketInt.put(destination, random);
 			
@@ -144,8 +148,10 @@ public class Router {
 	}
 	
 	/**
-	 * This method will respond to a diffie packet with a diffie/ack packet and store away the encryption for the source of the diffie packet.
-	 * It will only do this when the random integer in the diffiepacket is bigger than the one it has send itself.
+	 * This method will respond to a diffie packet with a diffie/ack packet 
+	 * and store away the encryption for the source of the diffie packet.
+	 * It will only do this when the random integer in the diffiepacket
+	 *  is bigger than the one it has send itself.
 	 * @param packet Received packet from a client, which wants to set up a secured connection.
 	 */
 	public void processDiffie(JRTVPacket packet) {
@@ -164,9 +170,12 @@ public class Router {
 			System.arraycopy(bytes, 0, randomb, 0, 4);
 			int random = byteArrayToInt(randomb);
 			
-			if (!(diffiePacketOutstanding.containsKey(packet.getSource()) && diffiePacketOutstanding.get(packet.getSource()))) { //TODO fix possible bug??
+			if (!(diffiePacketOutstanding.containsKey(packet.getSource())
+								&& diffiePacketOutstanding.get(packet.getSource()))) { //TODO fix possible bug??
 				sendDiffieResponse(bytes, packet);
-			} else if ((diffiePacketOutstanding.containsKey(packet.getSource()) && diffiePacketOutstanding.get(packet.getSource())) && sendDiffiePacketInt.get(packet.getSource()) <= random) {//Changeg the ==
+			} else if ((diffiePacketOutstanding.containsKey(packet.getSource()) 
+								&& diffiePacketOutstanding.get(packet.getSource())) 
+									&& sendDiffiePacketInt.get(packet.getSource()) <= random) {
 				sendDiffieResponse(bytes, packet);
 			}
 		}
@@ -199,9 +208,9 @@ public class Router {
 		numbers[2] = new BigInteger(number3);
 		
 		//Create encryption
-		CreateEncryptedSessionPacket encryption = new CreateEncryptedSessionPacket();
-		BigInteger reply = encryption.keyDiffieHellmanSecond(numbers);
-		this.encryption.put(packet.getSource(), encryption);
+		CreateEncryptedSessionPacket encryptie = new CreateEncryptedSessionPacket();
+		BigInteger reply = encryptie.keyDiffieHellmanSecond(numbers);
+		this.encryption.put(packet.getSource(), encryptie);
 		
 		JRTVPacket p = new JRTVPacket("");
 		p.setByteMessage(reply.toByteArray());
@@ -255,15 +264,18 @@ public class Router {
 				
 				for (int i = 0; i < integers.length; i++) {
 					byte[] b = new byte[4];
-					System.arraycopy(addresses, (i * 4), b, 0, 4);
+					System.arraycopy(addresses, i * 4, b, 0, 4);
 					integers[i] = byteArrayToInt(b);
 				}
 				List<Integer> accessableAddresses = new ArrayList<Integer>();
 				for (int i = 0; i < integers.length / 2; i++) {
 					accessableAddresses.add(integers[i * 2]);
-					if (integers[i * 2] != controller.getLocalIAddress() && integers[i * 2] != controller.multicastAddress && packet.getSource() != controller.getLocalIAddress()) {//TODO CHANGE THIS BACK
+					if (integers[i * 2] != controller.getLocalIAddress()
+								 && integers[i * 2] != controller.multicastAddress 
+										&& packet.getSource() != controller.getLocalIAddress()) {//TODO CHANGE THIS BACK
 						if (integers[(i * 2) + 1] < MAXINFINITY) {
-							table.addHop(integers[i * 2], packet.getSource(), integers[(i * 2) + 1] + 0);
+							table.addHop(integers[i * 2], 
+										 packet.getSource(), integers[(i * 2) + 1] + 0);
 						} else {
 							table.removeNextHop(integers[i * 2], packet.getSource());
 						}
@@ -289,13 +301,17 @@ public class Router {
 				String name = new String(nameBytes);
 				if (!name.equals("Anonymous")) {
 					if (addresstable.containsKey(packet.getSource())) {
-						if (addresstable.get(packet.getSource())!= null && !addresstable.get(packet.getSource()).equals("(" + getStringIP(packet.getSource()) + ") " + name)) {
+						if (addresstable.get(packet.getSource()) != null 
+							 		 && !addresstable.get(packet.getSource()).equals(
+											"(" + getStringIP(packet.getSource()) + ") " + name)) {
 							controller.removeRecipientToView(getName(packet.getSource()));
 							addresstable.remove(packet.getSource());
 						}
 					}
-					addresstable.put(packet.getSource(), "(" + getStringIP(packet.getSource()) + ") " + name);
-					controller.addRecipientToView("(" + getStringIP(packet.getSource()) + ") " + name);
+					addresstable.put(packet.getSource(),
+										"(" + getStringIP(packet.getSource()) + ") " + name);
+					controller.addRecipientToView(
+										"(" + getStringIP(packet.getSource()) + ") " + name);
 					//TODO name changing
 				}
 			}
@@ -320,8 +336,8 @@ public class Router {
 		if (client.equals("Anonymous")) {
 			result = Controller.multicastAddress;
 		} else { 
-			for(Integer e: addresstable.keySet()) {
-				if(addresstable.get(e).equals(client)) {
+			for (Integer e: addresstable.keySet()) {
+				if (addresstable.get(e).equals(client)) {
 					result = e;
 					break;
 				}
@@ -339,8 +355,8 @@ public class Router {
 	}
 	
 	public String getName(int address) {
-		if(!addresstable.containsKey(address)) {
-			return "Anonymous";//TODO
+		if (!addresstable.containsKey(address)) {
+			return "Anonymous"; //TODO
 		}
 		return addresstable.get(address);
 	}
@@ -355,10 +371,10 @@ public class Router {
 
 	static byte[] unpack(int bytes) {
 		return new byte[] {
-			(byte)((bytes >>> 24) & 0xff),
-			(byte)((bytes >>> 16) & 0xff),
-			(byte)((bytes >>>  8) & 0xff),
-			(byte)((bytes       ) & 0xff)
+			(byte) ((bytes >>> 24) & 0xff),
+			(byte) ((bytes >>> 16) & 0xff),
+			(byte) ((bytes >>>  8) & 0xff),
+			(byte) (bytes          & 0xff)
 		};
 	}
 	
@@ -379,7 +395,7 @@ public class Router {
 		return table;
 	}
 	
-	public Map<Integer,Map<Integer, Integer>> getTable() {
+	public Map<Integer, Map<Integer, Integer>> getTable() {
 		return table.getTable();
 	}
 

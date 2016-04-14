@@ -90,15 +90,18 @@ public class SeqAckTable {
 	public void registerSendPacket(JRTVPacket packet) {
 //		System.out.println("REGISTER PACKET:");
 		if (packet.isFile()) {
-			controller.getFileManager().registerSeqNr(packet.getSeqnr(), (new FilePacket(packet.getByteMessage()).getSequenceNumber()));
+			controller.getFileManager().registerSeqNr(packet.getSeqnr(),
+									new FilePacket(packet.getByteMessage()).getSequenceNumber());
 		}
 		if (packet.getDestination() == Controller.multicastAddress) {
 			for (Integer integer : controller.getForwardingTable().keySet()) {
-				if (integer != controller.getLocalIAddress() && integer != Controller.multicastAddress) {
+				if (integer != controller.getLocalIAddress() 
+													&& integer != Controller.multicastAddress) {
 					if (!send.containsKey(integer)) {
 						send.put(integer, new HashMap<Integer, Boolean>());
 					}
-					System.out.println("putting in: " + Router.getStringIP(integer) + " " + packet.getSeqnr());
+					System.out.println("putting in: " 
+										+ Router.getStringIP(integer) + " " + packet.getSeqnr());
 					send.get(integer).put(packet.getSeqnr(), false);
 				}
 			}

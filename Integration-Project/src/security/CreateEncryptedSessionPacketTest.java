@@ -12,7 +12,8 @@ public class CreateEncryptedSessionPacketTest {
 		JRTVPacket packet = new JRTVPacket("Hey There!");
 		System.out.println("input: " + packet.getMessage());
 		
-		JRTVPacket p = b.decrypt(a.encrypt(packet, RSA.getPrivateKey(-1062730494)), RSA.getPublicKey(-1062730494));
+		JRTVPacket p = b.decrypt(a.encrypt(packet, 
+						RSA.getPrivateKey(-1062730494)), RSA.getPublicKey(-1062730494));
 		
 		System.out.println("result: " + p.getMessage());
 	}
