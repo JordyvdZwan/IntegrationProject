@@ -48,15 +48,15 @@ public class Connection extends Thread {
 			}
 			
 			JRTVPacket p = new JRTVPacket(recv.getData());
-			if (p.isAck()) {
-				System.out.println("To: " + p.getDestination());
-				System.out.println("ACK: " + p.getAcknr());
-				System.out.println("+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+");
-			} else if (p.isNormal()) {
-				System.out.println("To: " + p.getDestination());
-				System.out.println("SEQ: " + p.getSeqnr());
-				System.out.println("+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+");
-			}
+//			if (p.isAck()) {
+//				System.out.println("To: " + p.getDestination());
+//				System.out.println("ACK: " + p.getAcknr());
+//				System.out.println("+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+");
+//			} else if (p.isNormal()) {
+//				System.out.println("To: " + p.getDestination());
+//				System.out.println("SEQ: " + p.getSeqnr());
+//				System.out.println("+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+");
+//			}
 			
 			
 			

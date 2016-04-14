@@ -246,6 +246,7 @@ public class Controller extends Thread {
 		for (int i = 0; i < outgoingEncryptionPackets.size(); i++) {
 			JRTVPacket packet = outgoingEncryptionPackets.get(i);
 			if (router.hasEncryptionKey(packet.getDestination())) {
+//				System.out.println("Sending encrypted message");
 //				System.out.println("======================== Before the encryption ==============================================");
 //				System.out.println(packet.getMessage());
 //				System.out.println("=============================================================================================");
@@ -254,7 +255,9 @@ public class Controller extends Thread {
 				sendPacket(packet);
 				break;
 			} else {
+//				System.out.println("router diffie added: " + (!router.isSettingUpDiffie(packet.getDestination()) && router.getForwardingTable().getTable().containsKey(packet.getDestination())));
 				if (!router.isSettingUpDiffie(packet.getDestination()) && router.getForwardingTable().getTable().containsKey(packet.getDestination())) {
+//					System.out.println("Sending diffie message");
 					router.setupDiffie(packet.getDestination());
 				}
 				break;
@@ -298,6 +301,7 @@ public class Controller extends Thread {
 	}	
 	
 	private void sendPacket(JRTVPacket packet) {
+//		System.out.println("Sending packet");
 		packet.setNextHop(router.getNextHop(packet.getDestination()));
 		DatagramPacket data = new DatagramPacket(packet.toByteArray(), packet.toByteArray().length, getMulticastIAddress(), 2000);
 		connection.send(data);
@@ -308,6 +312,7 @@ public class Controller extends Thread {
 	}
 	
 	public void retransmit(JRTVPacket packet, int destination) {
+//		System.out.println("Retransmitting 2");
 		packet.setSource(localIAddress);
 		packet.setDestination(destination);
 		
@@ -322,8 +327,10 @@ public class Controller extends Thread {
 		if (packet.getDestination() != multicastAddress && !packet.isDiffie() && !packet.isFile()) {
 			packet.setNextHop(router.getNextHop(packet.getDestination()));
 			outgoingEncryptionPackets.add(packet);
+//			System.out.println("Retransmitting encrypted");
 		} else {
 			//RSA Signing
+//			System.out.println("Retransmitting rsa signing");
 			byte[] first = packet.getByteMessage();
 			byte[] second = RSA.encrypt(new String(RSA.hash(first)), RSA.getPrivateKey(localIAddress));
 			byte[] message = new byte[first.length + second.length];

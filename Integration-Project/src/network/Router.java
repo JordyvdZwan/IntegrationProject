@@ -263,7 +263,7 @@ public class Router {
 					accessableAddresses.add(integers[i * 2]);
 					if (integers[i * 2] != controller.getLocalIAddress() && integers[i * 2] != controller.multicastAddress && packet.getSource() != controller.getLocalIAddress()) {//TODO CHANGE THIS BACK
 						if (integers[(i * 2) + 1] < MAXINFINITY) {
-							table.addHop(integers[i * 2], packet.getSource(), integers[(i * 2) + 1] + 0);
+							table.addHop(integers[i * 2], packet.getSource(), integers[(i * 2) + 1] + 1);
 						} else {
 							table.removeNextHop(integers[i * 2], packet.getSource());
 						}
@@ -298,6 +298,7 @@ public class Router {
 					controller.addRecipientToView("(" + getStringIP(packet.getSource()) + ") " + name);
 					//TODO name changing
 				}
+				System.out.println(table.getTable());
 			}
 		}
 //		System.out.println("=-------------------------------------------------------------------------------=");
